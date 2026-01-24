@@ -118,6 +118,51 @@ const UserManagement = () => {
         );
     };
 
+    const renderUserActions = (u) => {
+        if (u.role === 'superadmin') {
+            return <span className="protected-badge">🔒 Protected</span>;
+        }
+
+        return (
+            <>
+                {u.status === 'pending' && (
+                    <button
+                        className="btn-action btn-approve"
+                        onClick={() => handleApprove(u._id)}
+                        title="Approve User"
+                    >
+                        ✅
+                    </button>
+                )}
+                {u.status === 'approved' && (
+                    <button
+                        className="btn-action btn-pause"
+                        onClick={() => handlePause(u._id)}
+                        title="Pause User"
+                    >
+                        ⏸️
+                    </button>
+                )}
+                {u.status === 'paused' && (
+                    <button
+                        className="btn-action btn-approve"
+                        onClick={() => handleApprove(u._id)}
+                        title="Reactivate User"
+                    >
+                        ▶️
+                    </button>
+                )}
+                <button
+                    className="btn-action btn-delete"
+                    onClick={() => handleDelete(u._id)}
+                    title="Delete User"
+                >
+                    🗑️
+                </button>
+            </>
+        );
+    };
+
     if (loading) {
         return (
             <div className="loading-container">
@@ -137,12 +182,6 @@ const UserManagement = () => {
                 <div className="header-actions">
                     <button onClick={() => setShowCreateModal(true)} className="btn btn-primary">
                         ➕ Create User
-                    </button>
-                    <button onClick={() => navigate('/dashboard')} className="btn btn-secondary">
-                        🏠 Dashboard
-                    </button>
-                    <button onClick={handleLogout} className="btn btn-secondary">
-                        🚪 Logout
                     </button>
                 </div>
             </div>
@@ -207,7 +246,7 @@ const UserManagement = () => {
                 </button>
             </div>
 
-            {/* Users Table */}
+            {/* Users Table - Desktop */}
             <div className="users-table-container">
                 <table className="users-table">
                     <thead>
@@ -231,9 +270,7 @@ const UserManagement = () => {
                         ) : (
                             filteredUsers.map((u) => (
                                 <tr key={u._id}>
-                                    <td>
-                                        <strong>{u.name}</strong>
-                                    </td>
+                                    <td><strong>{u.name}</strong></td>
                                     <td>{u.email}</td>
                                     <td>{u.phone || '-'}</td>
                                     <td>{getRoleBadge(u.role)}</td>
@@ -241,47 +278,7 @@ const UserManagement = () => {
                                     <td>{new Date(u.createdAt).toLocaleDateString()}</td>
                                     <td>
                                         <div className="action-buttons">
-                                            {u.role !== 'superadmin' && (
-                                                <>
-                                                    {u.status === 'pending' && (
-                                                        <button
-                                                            className="btn-action btn-approve"
-                                                            onClick={() => handleApprove(u._id)}
-                                                            title="Approve User"
-                                                        >
-                                                            ✅
-                                                        </button>
-                                                    )}
-                                                    {u.status === 'approved' && (
-                                                        <button
-                                                            className="btn-action btn-pause"
-                                                            onClick={() => handlePause(u._id)}
-                                                            title="Pause User"
-                                                        >
-                                                            ⏸️
-                                                        </button>
-                                                    )}
-                                                    {u.status === 'paused' && (
-                                                        <button
-                                                            className="btn-action btn-approve"
-                                                            onClick={() => handleApprove(u._id)}
-                                                            title="Reactivate User"
-                                                        >
-                                                            ▶️
-                                                        </button>
-                                                    )}
-                                                    <button
-                                                        className="btn-action btn-delete"
-                                                        onClick={() => handleDelete(u._id)}
-                                                        title="Delete User"
-                                                    >
-                                                        🗑️
-                                                    </button>
-                                                </>
-                                            )}
-                                            {u.role === 'superadmin' && (
-                                                <span className="protected-badge">🔒 Protected</span>
-                                            )}
+                                            {renderUserActions(u)}
                                         </div>
                                     </td>
                                 </tr>
@@ -289,6 +286,49 @@ const UserManagement = () => {
                         )}
                     </tbody>
                 </table>
+            </div>
+
+            {/* Users Cards - Mobile */}
+            <div className="user-cards-mobile">
+                {filteredUsers.length === 0 ? (
+                    <div className="no-data" style={{ padding: '40px', textAlign: 'center' }}>
+                        No users found
+                    </div>
+                ) : (
+                    filteredUsers.map((u) => (
+                        <div key={u._id} className="user-card-mobile">
+                            <div className="user-card-header">
+                                <h3>{u.name}</h3>
+                                {getRoleBadge(u.role)}
+                            </div>
+
+                            <div className="user-card-info">
+                                <div className="user-card-info-row">
+                                    <span className="user-card-label">Email:</span>
+                                    <span className="user-card-value">{u.email}</span>
+                                </div>
+                                <div className="user-card-info-row">
+                                    <span className="user-card-label">Phone:</span>
+                                    <span className="user-card-value">{u.phone || '-'}</span>
+                                </div>
+                                <div className="user-card-info-row">
+                                    <span className="user-card-label">Status:</span>
+                                    <span className="user-card-value">{getStatusBadge(u.status)}</span>
+                                </div>
+                                <div className="user-card-info-row">
+                                    <span className="user-card-label">Registered:</span>
+                                    <span className="user-card-value">
+                                        {new Date(u.createdAt).toLocaleDateString()}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="user-card-actions">
+                                {renderUserActions(u)}
+                            </div>
+                        </div>
+                    ))
+                )}
             </div>
 
             {/* Create User Modal */}

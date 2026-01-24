@@ -3,7 +3,7 @@
    =========================== */
 
 .user-management-container {
-    padding: var(--spacing-xl);
+    padding: var(--spacing-lg);
     max-width: 1600px;
     margin: 0 auto;
     background: var(--light-gray);
@@ -129,6 +129,9 @@
     transition: all var(--transition-normal);
     color: var(--text-dark);
     font-size: 0.95rem;
+    flex: 1;
+    min-width: 120px;
+    text-align: center;
 }
 
 .filter-btn:hover {
@@ -242,6 +245,7 @@
     display: flex;
     gap: var(--spacing-sm);
     align-items: center;
+    flex-wrap: wrap;
 }
 
 .btn-action {
@@ -443,6 +447,7 @@
     gap: var(--spacing-md);
     justify-content: flex-end;
     margin-top: var(--spacing-xl);
+    flex-wrap: wrap;
 }
 
 /* Loading */
@@ -459,6 +464,70 @@
     animation: pulse 2s infinite;
 }
 
+/* Mobile Card View for Users */
+.user-cards-mobile {
+    display: none;
+}
+
+.user-card-mobile {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+    box-shadow: var(--shadow-md);
+    border-left: 4px solid var(--accent-green);
+}
+
+.user-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--spacing-md);
+    gap: var(--spacing-sm);
+}
+
+.user-card-header h3 {
+    font-size: 1.1rem;
+    color: var(--primary-dark-blue);
+    margin: 0;
+    flex: 1;
+}
+
+.user-card-info {
+    margin-bottom: var(--spacing-md);
+}
+
+.user-card-info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--spacing-sm) 0;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+.user-card-info-row:last-child {
+    border-bottom: none;
+}
+
+.user-card-label {
+    font-weight: 600;
+    color: var(--text-light);
+    font-size: 0.85rem;
+}
+
+.user-card-value {
+    color: var(--text-dark);
+    font-size: 0.9rem;
+    text-align: right;
+}
+
+.user-card-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: flex-end;
+    padding-top: var(--spacing-md);
+    border-top: 2px solid var(--light-gray);
+}
+
 /* Responsive */
 @media (max-width: 1200px) {
     .users-table-container {
@@ -472,16 +541,21 @@
 
 @media (max-width: 768px) {
     .user-management-container {
-        padding: var(--spacing-lg);
+        padding: var(--spacing-md);
     }
 
     .page-header {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: stretch;
+        padding: var(--spacing-lg);
     }
 
     .page-header h1 {
-        font-size: 2rem;
+        font-size: 1.8rem;
+    }
+
+    .page-header p {
+        font-size: 0.95rem;
     }
 
     .header-actions {
@@ -490,10 +564,19 @@
 
     .header-actions .btn {
         flex: 1;
+        font-size: 0.9rem;
+        padding: var(--spacing-sm) var(--spacing-md);
     }
 
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-md);
+    }
+
+    .stat-card {
+        padding: var(--spacing-md);
+        flex-direction: column;
+        text-align: center;
     }
 
     .stat-icon {
@@ -506,25 +589,105 @@
         font-size: 2rem;
     }
 
+    .stat-content p {
+        font-size: 0.9rem;
+    }
+
     .filter-section {
-        flex-direction: column;
+        padding: var(--spacing-md);
     }
 
     .filter-btn {
+        font-size: 0.85rem;
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+
+    /* Show mobile card view, hide table */
+    .users-table-container {
+        display: none;
+    }
+
+    .user-cards-mobile {
+        display: block;
+    }
+
+    .modal-content {
+        max-height: 85vh;
+    }
+
+    .modal-header h2 {
+        font-size: 1.4rem;
+    }
+
+    .modal-form {
+        padding: var(--spacing-lg);
+    }
+
+    .modal-actions {
+        flex-direction: column;
+    }
+
+    .modal-actions .btn {
         width: 100%;
     }
 }
 
 @media (max-width: 480px) {
+    .user-management-container {
+        padding: var(--spacing-sm);
+    }
+
+    .page-header {
+        padding: var(--spacing-md);
+    }
+
+    .page-header h1 {
+        font-size: 1.5rem;
+    }
+
     .stats-grid {
         grid-template-columns: 1fr;
     }
 
-    .modal-content {
-        margin: var(--spacing-md);
+    .stat-card {
+        flex-direction: row;
+        text-align: left;
     }
 
-    .modal-header h2 {
-        font-size: 1.4rem;
+    .stat-icon {
+        font-size: 2rem;
+        width: 60px;
+        height: 60px;
+    }
+
+    .stat-content h3 {
+        font-size: 1.8rem;
+    }
+
+    .filter-section {
+        gap: var(--spacing-sm);
+    }
+
+    .filter-btn {
+        min-width: auto;
+    }
+
+    .btn-action {
+        width: 42px;
+        height: 42px;
+        font-size: 1.3rem;
+    }
+
+    .modal-overlay {
+        padding: 0;
+    }
+
+    .modal-content {
+        border-radius: 0;
+        max-height: 100vh;
+    }
+
+    .modal-header {
+        border-radius: 0;
     }
 }

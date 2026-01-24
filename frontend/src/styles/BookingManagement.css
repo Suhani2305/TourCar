@@ -1,0 +1,302 @@
+/* Booking Management Styles */
+.booking-management-container {
+    padding: var(--spacing-lg);
+    max-width: 1600px;
+    margin: 0 auto;
+    background: var(--light-gray);
+    min-height: 100vh;
+}
+
+/* Super Admin Dual View Toggle */
+.view-mode-toggle {
+    display: flex;
+    gap: var(--spacing-sm);
+    background: var(--light-gray);
+    padding: var(--spacing-xs);
+    border-radius: var(--radius-lg);
+}
+
+.toggle-btn {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border: 2px solid transparent;
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--text-light);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    white-space: nowrap;
+}
+
+.toggle-btn:hover {
+    background: var(--white);
+    color: var(--primary-blue);
+}
+
+.toggle-btn.active {
+    background: var(--primary-blue);
+    color: var(--white);
+    border-color: var(--primary-blue);
+    box-shadow: var(--shadow-sm);
+}
+
+/* User Filter Dropdown */
+.user-filter {
+    margin-bottom: var(--spacing-lg);
+}
+
+.user-filter-select {
+    width: 100%;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    font-size: 1rem;
+    background: var(--white);
+    cursor: pointer;
+    transition: all var(--transition-normal);
+}
+
+.user-filter-select:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.user-filter-select:hover {
+    border-color: var(--primary-blue);
+}
+
+
+/* Stats Colors */
+.stat-pending {
+    border-left-color: var(--warning-orange);
+}
+
+.stat-confirmed {
+    border-left-color: var(--success-green);
+}
+
+.stat-completed {
+    border-left-color: var(--info-blue);
+}
+
+/* Bookings List */
+.bookings-list {
+    display: grid;
+    gap: var(--spacing-lg);
+}
+
+.booking-card {
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-normal);
+    border-left: 5px solid var(--accent-green);
+}
+
+.booking-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+
+.booking-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 2px solid var(--light-gray);
+}
+
+.booking-number {
+    display: flex;
+    flex-direction: column;
+}
+
+.booking-number .label {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    font-weight: 600;
+}
+
+.booking-number .value {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--primary-dark-blue);
+}
+
+.booking-card-body {
+    display: grid;
+    gap: var(--spacing-lg);
+}
+
+.booking-section h4 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--primary-dark-blue);
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.info-item .label {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    font-weight: 600;
+}
+
+.info-item .value {
+    font-size: 0.95rem;
+    color: var(--text-dark);
+    font-weight: 500;
+}
+
+.info-item .value.amount {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--success-green);
+}
+
+/* Date Range */
+.date-range {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+}
+
+.date-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.date-label {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    font-weight: 600;
+}
+
+.date-value {
+    font-size: 1rem;
+    color: var(--primary-dark-blue);
+    font-weight: 700;
+}
+
+.date-separator {
+    font-size: 1.5rem;
+    color: var(--accent-green);
+    font-weight: 700;
+}
+
+.duration-badge {
+    background: var(--gradient-accent);
+    color: var(--white);
+    padding: 6px 12px;
+    border-radius: var(--radius-md);
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+/* Actions */
+.booking-card-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    padding-top: var(--spacing-md);
+    border-top: 2px solid var(--light-gray);
+    flex-wrap: wrap;
+}
+
+.status-select {
+    flex: 1;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+}
+
+.status-select:focus {
+    outline: none;
+    border-color: var(--accent-green);
+}
+
+/* Form Sections */
+.form-section {
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-lg);
+    border-bottom: 2px solid var(--light-gray);
+}
+
+.form-section:last-of-type {
+    border-bottom: none;
+}
+
+.form-section h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary-dark-blue);
+    margin-bottom: var(--spacing-lg);
+}
+
+.badge-info {
+    background: rgba(52, 152, 219, 0.15);
+    color: var(--info-blue);
+    border: 2px solid var(--info-blue);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .booking-management-container {
+        padding: var(--spacing-md);
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .date-range {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .date-separator {
+        transform: rotate(90deg);
+    }
+
+    .booking-card-actions {
+        flex-direction: column;
+    }
+
+    .status-select,
+    .btn-edit,
+    .btn-delete {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .booking-card {
+        padding: var(--spacing-lg);
+    }
+
+    .booking-number .value {
+        font-size: 1.1rem;
+    }
+}

@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const jwt = require('jsonwebtoken');
 const { protect, authorize } = require('../middleware/auth');
+const { sendWelcomeEmail, sendUserApprovalEmail } = require('../utils/emailService');
 
 // Generate JWT Token
 const generateToken = (id) => {
@@ -45,9 +46,14 @@ router.post('/register', async (req, res) => {
             status: 'pending' // All new users need approval
         });
 
+        // Send welcome email
+        if (user.email) {
+            await sendWelcomeEmail(user);
+        }
+
         res.status(201).json({
             success: true,
-            message: 'Registration successful! Your account is pending approval by Super Admin.',
+            message: 'Registration successful! Your account is pending approval.',
             user: {
                 id: user._id,
                 name: user.name,
@@ -235,6 +241,28 @@ router.get('/users', protect, authorize('superadmin'), async (req, res) => {
     }
 });
 
+// @route   GET /api/auth/users/list
+// @desc    Get simplified user list for filtering (Super Admin only)
+// @access  Private/Super Admin
+router.get('/users/list', protect, authorize('superadmin'), async (req, res) => {
+    try {
+        const users = await User.find({ status: 'approved' })
+            .select('name email role')
+            .sort({ name: 1 });
+
+        res.status(200).json({
+            success: true,
+            count: users.length,
+            users
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching user list'
+        });
+    }
+});
+
 // @route   PUT /api/auth/users/:id/approve
 // @desc    Approve user (Super Admin only)
 // @access  Private/Super Admin
@@ -253,6 +281,11 @@ router.put('/users/:id/approve', protect, authorize('superadmin'), async (req, r
         user.approvedBy = req.user._id;
         user.approvedAt = Date.now();
         await user.save();
+
+        // Send approval email
+        if (user.email) {
+            await sendUserApprovalEmail(user);
+        }
 
         res.status(200).json({
             success: true,

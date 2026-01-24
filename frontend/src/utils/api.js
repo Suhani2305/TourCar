@@ -30,10 +30,33 @@ export const authAPI = {
     login: (data) => api.post('/auth/login', data),
     getMe: () => api.get('/auth/me'),
     getAllUsers: () => api.get('/auth/users'),
+    getUsersList: () => api.get('/auth/users/list'), // For super admin filtering
     createUser: (data) => api.post('/auth/create-user', data),
     approveUser: (id) => api.put(`/auth/users/${id}/approve`),
     pauseUser: (id) => api.put(`/auth/users/${id}/pause`),
     deleteUser: (id) => api.delete(`/auth/users/${id}`)
+};
+
+// Vehicle API calls
+export const vehicleAPI = {
+    getAll: (params) => api.get('/vehicles', { params }),
+    getById: (id) => api.get(`/vehicles/${id}`),
+    create: (data) => api.post('/vehicles', data),
+    update: (id, data) => api.put(`/vehicles/${id}`, data),
+    delete: (id) => api.delete(`/vehicles/${id}`),
+    getStats: () => api.get('/vehicles/stats/summary')
+};
+
+// Booking API calls
+export const bookingAPI = {
+    getAll: (params) => api.get('/bookings', { params }),
+    getById: (id) => api.get(`/bookings/${id}`),
+    create: (data) => api.post('/bookings', data),
+    update: (id, data) => api.put(`/bookings/${id}`, data),
+    delete: (id) => api.delete(`/bookings/${id}`),
+    updateStatus: (id, status) => api.put(`/bookings/${id}/status`, { status }),
+    getStats: () => api.get('/bookings/stats/summary'),
+    getDashboardStats: () => api.get('/bookings/stats/dashboard') // Dashboard statistics
 };
 
 export default api;
