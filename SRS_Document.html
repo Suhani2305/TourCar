@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Software Requirements Specification - Smart Tour & Travel Vehicle Booking Management System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-dark-blue: #1a2332;
+            --secondary-blue: #2c3e50;
+            --light-gray: #ecf0f1;
+            --accent-green: #27ae60;
+            --text-dark: #2c3e50;
+            --text-light: #7f8c8d;
+            --white: #ffffff;
+            --border-color: #bdc3c7;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: var(--light-gray);
+        }
+
+        .page-container {
+            max-width: 210mm;
+            margin: 20px auto;
+            background: var(--white);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .page {
+            padding: 25mm 20mm;
+            min-height: 297mm;
+        }
+
+        /* Header Styles */
+        .document-header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 4px solid var(--primary-dark-blue);
+            margin-bottom: 40px;
+            background: linear-gradient(135deg, var(--primary-dark-blue) 0%, var(--secondary-blue) 100%);
+            color: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(26, 35, 50, 0.2);
+        }
+
+        .document-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .document-header .subtitle {
+            font-size: 16px;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+
+        /* Section Styles */
+        .section {
+            margin-bottom: 35px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary-dark-blue);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--accent-green);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-subtitle {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--secondary-blue);
+            margin: 20px 0 12px 0;
+            padding-left: 15px;
+            border-left: 4px solid var(--accent-green);
+        }
+
+        .section-content {
+            font-size: 14px;
+            color: var(--text-dark);
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        /* Icon Styles */
+        .icon {
+            width: 28px;
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--accent-green);
+            border-radius: 6px;
+            color: var(--white);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        thead {
+            background: linear-gradient(135deg, var(--primary-dark-blue) 0%, var(--secondary-blue) 100%);
+            color: var(--white);
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 13px;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        tbody tr:hover {
+            background-color: rgba(39, 174, 96, 0.05);
+            transition: background-color 0.3s ease;
+        }
+
+        /* List Styles */
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        /* Feature Box */
+        .feature-box {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .feature-item {
+            background: linear-gradient(135deg, #f8f9fa 0%, var(--light-gray) 100%);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-green);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.2);
+        }
+
+        .feature-item::before {
+            content: "✓";
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background: var(--accent-green);
+            color: var(--white);
+            border-radius: 50%;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        /* Module Icons */
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .module-card {
+            background: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .module-card:hover {
+            border-color: var(--accent-green);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(39, 174, 96, 0.15);
+        }
+
+        .module-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 15px;
+            background: linear-gradient(135deg, var(--primary-dark-blue) 0%, var(--secondary-blue) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 28px;
+        }
+
+        .module-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary-dark-blue);
+        }
+
+        /* Alert Boxes */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid;
+            font-size: 13px;
+        }
+
+        .alert-info {
+            background: #e8f4f8;
+            border-color: #2980b9;
+            color: #2c3e50;
+        }
+
+        /* Database Schema */
+        .schema-box {
+            background: #f8f9fa;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        .schema-title {
+            font-weight: 700;
+            color: var(--primary-dark-blue);
+            margin-bottom: 8px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Page Break for Print */
+        @media print {
+            .page-break {
+                page-break-before: always;
+            }
+            
+            .page-container {
+                box-shadow: none;
+                margin: 0;
+            }
+        }
+
+        /* Numbered Sections */
+        .numbered-section {
+            counter-reset: subsection;
+        }
+
+        .numbered-subsection::before {
+            counter-increment: subsection;
+            content: counter(subsection) ". ";
+            font-weight: 700;
+            color: var(--accent-green);
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <div class="page">
+            <!-- Document Header -->
+            <div class="document-header">
+                <h1>📘 SOFTWARE REQUIREMENTS SPECIFICATION (SRS)</h1>
+                <div class="subtitle">Smart Tour & Travel Vehicle Booking Management System</div>
+            </div>
+
+            <!-- 1. Introduction -->
+            <div class="section">
+                <h2 class="section-title"><span class="icon">1</span>Introduction</h2>
+                
+                <h3 class="section-subtitle">1.1 Purpose</h3>
+                <p class="section-content">
+                    Is system ka purpose tour & travel operators ke vehicle bookings ko digital platform par manage karna hai. 
+                    Ye system manual diary-based booking ko replace karega aur double booking, missed bookings, aur time conflicts ki problem solve karega.
+                </p>
+
+                <h3 class="section-subtitle">1.2 Scope</h3>
+                <p class="section-content">
+                    System vehicle-wise, date-wise aur time-wise booking manage karega. 
+                    Ye automatic conflict detection, search facility, calendar view, and 48-hour advance notification provide karega via Email, WhatsApp, Calendar, and Website alerts.
+                </p>
+
+                <h3 class="section-subtitle">1.3 Intended Users</h3>
+                <ul>
+                    <li><strong>Super Admin (Owner)</strong></li>
+                    <li><strong>Admin (Office booking staff)</strong></li>
+                </ul>
+            </div>
+
+            <!-- 2. Overall Description -->
+            <div class="section">
+                <h2 class="section-title"><span class="icon">2</span>Overall Description</h2>
+                
+                <h3 class="section-subtitle">2.1 Product Perspective</h3>
+                <p class="section-content">
+                    System ek web-based application hoga jo desktop aur mobile browser dono par accessible hoga. 
+                    Database me vehicles, bookings aur notifications ka record store hoga.
+                </p>
+
+                <h3 class="section-subtitle">2.2 User Classes</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Super Admin</td>
+                            <td>Full system control, manage admins & vehicles</td>
+                        </tr>
+                        <tr>
+                            <td>Admin</td>
+                            <td>Add/manage bookings and view notifications</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 class="section-subtitle">2.3 Operating Environment</h3>
+                <ul>
+                    <li>Web Browser (Chrome, Edge, Mobile Browser)</li>
+                    <li>Internet Connection</li>
+                    <li>Cloud / Local Server</li>
+                </ul>
+            </div>
+
+            <!-- Page Break -->
+            <div class="page-break"></div>
+
+            <!-- 3. Functional Requirements - User Flow -->
+            <div class="section">
+                <h2 class="section-title"><span class="icon">3</span>Functional Requirements</h2>
+
+                <!-- User Registration & Login Module -->
+                <h3 class="section-subtitle">🔐 FR1 – User Registration & Login</h3>
+                <div class="module-grid">
+                    <div class="module-card">
+                        <div class="module-icon">👤</div>
+                        <div class="module-title">User Login</div>
+                    </div>
+                    <div class="module-card">
+                        <div class="module-icon">🔑</div>
+                        <div class="module-title">Authentication</div>
+                    </div>
+                    <div class="module-card">
+                        <div class="module-icon">🛡️</div>
+                        <div class="module-title">Role-Based Access</div>
+                    </div>
+                </div>
+                <p class="section-content">
+                    System login page provide karega with role-based access control hoga.
+                </p>
+
+                <!-- Dashboard Module -->
+                <h3 class="section-subtitle">📊 FR2 – Dashboard</h3>
+                <div class="module-grid">
+                    <div class="module-card">
+                        <div class="module-icon">📅</div>
+                        <div class="module-title">Today's Bookings</div>
+                    </div>
+                    <div class="module-card">
+                        <div class="module-icon">🚗</div>
+                        <div class="module-title">Available Vehicles</div>
+                    </div>
+                    <div class="module-card">
+                        <div class="module-icon">🔔</div>
+                        <div class="module-title">Upcoming Alerts</div>
+                    </div>
+                </div>
+                <p class="section-content">
+                    Dashboard me today's bookings, available vehicles aur upcoming booking alerts display honge.
+                </p>
+
+                <!-- Vehicle Management -->
+                <h3 class="section-subtitle">🚙 FR3 – Vehicle Management</h3>
+                <p class="section-content">
+                    Super Admin/Admin vehicles add, edit, delete kar sakte hain.<br>
+                    <strong>Vehicle details:</strong> Number, Type, Status
+                </p>
+
+                <!-- Booking Management -->
+                <h3 class="section-subtitle">📝 FR4 – Booking Management</h3>
+                <div class="module-grid">
+                    <div class="module-card">
+                        <div class="module-icon">➕</div>
+                        <div class="module-title">Add Booking</div>
+                    </div>
+                    <div class="module-card">
+                        <div class="module-icon">✏️</div>
+                        <div class="module-title">Edit Booking</div>
+                    </div>
+                    <div class="module-card">
+                        <div class="module-icon">❌</div>
+                        <div class="module-title">Cancel Booking</div>
+                    </div>
+                </div>
+                <p class="section-content">
+                    Admin booking add karega.<br>
+                    <strong>Required fields:</strong> Customer Name, Vehicle, Date, Start Time, End Time, Pickup, Drop
+                </p>
+
+                <!-- Conflict Detection -->
+                <h3 class="section-subtitle">⚠️ FR5 – Conflict Detection</h3>
+                <div class="alert alert-info">
+                    <strong>Important:</strong> Same vehicle + same date + overlapping time booking allowed nahi hogi. 
+                    System warning message show karega.
+                </div>
+
+                <!-- Calendar View -->
+                <h3 class="section-subtitle">📆 FR6 – Calendar View</h3>
+                <div class="module-grid">
+                    <div class="module-card">
+                        <div class="module-icon">📅</div>
+                        <div class="module-title">Calendar View</div>
+                    </div>
+                    <div class="module-card">
+                        <div class="module-icon">🔍</div>
+                        <div class="module-title">Date Selection</div>
+                    </div>
+                </div>
+                <p class="section-content">
+                    Date select karne par us date ki all bookings display hongi.
+                </p>
+
+                <!-- Search Function -->
+                <h3 class="section-subtitle">🔎 FR7 – Search Function</h3>
+                <p class="section-content">
+                    Booking search by date, vehicle number, or customer name.
+                </p>
+
+                <!-- Notification System -->
+                <h3 class="section-subtitle">🔔 FR8 – Notification System</h3>
+                <div class="module-grid">
+                    <div class="module-card">
+                        <div class="module-icon">📧</div>
+                        <div class="module-title">Email Alerts</div>
+                    </div>
+                    <div class="module-card">
+                        <div class="module-icon">💬</div>
+                        <div class="module-title">WhatsApp</div>
+                    </div>
+                    <div class="module-card">
+                        <div class="module-icon">🌐</div>
+                        <div class="module-title">Website Notification</div>
+                    </div>
+                    <div class="module-card">
+                        <div class="module-icon">📅</div>
+                        <div class="module-title">Calendar Event</div>
+                    </div>
+                </div>
+                <p class="section-content">
+                    Booking save hone par 48-hour prior reminder schedule hoga.<br>
+                    <strong>Reminder via:</strong> Email (Gmail), WhatsApp, Website Notification, Google Calendar Event
+                </p>
+
+                <!-- Reports -->
+                <h3 class="section-subtitle">📊 FR9 – Reports</h3>
+                <ul>
+                    <li>Monthly booking summary</li>
+                    <li>Vehicle usage report</li>
+                </ul>
+            </div>
+
+            <!-- Page Break -->
+            <div class="page-break"></div>
+
+            <!-- 4. Non-Functional Requirements -->
+            <div class="section">
+                <h2 class="section-title"><span class="icon">4</span>Non-Functional Requirements</h2>
+
+                <h3 class="section-subtitle">NFR1 – Usability</h3>
+                <p class="section-content">
+                    System simple and user-friendly hoga, non-technical staff easily use kar sake.
+                </p>
+
+                <h3 class="section-subtitle">NFR2 – Performance</h3>
+                <p class="section-content">
+                    System 100+ bookings per day smoothly handle karega.
+                </p>
+
+                <h3 class="section-subtitle">NFR3 – Security</h3>
+                <ul>
+                    <li>Password encryption</li>
+                    <li>Role-based access</li>
+                    <li>Secure database storage</li>
+                </ul>
+
+                <h3 class="section-subtitle">NFR4 – Reliability</h3>
+                <p class="section-content">
+                    System double booking kabhi allow nahi karega.
+                </p>
+
+                <h3 class="section-subtitle">NFR5 – Responsiveness</h3>
+                <p class="section-content">
+                    Website desktop aur mobile dono par properly work karegi.
+                </p>
+            </div>
+
+            <!-- 5. System Features -->
+            <div class="section">
+                <h2 class="section-title"><span class="icon">5</span>System Features</h2>
+                <div class="feature-box">
+                    <div class="feature-item">Vehicle-wise booking management</div>
+                    <div class="feature-item">Time-slot conflict prevention</div>
+                    <div class="feature-item">Calendar-based booking view</div>
+                    <div class="feature-item">Instant search</div>
+                    <div class="feature-item">Auto reminders</div>
+                    <div class="feature-item">Email & WhatsApp alerts</div>
+                    <div class="feature-item">Website notification panel</div>
+                </div>
+            </div>
+
+            <!-- 6. External Interface Requirements -->
+            <div class="section">
+                <h2 class="section-title"><span class="icon">6</span>External Interface Requirements</h2>
+
+                <h3 class="section-subtitle">User Interface</h3>
+                <ul>
+                    <li>Login Page</li>
+                    <li>Dashboard</li>
+                    <li>Add Vehicle Page</li>
+                    <li>Add Booking Form</li>
+                    <li>Calendar Page</li>
+                    <li>Search Page</li>
+                    <li>Notification Bell Icon</li>
+                </ul>
+
+                <h3 class="section-subtitle">Hardware Interface</h3>
+                <ul>
+                    <li>Any PC / Smartphone</li>
+                </ul>
+
+                <h3 class="section-subtitle">Software Interface</h3>
+                <ul>
+                    <li>Web Browser</li>
+                    <li>Email Service</li>
+                    <li>WhatsApp API</li>
+                    <li>Google Calendar</li>
+                </ul>
+            </div>
+
+            <!-- Page Break -->
+            <div class="page-break"></div>
+
+            <!-- 7. Database Requirements -->
+            <div class="section">
+                <h2 class="section-title"><span class="icon">7</span>Database Requirements</h2>
+                
+                <h3 class="section-subtitle">Tables</h3>
+
+                <div class="schema-box">
+                    <div class="schema-title">Users:</div>
+                    (id, name, email, password, role)
+                </div>
+
+                <div class="schema-box">
+                    <div class="schema-title">Vehicles:</div>
+                    (id, vehicle_number, type, status)
+                </div>
+
+                <div class="schema-box">
+                    <div class="schema-title">Bookings:</div>
+                    (id, vehicle_id, customer_name, date, start_time, end_time, pickup, drop)
+                </div>
+
+                <div class="schema-box">
+                    <div class="schema-title">Reminders:</div>
+                    (id, booking_id, reminder_time, status)
+                </div>
+
+                <div class="schema-box">
+                    <div class="schema-title">Notifications:</div>
+                    (id, message, is_seen, created_at)
+                </div>
+            </div>
+
+            <!-- 8. Future Enhancements -->
+            <div class="section">
+                <h2 class="section-title"><span class="icon">8</span>Future Enhancements</h2>
+                <ul>
+                    <li>Driver assignment</li>
+                    <li>Payment integration</li>
+                    <li>Customer SMS confirmation</li>
+                    <li>GPS live tracking</li>
+                </ul>
+            </div>
+
+            <!-- 9. Conclusion -->
+            <div class="section">
+                <h2 class="section-title"><span class="icon">9</span>Conclusion</h2>
+                <p class="section-content">
+                    This system will modernize tour & travel booking management by replacing manual registers with a smart automated platform 
+                    that prevents double bookings, ensures timely reminders, and improves business efficiency.
+                </p>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>
