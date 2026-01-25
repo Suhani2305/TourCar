@@ -27,6 +27,9 @@ api.interceptors.request.use(
 // Auth API calls
 export const authAPI = {
     register: (data) => api.post('/auth/register', data),
+    sendOTP: (data) => api.post('/auth/send-otp', data), // New OTP flow
+    verifyOTP: (data) => api.post('/auth/verify-otp', data), // Verify OTP
+    resendOTP: (email) => api.post('/auth/resend-otp', { email }), // Resend OTP
     login: (data) => api.post('/auth/login', data),
     getMe: () => api.get('/auth/me'),
     getAllUsers: () => api.get('/auth/users'),
@@ -56,7 +59,12 @@ export const bookingAPI = {
     delete: (id) => api.delete(`/bookings/${id}`),
     updateStatus: (id, status) => api.put(`/bookings/${id}/status`, { status }),
     getStats: () => api.get('/bookings/stats/summary'),
-    getDashboardStats: () => api.get('/bookings/stats/dashboard') // Dashboard statistics
+    getDashboardStats: () => api.get('/bookings/stats/dashboard'), // Dashboard statistics
+    getCalendarBookings: (params) => api.get('/bookings/calendar', { params }), // Calendar view
+    getAllUsers: () => api.get('/auth/users'), // Get all users for filtering
+    getRevenueReport: (params) => api.get('/reports/revenue', { params }), // Revenue report
+    getBookingAnalytics: (params) => api.get('/reports/booking-analytics', { params }), // Booking analytics
+    getVehicleUtilization: (params) => api.get('/reports/vehicle-utilization', { params }) // Vehicle utilization
 };
 
 export default api;

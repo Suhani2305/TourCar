@@ -43,6 +43,22 @@ const Navbar = () => {
                     </button>
 
                     <button
+                        className={`nav-link ${isActive('/calendar')}`}
+                        onClick={() => navigate('/calendar')}
+                    >
+                        <span className="nav-icon">📆</span>
+                        <span className="nav-text">Calendar</span>
+                    </button>
+
+                    <button
+                        className={`nav-link ${isActive('/reports')}`}
+                        onClick={() => navigate('/reports')}
+                    >
+                        <span className="nav-icon">📊</span>
+                        <span className="nav-text">Reports</span>
+                    </button>
+
+                    <button
                         className={`nav-link ${isActive('/vehicles')}`}
                         onClick={() => navigate('/vehicles')}
                     >

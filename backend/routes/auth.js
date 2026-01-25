@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
+const OTP = require('../models/OTP');
 const jwt = require('jsonwebtoken');
 const { protect, authorize } = require('../middleware/auth');
-const { sendWelcomeEmail, sendUserApprovalEmail } = require('../utils/emailService');
+const { sendWelcomeEmail, sendUserApprovalEmail, sendOTPEmail } = require('../utils/emailService');
 
 // Generate JWT Token
 const generateToken = (id) => {
@@ -12,8 +13,231 @@ const generateToken = (id) => {
     });
 };
 
+// @route   POST /api/auth/send-otp
+// @desc    Send OTP to email for registration
+// @access  Public
+router.post('/send-otp', async (req, res) => {
+    try {
+        const { name, email, password, phone, role } = req.body;
+
+        // Validation
+        if (!name || !email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please provide name, email and password'
+            });
+        }
+
+        // Check if user already exists
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({
+                success: false,
+                message: 'User with this email already exists'
+            });
+        }
+
+        // Check for recent OTP request (rate limiting - 1 per minute)
+        const recentOTP = await OTP.findOne({
+            email,
+            createdAt: { $gte: new Date(Date.now() - 60 * 1000) }
+        });
+
+        if (recentOTP) {
+            return res.status(429).json({
+                success: false,
+                message: 'Please wait 1 minute before requesting another OTP'
+            });
+        }
+
+        // Generate 6-digit OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+        // Delete any existing OTP for this email
+        await OTP.deleteMany({ email });
+
+        // Create OTP record (will be hashed by pre-save hook)
+        await OTP.create({
+            email,
+            otp,
+            name,
+            phone,
+            password,
+            role: role || 'user'
+        });
+
+        // Send OTP email
+        await sendOTPEmail(email, otp, name);
+
+        res.status(200).json({
+            success: true,
+            message: 'OTP sent to your email. Please verify within 10 minutes.'
+        });
+    } catch (error) {
+        console.error('Send OTP error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error sending OTP',
+            error: error.message
+        });
+    }
+});
+
+// @route   POST /api/auth/verify-otp
+// @desc    Verify OTP and create user
+// @access  Public
+router.post('/verify-otp', async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+
+        if (!email || !otp) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please provide email and OTP'
+            });
+        }
+
+        // Find OTP record
+        const otpRecord = await OTP.findOne({ email });
+
+        if (!otpRecord) {
+            return res.status(400).json({
+                success: false,
+                message: 'OTP not found or expired'
+            });
+        }
+
+        // Check if OTP is expired
+        if (otpRecord.expiresAt < new Date()) {
+            await OTP.deleteOne({ email });
+            return res.status(400).json({
+                success: false,
+                message: 'OTP has expired. Please request a new one.'
+            });
+        }
+
+        // Check attempts
+        if (otpRecord.attempts >= 3) {
+            await OTP.deleteOne({ email });
+            return res.status(400).json({
+                success: false,
+                message: 'Maximum verification attempts exceeded. Please request a new OTP.'
+            });
+        }
+
+        // Verify OTP
+        const isMatch = await otpRecord.compareOTP(otp);
+
+        if (!isMatch) {
+            otpRecord.attempts += 1;
+            await otpRecord.save();
+            return res.status(400).json({
+                success: false,
+                message: `Invalid OTP. ${3 - otpRecord.attempts} attempts remaining.`
+            });
+        }
+
+        // OTP verified - create user
+        const user = await User.create({
+            name: otpRecord.name,
+            email: otpRecord.email,
+            password: otpRecord.password,
+            phone: otpRecord.phone,
+            role: otpRecord.role,
+            status: 'pending' // Still needs admin approval
+        });
+
+        // Delete OTP record
+        await OTP.deleteOne({ email });
+
+        // Send welcome email
+        if (user.email) {
+            await sendWelcomeEmail(user);
+        }
+
+        res.status(201).json({
+            success: true,
+            message: 'Email verified successfully! Your account is pending approval.',
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                status: user.status
+            }
+        });
+    } catch (error) {
+        console.error('Verify OTP error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error verifying OTP',
+            error: error.message
+        });
+    }
+});
+
+// @route   POST /api/auth/resend-otp
+// @desc    Resend OTP
+// @access  Public
+router.post('/resend-otp', async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        if (!email) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please provide email'
+            });
+        }
+
+        // Find existing OTP record
+        const otpRecord = await OTP.findOne({ email });
+
+        if (!otpRecord) {
+            return res.status(400).json({
+                success: false,
+                message: 'No OTP request found for this email'
+            });
+        }
+
+        // Rate limiting - allow resend only after 1 minute
+        const timeSinceCreation = Date.now() - otpRecord.createdAt.getTime();
+        if (timeSinceCreation < 60 * 1000) {
+            return res.status(429).json({
+                success: false,
+                message: 'Please wait before requesting another OTP'
+            });
+        }
+
+        // Generate new OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+        // Update OTP record
+        otpRecord.otp = otp; // Will be hashed by pre-save hook
+        otpRecord.attempts = 0;
+        otpRecord.expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+        otpRecord.createdAt = new Date();
+        await otpRecord.save();
+
+        // Send OTP email
+        await sendOTPEmail(email, otp, otpRecord.name);
+
+        res.status(200).json({
+            success: true,
+            message: 'New OTP sent to your email'
+        });
+    } catch (error) {
+        console.error('Resend OTP error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error resending OTP',
+            error: error.message
+        });
+    }
+});
+
 // @route   POST /api/auth/register
-// @desc    Register new user
+// @desc    Register new user (OLD - kept for backward compatibility)
 // @access  Public
 router.post('/register', async (req, res) => {
     try {

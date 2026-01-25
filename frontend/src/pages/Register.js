@@ -42,14 +42,23 @@ const Register = () => {
 
         try {
             const { confirmPassword, ...registerData } = formData;
-            const response = await register(registerData);
 
-            toast.success(response.message || 'Registration successful! Waiting for Super Admin approval.');
+            // Send OTP instead of direct registration
+            const response = await register(registerData, true); // true = send OTP mode
+
+            toast.success('OTP sent to your email! Please verify.');
+
+            // Navigate to OTP verification page with email and name
             setTimeout(() => {
-                navigate('/login');
-            }, 2000);
+                navigate('/verify-otp', {
+                    state: {
+                        email: formData.email,
+                        name: formData.name
+                    }
+                });
+            }, 1000);
         } catch (error) {
-            const message = error.response?.data?.message || 'Registration failed. Please try again.';
+            const message = error.response?.data?.message || 'Failed to send OTP. Please try again.';
             toast.error(message);
         } finally {
             setLoading(false);

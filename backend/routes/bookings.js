@@ -84,6 +84,55 @@ router.get('/', protect, async (req, res) => {
     }
 });
 
+// @route   GET /api/bookings/calendar
+// @desc    Get bookings for calendar view
+// @access  Private
+router.get('/calendar', protect, async (req, res) => {
+    try {
+        const { startDate, endDate, viewMode, userId } = req.query;
+
+        let query = {};
+
+        // Role-based filtering
+        if (req.user.role !== 'superadmin') {
+            query.createdBy = req.user._id;
+        } else {
+            // Super admin logic
+            if (viewMode === 'all' && userId) {
+                query.createdBy = userId;
+            } else if (viewMode === 'my') {
+                query.createdBy = req.user._id;
+            }
+            // If viewMode === 'all' and no userId, fetch all bookings
+        }
+
+        // Date range filter
+        if (startDate && endDate) {
+            query.pickupDate = {
+                $gte: new Date(startDate),
+                $lte: new Date(endDate)
+            };
+        }
+
+        const bookings = await Booking.find(query)
+            .populate('vehicle', 'vehicleNumber type')
+            .populate('createdBy', 'name email')
+            .sort({ pickupDate: 1 });
+
+        res.status(200).json({
+            success: true,
+            bookings
+        });
+    } catch (error) {
+        console.error('Error fetching calendar bookings:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching calendar bookings',
+            error: error.message
+        });
+    }
+});
+
 // @route   GET /api/bookings/stats/summary
 // @desc    Get booking statistics
 // @access  Private

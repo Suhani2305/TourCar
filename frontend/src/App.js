@@ -9,15 +9,18 @@ import Navbar from './components/Navbar';
 // Pages
 import Login from './pages/Login';
 import Register from './pages/Register';
+import OTPVerification from './pages/OTPVerification';
 import Dashboard from './pages/Dashboard';
 import UserManagement from './pages/UserManagement';
 import VehicleManagement from './pages/VehicleManagement';
 import BookingManagement from './pages/BookingManagement';
+import CalendarView from './pages/CalendarView';
+import Reports from './pages/Reports';
 
 // Layout wrapper to conditionally show Navbar
 const Layout = ({ children }) => {
     const location = useLocation();
-    const showNavbar = !['/login', '/register'].includes(location.pathname);
+    const showNavbar = !['/login', '/register', '/verify-otp'].includes(location.pathname);
 
     return (
         <>
@@ -37,6 +40,7 @@ function App() {
                             {/* Public Routes */}
                             <Route path="/login" element={<Login />} />
                             <Route path="/register" element={<Register />} />
+                            <Route path="/verify-otp" element={<OTPVerification />} />
 
                             {/* Protected Routes */}
                             <Route
@@ -74,6 +78,26 @@ function App() {
                                 element={
                                     <ProtectedRoute>
                                         <BookingManagement />
+                                    </ProtectedRoute>
+                                }
+                            />
+
+                            {/* Calendar View */}
+                            <Route
+                                path="/calendar"
+                                element={
+                                    <ProtectedRoute>
+                                        <CalendarView />
+                                    </ProtectedRoute>
+                                }
+                            />
+
+                            {/* Reports */}
+                            <Route
+                                path="/reports"
+                                element={
+                                    <ProtectedRoute>
+                                        <Reports />
                                     </ProtectedRoute>
                                 }
                             />

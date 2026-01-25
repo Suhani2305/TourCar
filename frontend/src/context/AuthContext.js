@@ -45,9 +45,16 @@ export const AuthProvider = ({ children }) => {
         return response.data;
     };
 
-    const register = async (userData) => {
-        const response = await authAPI.register(userData);
-        return response.data;
+    const register = async (userData, sendOTP = false) => {
+        if (sendOTP) {
+            // New OTP-based registration
+            const response = await authAPI.sendOTP(userData);
+            return response.data;
+        } else {
+            // Old direct registration (backward compatibility)
+            const response = await authAPI.register(userData);
+            return response.data;
+        }
     };
 
     const logout = () => {
