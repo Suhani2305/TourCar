@@ -1,0 +1,97 @@
+/* ===========================
+   GLOBAL COLOR PALETTE
+   Professional Color Scheme
+   =========================== */
+
+:root {
+    /* Primary Colors */
+    --smoky-black: #11120D;
+    --olive-drab: #565449;
+    --bone: #D8CFBC;
+    --floral-white: #FFFBF4;
+
+    /* Semantic Colors for UI States */
+    --primary-dark: #11120D;
+    --primary-medium: #565449;
+    --primary-light: #D8CFBC;
+    --primary-lightest: #FFFBF4;
+
+    /* Status Colors */
+    --success: #2ecc71;
+    --warning: #f39c12;
+    --danger: #e74c3c;
+    --info: #3498db;
+
+    /* Gradients */
+    --gradient-dark: linear-gradient(135deg, #11120D 0%, #565449 100%);
+    --gradient-light: linear-gradient(135deg, #D8CFBC 0%, #FFFBF4 100%);
+    --gradient-accent: linear-gradient(135deg, #565449 0%, #11120D 100%);
+
+    /* Shadows */
+    --shadow-sm: 0 2px 4px rgba(17, 18, 13, 0.1);
+    --shadow-md: 0 4px 6px rgba(17, 18, 13, 0.15);
+    --shadow-lg: 0 8px 16px rgba(17, 18, 13, 0.2);
+    --shadow-xl: 0 12px 24px rgba(17, 18, 13, 0.25);
+
+    /* Text Colors */
+    --text-primary: #11120D;
+    --text-secondary: #565449;
+    --text-light: #D8CFBC;
+    --text-white: #FFFBF4;
+
+    /* Border Colors */
+    --border-dark: #11120D;
+    --border-medium: #565449;
+    --border-light: #D8CFBC;
+
+    /* Background Colors */
+    --bg-dark: #11120D;
+    --bg-medium: #565449;
+    --bg-light: #D8CFBC;
+    --bg-lightest: #FFFBF4;
+
+    /* Opacity Variations */
+    --overlay-dark: rgba(17, 18, 13, 0.8);
+    --overlay-medium: rgba(86, 84, 73, 0.8);
+    --overlay-light: rgba(216, 207, 188, 0.8);
+}
+
+/* Dark Theme Support (Future) */
+[data-theme="dark"] {
+    --bg-lightest: #11120D;
+    --bg-light: #565449;
+    --text-primary: #FFFBF4;
+    --text-secondary: #D8CFBC;
+}
+
+/* Global Resets with Color Palette */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-lightest);
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-light);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-medium);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-dark);
+}

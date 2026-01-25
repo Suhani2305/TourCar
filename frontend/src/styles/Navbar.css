@@ -1,37 +1,44 @@
 /* ===========================
-   RESPONSIVE NAVBAR CSS
-   Tour Management System
+   PROFESSIONAL RESPONSIVE NAVBAR
+   Fixed Height, Sticky, Hamburger <1100px
    =========================== */
 
-/* ===========================
-   BASE STYLES (Desktop)
-   =========================== */
-
+/* Fixed Navbar */
 .navbar {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    position: sticky;
+    position: fixed;
     top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 70px;
+    background: linear-gradient(135deg, #11120D 0%, #565449 100%);
+    box-shadow: 0 4px 12px rgba(17, 18, 13, 0.3);
     z-index: 1000;
+    display: flex;
+    align-items: center;
 }
 
 .navbar-container {
-    max-width: 1600px;
+    max-width: 1200px;
+    width: 100%;
+    height: 100%;
     margin: 0 auto;
-    padding: 1rem 2rem;
+    padding: 0 1.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 1.5rem;
+    gap: 1rem;
 }
 
 /* Brand */
 .navbar-brand {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.625rem;
     cursor: pointer;
     transition: transform 0.2s ease;
+    flex-shrink: 0;
+    z-index: 1001;
 }
 
 .navbar-brand:hover {
@@ -39,20 +46,57 @@
 }
 
 .brand-icon {
-    font-size: 2rem;
+    font-size: 1.875rem;
+    line-height: 1;
 }
 
 .brand-text {
-    font-size: 1.3rem;
+    font-size: 1.125rem;
     font-weight: 700;
     color: white;
     white-space: nowrap;
 }
 
-/* Navigation Links */
+/* Hamburger - Show below 1100px */
+.hamburger-btn {
+    display: none;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 32px;
+    height: 28px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 1001;
+}
+
+.hamburger-btn span {
+    width: 100%;
+    height: 3px;
+    background: white;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+    transform-origin: center;
+}
+
+.hamburger-btn.active span:nth-child(1) {
+    transform: rotate(45deg) translateY(9px);
+}
+
+.hamburger-btn.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger-btn.active span:nth-child(3) {
+    transform: rotate(-45deg) translateY(-9px);
+}
+
+/* Navigation Links - Desktop */
 .navbar-links {
     display: flex;
-    gap: 0.75rem;
+    gap: 0.5rem;
+    align-items: center;
     flex: 1;
     justify-content: center;
 }
@@ -61,36 +105,38 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.625rem 1.25rem;
+    padding: 0.625rem 1.125rem;
     background: rgba(255, 255, 255, 0.1);
     border: 2px solid transparent;
-    border-radius: 0.75rem;
+    border-radius: 0.5rem;
     color: white;
     font-weight: 600;
-    font-size: 0.95rem;
     cursor: pointer;
     transition: all 0.3s ease;
-    text-decoration: none;
     white-space: nowrap;
+    font-size: 0.9375rem;
 }
 
 .nav-link:hover {
     background: rgba(255, 255, 255, 0.2);
     transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.3);
 }
 
 .nav-link.active {
     background: white;
-    color: #667eea;
+    color: #11120D;
     border-color: #2ecc71;
 }
 
 .nav-icon {
-    font-size: 1.2rem;
+    font-size: 1.25rem;
+    line-height: 1;
 }
 
 .nav-text {
-    font-size: 0.95rem;
+    font-size: 0.9375rem;
+    line-height: 1;
 }
 
 /* User Section */
@@ -98,167 +144,148 @@
     display: flex;
     align-items: center;
     gap: 1rem;
+    flex-shrink: 0;
 }
 
 .user-info {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 2px;
+    gap: 0.125rem;
 }
 
 .user-name {
     color: white;
     font-weight: 700;
-    font-size: 0.95rem;
+    font-size: 0.9375rem;
     white-space: nowrap;
+    line-height: 1.2;
 }
 
 .user-role {
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.8125rem;
     font-weight: 600;
     white-space: nowrap;
+    line-height: 1;
 }
 
 .logout-btn {
-    padding: 0.625rem 1.25rem;
-    background: rgba(231, 76, 60, 0.9);
-    border: none;
-    border-radius: 0.5rem;
+    background: rgba(231, 76, 60, 0.95);
     color: white;
+    border: none;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.5rem;
     font-weight: 700;
-    font-size: 0.9rem;
     cursor: pointer;
     transition: all 0.3s ease;
     white-space: nowrap;
+    font-size: 0.9375rem;
 }
 
 .logout-btn:hover {
-    background: #e74c3c;
+    background: #c0392b;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 10px rgba(231, 76, 60, 0.5);
 }
 
 /* ===========================
-   TABLET VIEW (577px - 992px)
+   BREAKPOINT: 1200px
    =========================== */
-
-@media (max-width: 992px) and (min-width: 577px) {
+@media screen and (max-width: 1200px) {
     .navbar-container {
-        padding: 0.875rem 1.5rem;
-        gap: 1rem;
-    }
-
-    .brand-text {
-        font-size: 1.2rem;
-    }
-
-    .brand-icon {
-        font-size: 1.75rem;
+        padding: 0 1.25rem;
     }
 
     .navbar-links {
-        gap: 0.5rem;
+        gap: 0.375rem;
     }
 
     .nav-link {
-        padding: 0.5rem 1rem;
-        font-size: 0.9rem;
+        padding: 0.5625rem 1rem;
+        font-size: 0.875rem;
+    }
+
+    .nav-icon {
+        font-size: 1.125rem;
     }
 
     .nav-text {
-        font-size: 0.9rem;
-    }
-
-    .user-name {
-        font-size: 0.9rem;
-    }
-
-    .user-role {
-        font-size: 0.75rem;
-    }
-
-    .logout-btn {
-        padding: 0.5rem 1rem;
-        font-size: 0.85rem;
+        font-size: 0.875rem;
     }
 }
 
 /* ===========================
-   MOBILE VIEW (max 576px)
+   BREAKPOINT: 1100px - HAMBURGER
    =========================== */
-
-@media (max-width: 576px) {
-    .navbar-container {
-        flex-wrap: wrap;
-        padding: 0.75rem 1rem;
-        gap: 0.75rem;
+@media screen and (max-width: 1100px) {
+    .navbar {
+        height: 65px;
     }
 
-    /* Brand - Left */
-    .navbar-brand {
-        order: 1;
-        flex: 1;
+    .hamburger-btn {
+        display: flex;
     }
 
-    .brand-text {
-        font-size: 1.1rem;
-    }
-
-    .brand-icon {
-        font-size: 1.5rem;
-    }
-
-    /* User Section - Right */
-    .navbar-user {
-        order: 2;
+    .navbar-links {
+        position: fixed;
+        top: 0;
+        left: -300px;
+        width: 280px;
+        height: 100vh;
+        background: linear-gradient(135deg, #11120D 0%, #565449 100%);
+        flex-direction: column;
         gap: 0.5rem;
+        padding: 5.5rem 1.5rem 2rem;
+        transition: left 0.3s ease;
+        overflow-y: auto;
+        box-shadow: 6px 0 15px rgba(0, 0, 0, 0.4);
+        justify-content: flex-start;
     }
 
-    /* Hide user info text on mobile */
+    .navbar-links.mobile-active {
+        left: 0;
+    }
+
+    .nav-link {
+        width: 100%;
+        justify-content: flex-start;
+        padding: 0.875rem 1.125rem;
+        font-size: 1rem;
+    }
+
+    .nav-icon {
+        font-size: 1.375rem;
+    }
+
+    .nav-text {
+        font-size: 1rem;
+    }
+
     .user-info {
         display: none;
     }
 
-    .logout-btn {
-        padding: 0.5rem 0.875rem;
-        font-size: 0.85rem;
-    }
-
-    /* Navigation Links - Bottom (Full Width) */
-    .navbar-links {
-        order: 3;
-        width: 100%;
-        justify-content: space-around;
-        margin-top: 0.5rem;
-        gap: 0.5rem;
-    }
-
-    .nav-link {
-        flex: 1;
-        justify-content: center;
-        padding: 0.625rem 0.5rem;
-        min-width: 0;
-    }
-
-    /* Hide text, show only icons on mobile */
-    .nav-text {
-        display: none;
-    }
-
-    .nav-icon {
-        font-size: 1.4rem;
+    /* Overlay */
+    .navbar-links.mobile-active::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 280px;
+        width: calc(100vw - 280px);
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: -1;
+        backdrop-filter: blur(2px);
     }
 }
 
 /* ===========================
-   EXTRA SMALL MOBILE (max 400px)
+   BREAKPOINT: 1024px
    =========================== */
-
-@media (max-width: 400px) {
+@media screen and (max-width: 1024px) {
     .navbar-container {
-        padding: 0.625rem 0.75rem;
+        padding: 0 1rem;
     }
 
     .brand-text {
@@ -266,32 +293,100 @@
     }
 
     .brand-icon {
-        font-size: 1.3rem;
-    }
-
-    .logout-btn {
-        padding: 0.5rem 0.625rem;
-        font-size: 0.8rem;
-    }
-
-    .nav-link {
-        padding: 0.5rem 0.375rem;
-    }
-
-    .nav-icon {
-        font-size: 1.3rem;
+        font-size: 1.75rem;
     }
 }
 
 /* ===========================
-   PREVENT HORIZONTAL SCROLL
+   BREAKPOINT: 768px
    =========================== */
+@media screen and (max-width: 768px) {
+    .navbar {
+        height: 60px;
+    }
 
-.navbar * {
-    box-sizing: border-box;
+    .navbar-container {
+        padding: 0 0.875rem;
+    }
+
+    .brand-text {
+        font-size: 0.9375rem;
+    }
+
+    .brand-icon {
+        font-size: 1.625rem;
+    }
+
+    .navbar-links {
+        width: 260px;
+        left: -260px;
+        padding: 5rem 1.25rem 2rem;
+    }
+
+    .navbar-links.mobile-active::before {
+        left: 260px;
+        width: calc(100vw - 260px);
+    }
+
+    .logout-btn {
+        padding: 0.5625rem 1.125rem;
+        font-size: 0.875rem;
+    }
 }
 
-.navbar {
-    width: 100%;
-    overflow-x: hidden;
+/* ===========================
+   BREAKPOINT: 640px
+   =========================== */
+@media screen and (max-width: 640px) {
+    .navbar-container {
+        padding: 0 0.75rem;
+    }
+
+    .brand-text {
+        font-size: 0.875rem;
+    }
+
+    .brand-icon {
+        font-size: 1.5rem;
+    }
+
+    .navbar-links {
+        width: 240px;
+        left: -240px;
+    }
+
+    .navbar-links.mobile-active::before {
+        left: 240px;
+        width: calc(100vw - 240px);
+    }
+
+    .logout-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.8125rem;
+    }
+}
+
+/* Smooth scrolling for mobile menu */
+.navbar-links {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+.navbar-links::-webkit-scrollbar {
+    width: 5px;
+}
+
+.navbar-links::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.navbar-links::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+/* Prevent body scroll when menu open */
+body.menu-open {
+    overflow: hidden;
 }

@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
+import './styles/App.css'; // Import app-wide layout
 
 // Pages
 import Login from './pages/Login';
@@ -17,16 +18,18 @@ import BookingManagement from './pages/BookingManagement';
 import CalendarView from './pages/CalendarView';
 import Reports from './pages/Reports';
 
-// Layout wrapper to conditionally show Navbar
+// Layout wrapper with proper structure
 const Layout = ({ children }) => {
     const location = useLocation();
     const showNavbar = !['/login', '/register', '/verify-otp'].includes(location.pathname);
 
     return (
-        <>
+        <div className="app-wrapper">
             {showNavbar && <Navbar />}
-            {children}
-        </>
+            <div className={showNavbar ? "app-content" : ""}>
+                {children}
+            </div>
+        </div>
     );
 };
 

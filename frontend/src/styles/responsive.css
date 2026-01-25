@@ -1,0 +1,509 @@
+/* ===========================
+   GLOBAL RESPONSIVE UTILITIES
+   Tour Management System
+   =========================== */
+
+/* Reset and Base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: #D8CFBC;
+    color: #11120D;
+    line-height: 1.6;
+    overflow-x: hidden;
+    /* Prevent horizontal scroll */
+    width: 100%;
+    max-width: 100vw;
+}
+
+/* Prevent horizontal overflow */
+.container,
+[class*="-container"] {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* ===========================
+   RESPONSIVE GRID SYSTEM
+   =========================== */
+
+/* 4 columns on desktop */
+.grid-4-col {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+}
+
+/* 3 columns variant */
+.grid-3-col {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+/* 2 columns variant */
+.grid-2-col {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+/* Auto-fit responsive grid */
+.grid-auto-fit {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+/* ===========================
+   TABLET BREAKPOINT (1024px)
+   =========================== */
+@media screen and (max-width: 1024px) {
+
+    /* 4-col becomes 2-col */
+    .grid-4-col {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+    }
+
+    /* 3-col becomes 2-col */
+    .grid-3-col {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+    }
+
+    /* Auto-fit with smaller minmax */
+    .grid-auto-fit {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.25rem;
+    }
+}
+
+/* ===========================
+   MOBILE BREAKPOINT (768px)
+   =========================== */
+@media screen and (max-width: 768px) {
+    html {
+        font-size: 15px;
+    }
+
+    /* All grids become 1 column */
+    .grid-4-col,
+    .grid-3-col,
+    .grid-2-col {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .grid-auto-fit {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
+
+/* ===========================
+   RESPONSIVE CONTAINERS
+   =========================== */
+
+.page-container {
+    padding: 2rem;
+    max-width: 100%;
+    width: 100%;
+}
+
+@media screen and (max-width: 1024px) {
+    .page-container {
+        padding: 1.5rem;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .page-container {
+        padding: 1rem;
+    }
+}
+
+/* ===========================
+   RESPONSIVE CARDS
+   =========================== */
+
+.card {
+    background: #FFFBF4;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(17, 18, 13, 0.1);
+    transition: all 0.3s ease;
+    width: 100%;
+    max-width: 100%;
+}
+
+.card:hover {
+    box-shadow: 0 8px 16px rgba(17, 18, 13, 0.15);
+    transform: translateY(-3px);
+}
+
+@media screen and (max-width: 768px) {
+    .card {
+        padding: 1.25rem;
+        border-radius: 0.625rem;
+    }
+}
+
+/* ===========================
+   RESPONSIVE TABLES
+   =========================== */
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 1rem 0;
+}
+
+.responsive-table {
+    width: 100%;
+    min-width: 600px;
+    /* Prevents table from being too narrow */
+    border-collapse: collapse;
+}
+
+@media screen and (max-width: 768px) {
+    .table-container {
+        margin: 0.75rem -1rem;
+        /* Negative margin to extend to edges */
+        padding: 0 1rem;
+    }
+
+    .responsive-table {
+        font-size: 0.875rem;
+    }
+
+    .responsive-table th,
+    .responsive-table td {
+        padding: 0.75rem 0.5rem !important;
+    }
+}
+
+/* ===========================
+   RESPONSIVE BUTTONS
+   =========================== */
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    white-space: nowrap;
+}
+
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+.btn-lg {
+    padding: 1rem 2rem;
+    font-size: 1.125rem;
+}
+
+@media screen and (max-width: 768px) {
+    .btn {
+        padding: 0.625rem 1.25rem;
+        font-size: 0.9375rem;
+    }
+
+    .btn-sm {
+        padding: 0.5rem 0.875rem;
+        font-size: 0.8125rem;
+    }
+
+    .btn-lg {
+        padding: 0.875rem 1.75rem;
+        font-size: 1rem;
+    }
+}
+
+/* ===========================
+   RESPONSIVE FORMS
+   =========================== */
+
+.form-group {
+    margin-bottom: 1.25rem;
+    width: 100%;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #11120D;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #D8CFBC;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+}
+
+@media screen and (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 0.625rem;
+        font-size: 0.9375rem;
+    }
+}
+
+/* ===========================
+   RESPONSIVE FILTERS/SEARCH
+   =========================== */
+
+.filters-container {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+@media screen and (max-width: 768px) {
+    .filters-container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+
+    .filters-container>* {
+        width: 100%;
+    }
+}
+
+/* ===========================
+   RESPONSIVE HEADERS
+   =========================== */
+
+.page-header {
+    margin-bottom: 2rem;
+    background: linear-gradient(135deg, #11120D 0%, #565449 100%);
+    padding: 2rem;
+    border-radius: 1rem;
+    color: white;
+    width: 100%;
+}
+
+.page-header h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.page-header p {
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+@media screen and (max-width: 1024px) {
+    .page-header {
+        padding: 1.75rem;
+    }
+
+    .page-header h1 {
+        font-size: 1.75rem;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .page-header {
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .page-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .page-header p {
+        font-size: 0.9375rem;
+    }
+}
+
+/* ===========================
+   UTILITY CLASSES
+   =========================== */
+
+/* Responsive spacing */
+.mb-1 {
+    margin-bottom: 0.5rem;
+}
+
+.mb-2 {
+    margin-bottom: 1rem;
+}
+
+.mb-3 {
+    margin-bottom: 1.5rem;
+}
+
+.mb-4 {
+    margin-bottom: 2rem;
+}
+
+.mt-1 {
+    margin-top: 0.5rem;
+}
+
+.mt-2 {
+    margin-top: 1rem;
+}
+
+.mt-3 {
+    margin-top: 1.5rem;
+}
+
+.mt-4 {
+    margin-top: 2rem;
+}
+
+/* Hide/Show utilities */
+.hide-mobile {
+    display: block;
+}
+
+.show-mobile {
+    display: none;
+}
+
+@media screen and (max-width: 768px) {
+    .hide-mobile {
+        display: none;
+    }
+
+    .show-mobile {
+        display: block;
+    }
+}
+
+/* Flex utilities */
+.flex {
+    display: flex;
+}
+
+.flex-col {
+    flex-direction: column;
+}
+
+.flex-wrap {
+    flex-wrap: wrap;
+}
+
+.flex-center {
+    justify-content: center;
+    align-items: center;
+}
+
+.flex-between {
+    justify-content: space-between;
+    align-items: center;
+}
+
+.gap-1 {
+    gap: 0.5rem;
+}
+
+.gap-2 {
+    gap: 1rem;
+}
+
+.gap-3 {
+    gap: 1.5rem;
+}
+
+/* Text utilities */
+.text-center {
+    text-align: center;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-right {
+    text-align: right;
+}
+
+@media screen and (max-width: 768px) {
+    .text-center-mobile {
+        text-align: center;
+    }
+}
+
+/* Width utilities */
+.w-full {
+    width: 100%;
+}
+
+.w-auto {
+    width: auto;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #D8CFBC;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #565449;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #11120D;
+}
+
+/* Smooth transitions */
+* {
+    transition: margin 0.3s ease, padding 0.3s ease;
+}
+
+button,
+a,
+input,
+select {
+    transition: all 0.3s ease;
+}

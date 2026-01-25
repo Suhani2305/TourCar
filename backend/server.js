@@ -67,6 +67,10 @@ app.listen(PORT, () => {
     console.log(`📡 Server URL: http://localhost:${PORT}`);
     console.log(`🔗 API Health: http://localhost:${PORT}/api/health`);
     console.log('='.repeat(50));
+
+    // Start WhatsApp reminder cron job
+    const { startReminderCron } = require('./utils/reminderCron');
+    startReminderCron();
 });
 
 module.exports = app;

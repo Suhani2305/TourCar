@@ -77,10 +77,10 @@ const Dashboard = () => {
     };
 
     return (
-        <div className="dashboard-container">
+        <div className="main-container">
             <div className="dashboard-header">
-                <h1>👋 Welcome, {user?.role === 'superadmin' ? 'Super Admin' : user?.name}!</h1>
-                <p className="dashboard-subtitle">Here's your tour management overview</p>
+                <h1>👋 Welcome, {user?.name}!</h1>
+                <p>Here's your tour management overview</p>
             </div>
 
             {loading ? (
@@ -91,7 +91,7 @@ const Dashboard = () => {
             ) : (
                 <>
                     {/* Stats Cards */}
-                    <div className="stats-grid">
+                    <div className="cards-grid-4">
                         <div className="stat-card stat-bookings">
                             <div className="stat-icon">📅</div>
                             <div className="stat-content">
