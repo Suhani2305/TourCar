@@ -1,17 +1,18 @@
 /* ===========================
    IMPROVED USER MANAGEMENT STYLES
-   Better Visual Hierarchy & Contrast
+   Fixed Card Spacing & Equal Heights
    =========================== */
 
 .user-management-container {
-    padding: 2rem;
     background: #D8CFBC;
     min-height: 100vh;
+    padding-bottom: 2rem;
 }
 
-/* Header - More Prominent */
+/* ================= HEADER ================= */
+
 .users-header {
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
     background: linear-gradient(135deg, #11120D 0%, #565449 100%);
     padding: 2rem;
     border-radius: 1rem;
@@ -36,11 +37,27 @@
     font-weight: 500;
 }
 
-/* Tabs - Better Design */
+.header-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.header-actions button {
+    padding: 0.875rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* ================= TABS ================= */
+
 .user-tabs {
     background: #FFFBF4;
     padding: 1rem;
     border-radius: 0.75rem;
+    margin-top: 2rem;
     margin-bottom: 2rem;
     display: flex;
     gap: 1rem;
@@ -75,12 +92,19 @@
     background: #D8CFBC;
 }
 
-/* Stats Section */
+/* ================= STATS GRID ================= */
+
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 1.5rem;
     margin-bottom: 2rem;
+    box-sizing: border-box;
+}
+
+.stats-grid>* {
+    box-sizing: border-box;
+    min-width: 0;
 }
 
 .stat-card {
@@ -90,6 +114,7 @@
     box-shadow: 0 6px 12px rgba(17, 18, 13, 0.12);
     transition: all 0.3s ease;
     border-left: 5px solid transparent;
+    box-sizing: border-box;
 }
 
 .stat-card:hover {
@@ -134,22 +159,127 @@
     margin: 0;
 }
 
-/* Users Grid - Better Cards */
+/* ================= FILTER SECTION ================= */
+
+.filter-section {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+}
+
+.filter-section .filter-btn {
+    padding: 0.75rem 1.5rem;
+    border: 2px solid #D8CFBC;
+    background: white;
+    border-radius: 0.5rem;
+    color: #11120D;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.filter-section .filter-btn.active {
+    background: linear-gradient(135deg, #11120D 0%, #565449 100%);
+    color: #FFFBF4;
+    border-color: #11120D;
+}
+
+.filter-section .filter-btn:hover:not(.active) {
+    border-color: #565449;
+    background: #D8CFBC;
+}
+
+/* ================= USERS TABLE ================= */
+
+.users-table-container {
+    display: none;
+    background: #FFFBF4;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 6px 12px rgba(17, 18, 13, 0.12);
+    overflow-x: auto;
+    border-left: 5px solid #11120D;
+}
+
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+}
+
+.users-table thead {
+    background: linear-gradient(135deg, #11120D 0%, #565449 100%);
+}
+
+.users-table th {
+    padding: 1rem;
+    text-align: left;
+    color: #FFFBF4;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.85rem;
+}
+
+.users-table th:first-child {
+    border-top-left-radius: 0.5rem;
+}
+
+.users-table th:last-child {
+    border-top-right-radius: 0.5rem;
+}
+
+.users-table tbody tr {
+    border-bottom: 2px solid #D8CFBC;
+    transition: all 0.3s ease;
+}
+
+.users-table tbody tr:hover {
+    background: #D8CFBC;
+}
+
+.users-table td {
+    padding: 1rem;
+    color: #11120D;
+    font-weight: 500;
+}
+
+.users-table td button {
+    margin: 0 0.25rem;
+}
+
+/* ================= USERS GRID - FIXED LAYOUT ================= */
+
 .users-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 1.75rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    align-items: stretch;
 }
+
+/* ================= USER CARD - EQUAL HEIGHT FIX ================= */
 
 .user-card {
     background: #FFFBF4;
     padding: 2rem;
     border-radius: 1rem;
     box-shadow: 0 6px 12px rgba(17, 18, 13, 0.12);
-    transition: all 0.3s ease;
     border-left: 5px solid #11120D;
     position: relative;
     overflow: hidden;
+
+    /* CRITICAL: Flexbox for equal heights */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    /* Ensure all cards have same minimum height */
+    min-height: 420px;
+
+    /* Smooth transitions without layout jump */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .user-card::before {
@@ -167,6 +297,8 @@
     transform: translateY(-8px);
     box-shadow: 0 12px 24px rgba(17, 18, 13, 0.2);
 }
+
+/* ================= CARD HEADER ================= */
 
 .user-card-header {
     display: flex;
@@ -211,6 +343,8 @@
     margin: 0.25rem 0 0 0;
 }
 
+/* ================= STATUS BADGE ================= */
+
 .approval-badge {
     padding: 0.5rem 1rem;
     border-radius: 0.5rem;
@@ -235,12 +369,15 @@
     box-shadow: 0 2px 4px rgba(46, 204, 113, 0.3);
 }
 
+/* ================= USER DETAILS ================= */
+
 .user-details {
     margin: 1.25rem 0;
     padding: 1.25rem;
     background: linear-gradient(135deg, #D8CFBC 0%, #FFFBF4 100%);
     border-radius: 0.75rem;
     border: 2px solid #D8CFBC;
+    flex-grow: 1;
 }
 
 .user-details p {
@@ -257,10 +394,12 @@
     font-weight: 700;
 }
 
+/* ================= ACTION BUTTONS ================= */
+
 .user-actions {
     display: flex;
     gap: 0.75rem;
-    margin-top: 1.5rem;
+    margin-top: auto;
 }
 
 .btn-approve {
@@ -301,7 +440,78 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* Empty State */
+/* ================= MOBILE USER CARDS ================= */
+
+.user-card-mobile {
+    background: #FFFBF4;
+    padding: 1.25rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 8px rgba(17, 18, 13, 0.1);
+    border-left: 5px solid #11120D;
+}
+
+.user-card-mobile .user-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #D8CFBC;
+}
+
+.user-card-mobile .user-card-header h3 {
+    color: #11120D;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.user-card-info {
+    margin-bottom: 0.75rem;
+}
+
+.user-card-info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.4rem 0;
+    border-bottom: 1px solid #D8CFBC;
+}
+
+.user-card-info-row:last-child {
+    border-bottom: none;
+}
+
+.user-card-label {
+    color: #565449;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.user-card-value {
+    color: #11120D;
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+
+.user-card-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.user-card-actions button {
+    flex: 1;
+    padding: 0.6rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.85rem;
+}
+
+/* ================= EMPTY STATE ================= */
+
 .empty-state {
     text-align: center;
     padding: 4rem 2rem;
@@ -321,26 +531,55 @@
     font-size: 1.05rem;
 }
 
-/* Responsive */
-@media (max-width: 1200px) {
+/* ================= RESPONSIVE BREAKPOINTS ================= */
+
+/* Tablet (≤1024px) - 1 card per row */
+@media screen and (max-width: 1024px) {
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 768px) {
-    .user-management-container {
-        padding: 1rem;
+        gap: 1.25rem;
     }
 
     .users-header {
-        flex-direction: column;
+        padding: 1.75rem;
+    }
+
+    /* CRITICAL: Switch to 1 column on tablet */
+    .users-grid {
+        grid-template-columns: 1fr;
         gap: 1.5rem;
+    }
+
+    .user-card {
+        min-height: auto;
+    }
+}
+
+/* Large Mobile (≤768px) */
+@media screen and (max-width: 768px) {
+    .users-header {
+        flex-direction: column;
         align-items: flex-start;
+        gap: 1rem;
+        padding: 1.5rem;
+    }
+
+    .header-actions {
+        width: 100%;
+    }
+
+    .header-actions button {
+        width: 100%;
     }
 
     .user-tabs {
         flex-direction: column;
+        padding: 0.75rem;
+    }
+
+    .tab-btn {
+        width: 100%;
+        text-align: center;
     }
 
     .stats-grid {
@@ -349,5 +588,92 @@
 
     .users-grid {
         grid-template-columns: 1fr;
+        gap: 1.25rem;
+    }
+}
+
+/* Mobile (≤640px) - 1 card per row */
+@media screen and (max-width: 640px) {
+    .users-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .users-header {
+        padding: 1.25rem;
+    }
+
+    .users-header h1 {
+        font-size: 1.375rem;
+    }
+
+    .user-tabs {
+        padding: 0.5rem;
+    }
+
+    .tab-btn {
+        padding: 0.75rem 1rem;
+        font-size: 0.8rem;
+    }
+
+    .filter-section {
+        flex-direction: column;
+    }
+
+    .filter-section .filter-btn {
+        width: 100%;
+        text-align: center;
+    }
+
+    .stat-card {
+        padding: 1.5rem;
+    }
+
+    .user-card {
+        padding: 1.5rem;
+    }
+
+    .users-table-container {
+        padding: 1rem;
+    }
+}
+
+/* ================= SPACING FIX FOR VERTICAL CARDS ================= */
+/* Critical fix: Cards were touching with no separation */
+
+.user-cards-mobile {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    align-items: start;
+}
+
+.user-card-mobile {
+    margin-bottom: 0 !important;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Ensure action buttons don't collide with next card */
+.user-card-actions {
+    margin-top: auto;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+/* Tablet: 2 cards per row (≤1024px) */
+@media screen and (max-width: 1024px) {
+    .user-cards-mobile {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 1.5rem !important;
+    }
+}
+
+/* Mobile: 1 card per row (≤640px) */
+@media screen and (max-width: 640px) {
+    .user-cards-mobile {
+        grid-template-columns: 1fr !important;
+        gap: 1.25rem !important;
     }
 }

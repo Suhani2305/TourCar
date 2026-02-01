@@ -170,211 +170,213 @@ const Reports = () => {
     }
 
     return (
-        <div className="reports-container">
-            {/* Header */}
-            <div className="reports-header">
-                <div className="header-left">
-                    <h1>📊 Reports & Analytics</h1>
-                    <p className="subtitle">Comprehensive business insights and data visualization</p>
+        <div className="main-container">
+            <div className="reports-container">
+                {/* Header */}
+                <div className="reports-header">
+                    <div className="header-left">
+                        <h1>📊 Reports & Analytics</h1>
+                        <p className="subtitle">Comprehensive business insights and data visualization</p>
+                    </div>
+
+                    <div className="header-actions">
+                        <button onClick={exportToPDF} className="export-btn pdf-btn">
+                            📄 Export PDF
+                        </button>
+                        <button onClick={exportToExcel} className="export-btn excel-btn">
+                            📊 Export Excel
+                        </button>
+                    </div>
                 </div>
 
-                <div className="header-actions">
-                    <button onClick={exportToPDF} className="export-btn pdf-btn">
-                        📄 Export PDF
-                    </button>
-                    <button onClick={exportToExcel} className="export-btn excel-btn">
-                        📊 Export Excel
-                    </button>
-                </div>
-            </div>
+                {/* Filters */}
+                <div className="reports-filters">
+                    <div className="filter-group">
+                        <label>Start Date</label>
+                        <input
+                            type="date"
+                            value={dateRange.startDate}
+                            onChange={(e) => setDateRange({ ...dateRange, startDate: e.target.value })}
+                        />
+                    </div>
+                    <div className="filter-group">
+                        <label>End Date</label>
+                        <input
+                            type="date"
+                            value={dateRange.endDate}
+                            onChange={(e) => setDateRange({ ...dateRange, endDate: e.target.value })}
+                        />
+                    </div>
 
-            {/* Filters */}
-            <div className="reports-filters">
-                <div className="filter-group">
-                    <label>Start Date</label>
-                    <input
-                        type="date"
-                        value={dateRange.startDate}
-                        onChange={(e) => setDateRange({ ...dateRange, startDate: e.target.value })}
-                    />
-                </div>
-                <div className="filter-group">
-                    <label>End Date</label>
-                    <input
-                        type="date"
-                        value={dateRange.endDate}
-                        onChange={(e) => setDateRange({ ...dateRange, endDate: e.target.value })}
-                    />
-                </div>
-
-                {user?.role === 'superadmin' && (
-                    <>
-                        <div className="filter-group">
-                            <label>View Mode</label>
-                            <div className="view-toggle">
-                                <button
-                                    className={viewMode === 'my' ? 'active' : ''}
-                                    onClick={() => {
-                                        setViewMode('my');
-                                        setSelectedUser('');
-                                    }}
-                                >
-                                    My Data
-                                </button>
-                                <button
-                                    className={viewMode === 'all' ? 'active' : ''}
-                                    onClick={() => setViewMode('all')}
-                                >
-                                    All Data
-                                </button>
-                            </div>
-                        </div>
-
-                        {viewMode === 'all' && (
+                    {user?.role === 'superadmin' && (
+                        <>
                             <div className="filter-group">
-                                <label>Filter by User</label>
-                                <select
-                                    value={selectedUser}
-                                    onChange={(e) => setSelectedUser(e.target.value)}
-                                >
-                                    <option value="">All Users</option>
-                                    {users.map(u => (
-                                        <option key={u._id} value={u._id}>
-                                            {u.name} ({u.email})
-                                        </option>
-                                    ))}
-                                </select>
+                                <label>View Mode</label>
+                                <div className="view-toggle">
+                                    <button
+                                        className={viewMode === 'my' ? 'active' : ''}
+                                        onClick={() => {
+                                            setViewMode('my');
+                                            setSelectedUser('');
+                                        }}
+                                    >
+                                        My Data
+                                    </button>
+                                    <button
+                                        className={viewMode === 'all' ? 'active' : ''}
+                                        onClick={() => setViewMode('all')}
+                                    >
+                                        All Data
+                                    </button>
+                                </div>
                             </div>
-                        )}
-                    </>
-                )}
-            </div>
 
-            {/* Revenue Summary Cards */}
-            <div className="summary-cards">
-                <div className="summary-card revenue-card">
-                    <div className="card-icon">💰</div>
-                    <div className="card-content">
-                        <h3>Total Revenue</h3>
-                        <p className="card-value">₹{revenueData?.totalRevenue?.toLocaleString() || 0}</p>
+                            {viewMode === 'all' && (
+                                <div className="filter-group">
+                                    <label>Filter by User</label>
+                                    <select
+                                        value={selectedUser}
+                                        onChange={(e) => setSelectedUser(e.target.value)}
+                                    >
+                                        <option value="">All Users</option>
+                                        {users.map(u => (
+                                            <option key={u._id} value={u._id}>
+                                                {u.name} ({u.email})
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            )}
+                        </>
+                    )}
+                </div>
+
+                {/* Revenue Summary Cards */}
+                <div className="summary-cards">
+                    <div className="summary-card revenue-card">
+                        <div className="card-icon">💰</div>
+                        <div className="card-content">
+                            <h3>Total Revenue</h3>
+                            <p className="card-value">₹{revenueData?.totalRevenue?.toLocaleString() || 0}</p>
+                        </div>
+                    </div>
+                    <div className="summary-card bookings-card">
+                        <div className="card-icon">📋</div>
+                        <div className="card-content">
+                            <h3>Total Bookings</h3>
+                            <p className="card-value">{revenueData?.bookingCount || 0}</p>
+                        </div>
+                    </div>
+                    <div className="summary-card average-card">
+                        <div className="card-icon">📈</div>
+                        <div className="card-content">
+                            <h3>Average Booking Value</h3>
+                            <p className="card-value">₹{revenueData?.averageBookingValue?.toLocaleString() || 0}</p>
+                        </div>
+                    </div>
+                    <div className="summary-card growth-card">
+                        <div className="card-icon">🚀</div>
+                        <div className="card-content">
+                            <h3>Growth Rate</h3>
+                            <p className="card-value">{revenueData?.growthRate || 0}%</p>
+                        </div>
                     </div>
                 </div>
-                <div className="summary-card bookings-card">
-                    <div className="card-icon">📋</div>
-                    <div className="card-content">
-                        <h3>Total Bookings</h3>
-                        <p className="card-value">{revenueData?.bookingCount || 0}</p>
+
+                {/* Charts Section */}
+                <div className="charts-grid">
+                    {/* Revenue Trend Chart */}
+                    <div className="chart-card">
+                        <h3>Revenue Trend</h3>
+                        <ResponsiveContainer width="100%" height={300}>
+                            <LineChart data={revenueData?.dailyRevenue || []}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="date" />
+                                <YAxis />
+                                <Tooltip formatter={(value) => `₹${value.toLocaleString()}`} />
+                                <Legend />
+                                <Line type="monotone" dataKey="revenue" stroke="#2ecc71" strokeWidth={2} />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </div>
+
+                    {/* Booking Status Distribution */}
+                    <div className="chart-card">
+                        <h3>Booking Status Distribution</h3>
+                        <ResponsiveContainer width="100%" height={300}>
+                            <PieChart>
+                                <Pie
+                                    data={Object.entries(bookingStats?.byStatus || {}).map(([name, value]) => ({
+                                        name: name.charAt(0).toUpperCase() + name.slice(1),
+                                        value
+                                    }))}
+                                    cx="50%"
+                                    cy="50%"
+                                    labelLine={false}
+                                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                                    outerRadius={100}
+                                    fill="#8884d8"
+                                    dataKey="value"
+                                >
+                                    {Object.keys(bookingStats?.byStatus || {}).map((_, index) => (
+                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                    ))}
+                                </Pie>
+                                <Tooltip />
+                            </PieChart>
+                        </ResponsiveContainer>
+                    </div>
+
+                    {/* Top Vehicles Revenue */}
+                    <div className="chart-card full-width">
+                        <h3>Top Vehicles by Revenue</h3>
+                        <ResponsiveContainer width="100%" height={300}>
+                            <BarChart data={vehicleUtilization?.topVehicles?.slice(0, 10) || []}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="vehicleNumber" />
+                                <YAxis />
+                                <Tooltip formatter={(value) => `₹${value.toLocaleString()}`} />
+                                <Legend />
+                                <Bar dataKey="revenue" fill="#3498db" />
+                                <Bar dataKey="bookings" fill="#f39c12" />
+                            </BarChart>
+                        </ResponsiveContainer>
                     </div>
                 </div>
-                <div className="summary-card average-card">
-                    <div className="card-icon">📈</div>
-                    <div className="card-content">
-                        <h3>Average Booking Value</h3>
-                        <p className="card-value">₹{revenueData?.averageBookingValue?.toLocaleString() || 0}</p>
-                    </div>
-                </div>
-                <div className="summary-card growth-card">
-                    <div className="card-icon">🚀</div>
-                    <div className="card-content">
-                        <h3>Growth Rate</h3>
-                        <p className="card-value">{revenueData?.growthRate || 0}%</p>
-                    </div>
-                </div>
-            </div>
 
-            {/* Charts Section */}
-            <div className="charts-grid">
-                {/* Revenue Trend Chart */}
-                <div className="chart-card">
-                    <h3>Revenue Trend</h3>
-                    <ResponsiveContainer width="100%" height={300}>
-                        <LineChart data={revenueData?.dailyRevenue || []}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="date" />
-                            <YAxis />
-                            <Tooltip formatter={(value) => `₹${value.toLocaleString()}`} />
-                            <Legend />
-                            <Line type="monotone" dataKey="revenue" stroke="#2ecc71" strokeWidth={2} />
-                        </LineChart>
-                    </ResponsiveContainer>
-                </div>
-
-                {/* Booking Status Distribution */}
-                <div className="chart-card">
-                    <h3>Booking Status Distribution</h3>
-                    <ResponsiveContainer width="100%" height={300}>
-                        <PieChart>
-                            <Pie
-                                data={Object.entries(bookingStats?.byStatus || {}).map(([name, value]) => ({
-                                    name: name.charAt(0).toUpperCase() + name.slice(1),
-                                    value
-                                }))}
-                                cx="50%"
-                                cy="50%"
-                                labelLine={false}
-                                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                                outerRadius={100}
-                                fill="#8884d8"
-                                dataKey="value"
-                            >
-                                {Object.keys(bookingStats?.byStatus || {}).map((_, index) => (
-                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                ))}
-                            </Pie>
-                            <Tooltip />
-                        </PieChart>
-                    </ResponsiveContainer>
-                </div>
-
-                {/* Top Vehicles Revenue */}
-                <div className="chart-card full-width">
-                    <h3>Top Vehicles by Revenue</h3>
-                    <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={vehicleUtilization?.topVehicles?.slice(0, 10) || []}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="vehicleNumber" />
-                            <YAxis />
-                            <Tooltip formatter={(value) => `₹${value.toLocaleString()}`} />
-                            <Legend />
-                            <Bar dataKey="revenue" fill="#3498db" />
-                            <Bar dataKey="bookings" fill="#f39c12" />
-                        </BarChart>
-                    </ResponsiveContainer>
-                </div>
-            </div>
-
-            {/* Vehicle Utilization Table */}
-            <div className="data-table-card">
-                <h3>Vehicle Utilization Report</h3>
-                <div className="table-wrapper">
-                    <table className="data-table">
-                        <thead>
-                            <tr>
-                                <th>Vehicle Number</th>
-                                <th>Total Bookings</th>
-                                <th>Revenue</th>
-                                <th>Utilization %</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {vehicleUtilization?.vehicles?.map(v => (
-                                <tr key={v._id}>
-                                    <td>{v.vehicleNumber}</td>
-                                    <td>{v.bookings}</td>
-                                    <td>₹{v.revenue?.toLocaleString()}</td>
-                                    <td>
-                                        <div className="utilization-bar">
-                                            <div
-                                                className="utilization-fill"
-                                                style={{ width: `${v.utilizationRate || 0}%` }}
-                                            ></div>
-                                            <span>{v.utilizationRate?.toFixed(1) || 0}%</span>
-                                        </div>
-                                    </td>
+                {/* Vehicle Utilization Table */}
+                <div className="data-table-card">
+                    <h3>Vehicle Utilization Report</h3>
+                    <div className="table-wrapper">
+                        <table className="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Vehicle Number</th>
+                                    <th>Total Bookings</th>
+                                    <th>Revenue</th>
+                                    <th>Utilization %</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {vehicleUtilization?.vehicles?.map(v => (
+                                    <tr key={v._id}>
+                                        <td>{v.vehicleNumber}</td>
+                                        <td>{v.bookings}</td>
+                                        <td>₹{v.revenue?.toLocaleString()}</td>
+                                        <td>
+                                            <div className="utilization-bar">
+                                                <div
+                                                    className="utilization-fill"
+                                                    style={{ width: `${v.utilizationRate || 0}%` }}
+                                                ></div>
+                                                <span>{v.utilizationRate?.toFixed(1) || 0}%</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

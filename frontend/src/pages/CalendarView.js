@@ -119,147 +119,149 @@ const CalendarView = () => {
     };
 
     return (
-        <div className="calendar-view-container">
-            {/* Header */}
-            <div className="calendar-header">
-                <div className="header-left">
-                    <h1>📅 Booking Calendar</h1>
-                    <p className="subtitle">View and manage your bookings in calendar format</p>
+        <div className="main-container">
+            <div className="calendar-view-container">
+                {/* Header */}
+                <div className="calendar-header">
+                    <div className="header-left">
+                        <h1>📅 Booking Calendar</h1>
+                        <p className="subtitle">View and manage your bookings in calendar format</p>
+                    </div>
+
+                    {user?.role === 'superadmin' && (
+                        <div className="view-controls">
+                            <div className="view-toggle">
+                                <button
+                                    className={viewMode === 'my' ? 'active' : ''}
+                                    onClick={() => {
+                                        setViewMode('my');
+                                        setSelectedUser('');
+                                    }}
+                                >
+                                    My Bookings
+                                </button>
+                                <button
+                                    className={viewMode === 'all' ? 'active' : ''}
+                                    onClick={() => setViewMode('all')}
+                                >
+                                    All Bookings
+                                </button>
+                            </div>
+
+                            {viewMode === 'all' && (
+                                <select
+                                    value={selectedUser}
+                                    onChange={(e) => setSelectedUser(e.target.value)}
+                                    className="user-filter"
+                                >
+                                    <option value="">All Users</option>
+                                    {users.map(u => (
+                                        <option key={u._id} value={u._id}>
+                                            {u.name} ({u.email})
+                                        </option>
+                                    ))}
+                                </select>
+                            )}
+                        </div>
+                    )}
                 </div>
 
-                {user?.role === 'superadmin' && (
-                    <div className="view-controls">
-                        <div className="view-toggle">
-                            <button
-                                className={viewMode === 'my' ? 'active' : ''}
-                                onClick={() => {
-                                    setViewMode('my');
-                                    setSelectedUser('');
-                                }}
-                            >
-                                My Bookings
-                            </button>
-                            <button
-                                className={viewMode === 'all' ? 'active' : ''}
-                                onClick={() => setViewMode('all')}
-                            >
-                                All Bookings
-                            </button>
-                        </div>
+                {/* Legend */}
+                <div className="calendar-legend">
+                    <span className="legend-item">
+                        <span className="color-box confirmed"></span> Confirmed
+                    </span>
+                    <span className="legend-item">
+                        <span className="color-box pending"></span> Pending
+                    </span>
+                    <span className="legend-item">
+                        <span className="color-box cancelled"></span> Cancelled
+                    </span>
+                    <span className="legend-item">
+                        <span className="color-box completed"></span> Completed
+                    </span>
+                </div>
 
-                        {viewMode === 'all' && (
-                            <select
-                                value={selectedUser}
-                                onChange={(e) => setSelectedUser(e.target.value)}
-                                className="user-filter"
-                            >
-                                <option value="">All Users</option>
-                                {users.map(u => (
-                                    <option key={u._id} value={u._id}>
-                                        {u.name} ({u.email})
-                                    </option>
+                {/* Calendar */}
+                <div className="calendar-wrapper">
+                    {loading ? (
+                        <div className="loading-spinner">
+                            <div className="spinner"></div>
+                            <p>Loading bookings...</p>
+                        </div>
+                    ) : (
+                        <Calendar
+                            onChange={setDate}
+                            value={date}
+                            onClickDay={handleDateClick}
+                            tileContent={getTileContent}
+                            tileClassName={getTileClassName}
+                            locale="en-US"
+                        />
+                    )}
+                </div>
+
+                {/* Booking Popup */}
+                {showPopup && (
+                    <div className="booking-popup-overlay" onClick={() => setShowPopup(false)}>
+                        <div className="booking-popup" onClick={(e) => e.stopPropagation()}>
+                            <div className="popup-header">
+                                <h3>
+                                    Bookings on {format(new Date(selectedDateBookings[0]?.pickupDate), 'MMMM dd, yyyy')}
+                                </h3>
+                                <button onClick={() => setShowPopup(false)} className="close-btn">×</button>
+                            </div>
+                            <div className="popup-content">
+                                {selectedDateBookings.map(booking => (
+                                    <div key={booking._id} className="popup-booking-card">
+                                        <div className="booking-header-row">
+                                            <span className="booking-number">{booking.bookingNumber}</span>
+                                            <span
+                                                className="status-badge"
+                                                style={{ backgroundColor: getStatusColor(booking.status) }}
+                                            >
+                                                {booking.status}
+                                            </span>
+                                        </div>
+                                        <div className="booking-details">
+                                            <p><strong>Customer:</strong> {booking.customerName}</p>
+                                            <p><strong>Vehicle:</strong> {booking.vehicleNumber}</p>
+                                            <p><strong>Pickup Time:</strong> {booking.pickupTime}</p>
+                                            <p><strong>Drop Time:</strong> {booking.dropTime}</p>
+                                            <p><strong>Destination:</strong> {booking.destination}</p>
+                                            <p><strong>Amount:</strong> ₹{booking.amount?.toLocaleString()}</p>
+                                        </div>
+                                    </div>
                                 ))}
-                            </select>
-                        )}
-                    </div>
-                )}
-            </div>
-
-            {/* Legend */}
-            <div className="calendar-legend">
-                <span className="legend-item">
-                    <span className="color-box confirmed"></span> Confirmed
-                </span>
-                <span className="legend-item">
-                    <span className="color-box pending"></span> Pending
-                </span>
-                <span className="legend-item">
-                    <span className="color-box cancelled"></span> Cancelled
-                </span>
-                <span className="legend-item">
-                    <span className="color-box completed"></span> Completed
-                </span>
-            </div>
-
-            {/* Calendar */}
-            <div className="calendar-wrapper">
-                {loading ? (
-                    <div className="loading-spinner">
-                        <div className="spinner"></div>
-                        <p>Loading bookings...</p>
-                    </div>
-                ) : (
-                    <Calendar
-                        onChange={setDate}
-                        value={date}
-                        onClickDay={handleDateClick}
-                        tileContent={getTileContent}
-                        tileClassName={getTileClassName}
-                        locale="en-US"
-                    />
-                )}
-            </div>
-
-            {/* Booking Popup */}
-            {showPopup && (
-                <div className="booking-popup-overlay" onClick={() => setShowPopup(false)}>
-                    <div className="booking-popup" onClick={(e) => e.stopPropagation()}>
-                        <div className="popup-header">
-                            <h3>
-                                Bookings on {format(new Date(selectedDateBookings[0]?.pickupDate), 'MMMM dd, yyyy')}
-                            </h3>
-                            <button onClick={() => setShowPopup(false)} className="close-btn">×</button>
-                        </div>
-                        <div className="popup-content">
-                            {selectedDateBookings.map(booking => (
-                                <div key={booking._id} className="popup-booking-card">
-                                    <div className="booking-header-row">
-                                        <span className="booking-number">{booking.bookingNumber}</span>
-                                        <span
-                                            className="status-badge"
-                                            style={{ backgroundColor: getStatusColor(booking.status) }}
-                                        >
-                                            {booking.status}
-                                        </span>
-                                    </div>
-                                    <div className="booking-details">
-                                        <p><strong>Customer:</strong> {booking.customerName}</p>
-                                        <p><strong>Vehicle:</strong> {booking.vehicleNumber}</p>
-                                        <p><strong>Pickup Time:</strong> {booking.pickupTime}</p>
-                                        <p><strong>Drop Time:</strong> {booking.dropTime}</p>
-                                        <p><strong>Destination:</strong> {booking.destination}</p>
-                                        <p><strong>Amount:</strong> ₹{booking.amount?.toLocaleString()}</p>
-                                    </div>
-                                </div>
-                            ))}
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
 
-            {/* Stats Summary */}
-            <div className="calendar-stats">
-                <div className="stat-box">
-                    <span className="stat-number">{bookings.length}</span>
-                    <span className="stat-label">Total Bookings This Month</span>
-                </div>
-                <div className="stat-box">
-                    <span className="stat-number">
-                        {bookings.filter(b => b.status === 'confirmed').length}
-                    </span>
-                    <span className="stat-label">Confirmed</span>
-                </div>
-                <div className="stat-box">
-                    <span className="stat-number">
-                        {bookings.filter(b => b.status === 'pending').length}
-                    </span>
-                    <span className="stat-label">Pending</span>
-                </div>
-                <div className="stat-box">
-                    <span className="stat-number">
-                        ₹{bookings.reduce((sum, b) => sum + (b.amount || 0), 0).toLocaleString()}
-                    </span>
-                    <span className="stat-label">Total Revenue</span>
+                {/* Stats Summary */}
+                <div className="calendar-stats">
+                    <div className="stat-box">
+                        <span className="stat-number">{bookings.length}</span>
+                        <span className="stat-label">Total Bookings This Month</span>
+                    </div>
+                    <div className="stat-box">
+                        <span className="stat-number">
+                            {bookings.filter(b => b.status === 'confirmed').length}
+                        </span>
+                        <span className="stat-label">Confirmed</span>
+                    </div>
+                    <div className="stat-box">
+                        <span className="stat-number">
+                            {bookings.filter(b => b.status === 'pending').length}
+                        </span>
+                        <span className="stat-label">Pending</span>
+                    </div>
+                    <div className="stat-box">
+                        <span className="stat-number">
+                            ₹{bookings.reduce((sum, b) => sum + (b.amount || 0), 0).toLocaleString()}
+                        </span>
+                        <span className="stat-label">Total Revenue</span>
+                    </div>
                 </div>
             </div>
         </div>

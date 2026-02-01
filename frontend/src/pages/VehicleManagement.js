@@ -180,96 +180,71 @@ const VehicleManagement = () => {
     }
 
     return (
-        <div className="vehicle-management-container">
-            {/* Header */}
-            <div className="page-header">
-                <div>
-                    <h1>🚗 Vehicle Management</h1>
-                    <p>Manage your fleet of vehicles</p>
+        <div className="main-container">
+            <div className="vehicle-management-container">
+                {/* Header */}
+                <div className="page-header">
+                    <div>
+                        <h1>🚗 Vehicle Management</h1>
+                        <p>Manage your fleet of vehicles</p>
+                    </div>
+                    <div className="header-actions">
+                        {user?.role === 'superadmin' && (
+                            <div className="view-mode-toggle">
+                                <button
+                                    className={`toggle-btn ${viewMode === 'my' ? 'active' : ''}`}
+                                    onClick={() => handleViewModeChange('my')}
+                                >
+                                    📋 My Vehicles
+                                </button>
+                                <button
+                                    className={`toggle-btn ${viewMode === 'all' ? 'active' : ''}`}
+                                    onClick={() => handleViewModeChange('all')}
+                                >
+                                    🌐 All Vehicles
+                                </button>
+                            </div>
+                        )}
+                        <button onClick={() => setShowModal(true)} className="btn btn-primary">
+                            ➕ Add Vehicle
+                        </button>
+                    </div>
                 </div>
-                <div className="header-actions">
-                    {user?.role === 'superadmin' && (
-                        <div className="view-mode-toggle">
-                            <button
-                                className={`toggle-btn ${viewMode === 'my' ? 'active' : ''}`}
-                                onClick={() => handleViewModeChange('my')}
-                            >
-                                📋 My Vehicles
-                            </button>
-                            <button
-                                className={`toggle-btn ${viewMode === 'all' ? 'active' : ''}`}
-                                onClick={() => handleViewModeChange('all')}
-                            >
-                                🌐 All Vehicles
-                            </button>
+
+                {/* Stats */}
+                <div className="stats-grid">
+                    <div className="stat-card stat-total">
+                        <div className="stat-icon">🚗</div>
+                        <div className="stat-content">
+                            <h3>{vehicles.length}</h3>
+                            <p>Total Vehicles</p>
                         </div>
-                    )}
-                    <button onClick={() => setShowModal(true)} className="btn btn-primary">
-                        ➕ Add Vehicle
-                    </button>
-                </div>
-            </div>
-
-            {/* Stats */}
-            <div className="stats-grid">
-                <div className="stat-card stat-total">
-                    <div className="stat-icon">🚗</div>
-                    <div className="stat-content">
-                        <h3>{vehicles.length}</h3>
-                        <p>Total Vehicles</p>
                     </div>
-                </div>
-                <div className="stat-card stat-available">
-                    <div className="stat-icon">✅</div>
-                    <div className="stat-content">
-                        <h3>{vehicles.filter(v => v.status === 'available').length}</h3>
-                        <p>Available</p>
+                    <div className="stat-card stat-available">
+                        <div className="stat-icon">✅</div>
+                        <div className="stat-content">
+                            <h3>{vehicles.filter(v => v.status === 'available').length}</h3>
+                            <p>Available</p>
+                        </div>
                     </div>
-                </div>
-                <div className="stat-card stat-booked">
-                    <div className="stat-icon">📅</div>
-                    <div className="stat-content">
-                        <h3>{vehicles.filter(v => v.status === 'booked').length}</h3>
-                        <p>Booked</p>
+                    <div className="stat-card stat-booked">
+                        <div className="stat-icon">📅</div>
+                        <div className="stat-content">
+                            <h3>{vehicles.filter(v => v.status === 'booked').length}</h3>
+                            <p>Booked</p>
+                        </div>
                     </div>
-                </div>
-                <div className="stat-card stat-maintenance">
-                    <div className="stat-icon">🔧</div>
-                    <div className="stat-content">
-                        <h3>{vehicles.filter(v => v.status === 'maintenance').length}</h3>
-                        <p>Maintenance</p>
+                    <div className="stat-card stat-maintenance">
+                        <div className="stat-icon">🔧</div>
+                        <div className="stat-content">
+                            <h3>{vehicles.filter(v => v.status === 'maintenance').length}</h3>
+                            <p>Maintenance</p>
+                        </div>
                     </div>
-                </div>
-            </div>
-
-            {/* Search and Filter */}
-            <div className="controls-section">
-                <div className="search-box">
-                    <input
-                        type="text"
-                        placeholder="🔍 Search by number, brand, or model..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
                 </div>
 
-                {/* User Filter for Super Admin in 'All' mode */}
-                {user?.role === 'superadmin' && viewMode === 'all' && (
-                    <div className="user-filter">
-                        <select
-                            value={selectedUserId}
-                            onChange={(e) => setSelectedUserId(e.target.value)}
-                            className="user-filter-select"
-                        >
-                            <option value="">👥 All Users</option>
-                            {usersList.map((u) => (
-                                <option key={u._id} value={u._id}>
-                                    {u.name} ({u.email})
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                )}
+
+                {/* Filter Buttons */}
                 <div className="filter-buttons">
                     <button
                         className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
@@ -296,209 +271,239 @@ const VehicleManagement = () => {
                         Maintenance ({vehicles.filter(v => v.status === 'maintenance').length})
                     </button>
                 </div>
-            </div>
 
-            {/* Vehicles Grid - Desktop & Tablet */}
-            <div className="vehicles-grid">
-                {filteredVehicles.length === 0 ? (
-                    <div className="no-data">No vehicles found</div>
-                ) : (
-                    filteredVehicles.map((vehicle) => (
-                        <div key={vehicle._id} className="vehicle-card">
-                            <div className="vehicle-card-header">
-                                <h3>{vehicle.vehicleNumber}</h3>
-                                {getStatusBadge(vehicle.status)}
-                            </div>
+                {/* Search and User Filter */}
+                <div className="controls-section">
+                    <div className="search-box">
+                        <input
+                            type="text"
+                            placeholder="🔍 Search by number, brand, or model..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
 
-                            <div className="vehicle-card-body">
-                                <div className="vehicle-info">
-                                    <span className="info-label">Type:</span>
-                                    <span className="info-value">{vehicle.type}</span>
-                                </div>
-                                {vehicle.brand && (
-                                    <div className="vehicle-info">
-                                        <span className="info-label">Brand:</span>
-                                        <span className="info-value">{vehicle.brand}</span>
-                                    </div>
-                                )}
-                                {vehicle.model && (
-                                    <div className="vehicle-info">
-                                        <span className="info-label">Model:</span>
-                                        <span className="info-value">{vehicle.model}</span>
-                                    </div>
-                                )}
-                                {vehicle.capacity && (
-                                    <div className="vehicle-info">
-                                        <span className="info-label">Capacity:</span>
-                                        <span className="info-value">{vehicle.capacity} seats</span>
-                                    </div>
-                                )}
-                                {vehicle.color && (
-                                    <div className="vehicle-info">
-                                        <span className="info-label">Color:</span>
-                                        <span className="info-value">{vehicle.color}</span>
-                                    </div>
-                                )}
-                                {vehicle.year && (
-                                    <div className="vehicle-info">
-                                        <span className="info-label">Year:</span>
-                                        <span className="info-value">{vehicle.year}</span>
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="vehicle-card-actions">
-                                <button
-                                    className="btn-action btn-edit"
-                                    onClick={() => handleEdit(vehicle)}
-                                    title="Edit Vehicle"
-                                >
-                                    ✏️ Edit
-                                </button>
-                                <button
-                                    className="btn-action btn-delete"
-                                    onClick={() => handleDelete(vehicle._id)}
-                                    title="Delete Vehicle"
-                                >
-                                    🗑️ Delete
-                                </button>
-                            </div>
+                    {/* User Filter for Super Admin in 'All' mode */}
+                    {user?.role === 'superadmin' && viewMode === 'all' && (
+                        <div className="user-filter">
+                            <select
+                                value={selectedUserId}
+                                onChange={(e) => setSelectedUserId(e.target.value)}
+                                className="user-filter-select"
+                            >
+                                <option value="">👥 All Users</option>
+                                {usersList.map((u) => (
+                                    <option key={u._id} value={u._id}>
+                                        {u.name} ({u.email})
+                                    </option>
+                                ))}
+                            </select>
                         </div>
-                    ))
+                    )}
+                </div>
+
+                {/* Vehicles Grid - Desktop & Tablet */}
+                <div className="vehicles-grid">
+                    {filteredVehicles.length === 0 ? (
+                        <div className="no-data">No vehicles found</div>
+                    ) : (
+                        filteredVehicles.map((vehicle) => (
+                            <div key={vehicle._id} className="vehicle-card">
+                                <div className="vehicle-card-header">
+                                    <h3>{vehicle.vehicleNumber}</h3>
+                                    {getStatusBadge(vehicle.status)}
+                                </div>
+
+                                <div className="vehicle-card-body">
+                                    <div className="vehicle-info">
+                                        <span className="info-label">Type:</span>
+                                        <span className="info-value">{vehicle.type}</span>
+                                    </div>
+                                    {vehicle.brand && (
+                                        <div className="vehicle-info">
+                                            <span className="info-label">Brand:</span>
+                                            <span className="info-value">{vehicle.brand}</span>
+                                        </div>
+                                    )}
+                                    {vehicle.model && (
+                                        <div className="vehicle-info">
+                                            <span className="info-label">Model:</span>
+                                            <span className="info-value">{vehicle.model}</span>
+                                        </div>
+                                    )}
+                                    {vehicle.capacity && (
+                                        <div className="vehicle-info">
+                                            <span className="info-label">Capacity:</span>
+                                            <span className="info-value">{vehicle.capacity} seats</span>
+                                        </div>
+                                    )}
+                                    {vehicle.color && (
+                                        <div className="vehicle-info">
+                                            <span className="info-label">Color:</span>
+                                            <span className="info-value">{vehicle.color}</span>
+                                        </div>
+                                    )}
+                                    {vehicle.year && (
+                                        <div className="vehicle-info">
+                                            <span className="info-label">Year:</span>
+                                            <span className="info-value">{vehicle.year}</span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="vehicle-card-actions">
+                                    <button
+                                        className="btn-action btn-edit"
+                                        onClick={() => handleEdit(vehicle)}
+                                        title="Edit Vehicle"
+                                    >
+                                        ✏️ Edit
+                                    </button>
+                                    <button
+                                        className="btn-action btn-delete"
+                                        onClick={() => handleDelete(vehicle._id)}
+                                        title="Delete Vehicle"
+                                    >
+                                        🗑️ Delete
+                                    </button>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
+
+                {/* Add/Edit Modal */}
+                {showModal && (
+                    <div className="modal-overlay" onClick={handleCloseModal}>
+                        <div className="modal-content modal-large" onClick={(e) => e.stopPropagation()}>
+                            <div className="modal-header">
+                                <h2>{editingVehicle ? '✏️ Edit Vehicle' : '➕ Add New Vehicle'}</h2>
+                                <button className="modal-close" onClick={handleCloseModal}>✕</button>
+                            </div>
+
+                            <form onSubmit={handleSubmit} className="modal-form">
+                                <div className="form-row">
+                                    <div className="form-group">
+                                        <label>Vehicle Number *</label>
+                                        <input
+                                            type="text"
+                                            value={formData.vehicleNumber}
+                                            onChange={(e) => setFormData({ ...formData, vehicleNumber: e.target.value.toUpperCase() })}
+                                            placeholder="e.g., MH12AB1234"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Type *</label>
+                                        <select
+                                            value={formData.type}
+                                            onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                                            required
+                                        >
+                                            {vehicleTypes.map(type => (
+                                                <option key={type} value={type}>{type}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group">
+                                        <label>Brand</label>
+                                        <input
+                                            type="text"
+                                            value={formData.brand}
+                                            onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+                                            placeholder="e.g., Toyota, Honda"
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Model</label>
+                                        <input
+                                            type="text"
+                                            value={formData.model}
+                                            onChange={(e) => setFormData({ ...formData, model: e.target.value })}
+                                            placeholder="e.g., Innova, City"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group">
+                                        <label>Capacity (Seats)</label>
+                                        <input
+                                            type="number"
+                                            value={formData.capacity}
+                                            onChange={(e) => setFormData({ ...formData, capacity: e.target.value })}
+                                            placeholder="e.g., 7"
+                                            min="1"
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Color</label>
+                                        <input
+                                            type="text"
+                                            value={formData.color}
+                                            onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                                            placeholder="e.g., White, Black"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group">
+                                        <label>Year</label>
+                                        <input
+                                            type="number"
+                                            value={formData.year}
+                                            onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+                                            min="1900"
+                                            max={new Date().getFullYear() + 1}
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Status *</label>
+                                        <select
+                                            value={formData.status}
+                                            onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                                            required
+                                        >
+                                            {statusOptions.map(status => (
+                                                <option key={status} value={status}>
+                                                    {status.charAt(0).toUpperCase() + status.slice(1)}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="form-group">
+                                    <label>Notes</label>
+                                    <textarea
+                                        value={formData.notes}
+                                        onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                                        placeholder="Additional notes about the vehicle..."
+                                        rows="3"
+                                    />
+                                </div>
+
+                                <div className="modal-actions">
+                                    <button type="button" onClick={handleCloseModal} className="btn btn-secondary">
+                                        Cancel
+                                    </button>
+                                    <button type="submit" className="btn btn-primary">
+                                        {editingVehicle ? '✅ Update Vehicle' : '✅ Add Vehicle'}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 )}
             </div>
-
-            {/* Add/Edit Modal */}
-            {showModal && (
-                <div className="modal-overlay" onClick={handleCloseModal}>
-                    <div className="modal-content modal-large" onClick={(e) => e.stopPropagation()}>
-                        <div className="modal-header">
-                            <h2>{editingVehicle ? '✏️ Edit Vehicle' : '➕ Add New Vehicle'}</h2>
-                            <button className="modal-close" onClick={handleCloseModal}>✕</button>
-                        </div>
-
-                        <form onSubmit={handleSubmit} className="modal-form">
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>Vehicle Number *</label>
-                                    <input
-                                        type="text"
-                                        value={formData.vehicleNumber}
-                                        onChange={(e) => setFormData({ ...formData, vehicleNumber: e.target.value.toUpperCase() })}
-                                        placeholder="e.g., MH12AB1234"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="form-group">
-                                    <label>Type *</label>
-                                    <select
-                                        value={formData.type}
-                                        onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                                        required
-                                    >
-                                        {vehicleTypes.map(type => (
-                                            <option key={type} value={type}>{type}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>Brand</label>
-                                    <input
-                                        type="text"
-                                        value={formData.brand}
-                                        onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
-                                        placeholder="e.g., Toyota, Honda"
-                                    />
-                                </div>
-
-                                <div className="form-group">
-                                    <label>Model</label>
-                                    <input
-                                        type="text"
-                                        value={formData.model}
-                                        onChange={(e) => setFormData({ ...formData, model: e.target.value })}
-                                        placeholder="e.g., Innova, City"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>Capacity (Seats)</label>
-                                    <input
-                                        type="number"
-                                        value={formData.capacity}
-                                        onChange={(e) => setFormData({ ...formData, capacity: e.target.value })}
-                                        placeholder="e.g., 7"
-                                        min="1"
-                                    />
-                                </div>
-
-                                <div className="form-group">
-                                    <label>Color</label>
-                                    <input
-                                        type="text"
-                                        value={formData.color}
-                                        onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                                        placeholder="e.g., White, Black"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>Year</label>
-                                    <input
-                                        type="number"
-                                        value={formData.year}
-                                        onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-                                        min="1900"
-                                        max={new Date().getFullYear() + 1}
-                                    />
-                                </div>
-
-                                <div className="form-group">
-                                    <label>Status *</label>
-                                    <select
-                                        value={formData.status}
-                                        onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                                        required
-                                    >
-                                        {statusOptions.map(status => (
-                                            <option key={status} value={status}>
-                                                {status.charAt(0).toUpperCase() + status.slice(1)}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div className="form-group">
-                                <label>Notes</label>
-                                <textarea
-                                    value={formData.notes}
-                                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                                    placeholder="Additional notes about the vehicle..."
-                                    rows="3"
-                                />
-                            </div>
-
-                            <div className="modal-actions">
-                                <button type="button" onClick={handleCloseModal} className="btn btn-secondary">
-                                    Cancel
-                                </button>
-                                <button type="submit" className="btn btn-primary">
-                                    {editingVehicle ? '✅ Update Vehicle' : '✅ Add Vehicle'}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
         </div>
     );
 };

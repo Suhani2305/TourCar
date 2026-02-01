@@ -172,247 +172,249 @@ const UserManagement = () => {
     }
 
     return (
-        <div className="user-management-container">
-            {/* Header */}
-            <div className="page-header">
-                <div>
-                    <h1>👥 User Management</h1>
-                    <p>Manage user accounts and approvals</p>
+        <div className="main-container">
+            <div className="user-management-container">
+                {/* Header */}
+                <div className="page-header">
+                    <div>
+                        <h1>👥 User Management</h1>
+                        <p>Manage user accounts and approvals</p>
+                    </div>
+                    <div className="header-actions">
+                        <button onClick={() => setShowCreateModal(true)} className="btn btn-primary">
+                            ➕ Create User
+                        </button>
+                    </div>
                 </div>
-                <div className="header-actions">
-                    <button onClick={() => setShowCreateModal(true)} className="btn btn-primary">
-                        ➕ Create User
+
+                {/* Stats Grid */}
+                <div className="stats-grid">
+                    <div className="stat-card stat-total">
+                        <div className="stat-icon">📊</div>
+                        <div className="stat-content">
+                            <h3>{users.length}</h3>
+                            <p>Total Users</p>
+                        </div>
+                    </div>
+                    <div className="stat-card stat-pending">
+                        <div className="stat-icon">⏳</div>
+                        <div className="stat-content">
+                            <h3>{users.filter(u => u.status === 'pending').length}</h3>
+                            <p>Pending Approval</p>
+                        </div>
+                    </div>
+                    <div className="stat-card stat-approved">
+                        <div className="stat-icon">✅</div>
+                        <div className="stat-content">
+                            <h3>{users.filter(u => u.status === 'approved').length}</h3>
+                            <p>Approved</p>
+                        </div>
+                    </div>
+                    <div className="stat-card stat-paused">
+                        <div className="stat-icon">⏸️</div>
+                        <div className="stat-content">
+                            <h3>{users.filter(u => u.status === 'paused').length}</h3>
+                            <p>Paused</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Filter Section */}
+                <div className="filter-section">
+                    <button
+                        className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
+                        onClick={() => setFilter('all')}
+                    >
+                        All Users ({users.length})
+                    </button>
+                    <button
+                        className={`filter-btn ${filter === 'pending' ? 'active' : ''}`}
+                        onClick={() => setFilter('pending')}
+                    >
+                        Pending ({users.filter(u => u.status === 'pending').length})
+                    </button>
+                    <button
+                        className={`filter-btn ${filter === 'approved' ? 'active' : ''}`}
+                        onClick={() => setFilter('approved')}
+                    >
+                        Approved ({users.filter(u => u.status === 'approved').length})
+                    </button>
+                    <button
+                        className={`filter-btn ${filter === 'paused' ? 'active' : ''}`}
+                        onClick={() => setFilter('paused')}
+                    >
+                        Paused ({users.filter(u => u.status === 'paused').length})
                     </button>
                 </div>
-            </div>
 
-            {/* Stats Grid */}
-            <div className="stats-grid">
-                <div className="stat-card stat-total">
-                    <div className="stat-icon">📊</div>
-                    <div className="stat-content">
-                        <h3>{users.length}</h3>
-                        <p>Total Users</p>
-                    </div>
-                </div>
-                <div className="stat-card stat-pending">
-                    <div className="stat-icon">⏳</div>
-                    <div className="stat-content">
-                        <h3>{users.filter(u => u.status === 'pending').length}</h3>
-                        <p>Pending Approval</p>
-                    </div>
-                </div>
-                <div className="stat-card stat-approved">
-                    <div className="stat-icon">✅</div>
-                    <div className="stat-content">
-                        <h3>{users.filter(u => u.status === 'approved').length}</h3>
-                        <p>Approved</p>
-                    </div>
-                </div>
-                <div className="stat-card stat-paused">
-                    <div className="stat-icon">⏸️</div>
-                    <div className="stat-content">
-                        <h3>{users.filter(u => u.status === 'paused').length}</h3>
-                        <p>Paused</p>
-                    </div>
-                </div>
-            </div>
-
-            {/* Filter Section */}
-            <div className="filter-section">
-                <button
-                    className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
-                    onClick={() => setFilter('all')}
-                >
-                    All Users ({users.length})
-                </button>
-                <button
-                    className={`filter-btn ${filter === 'pending' ? 'active' : ''}`}
-                    onClick={() => setFilter('pending')}
-                >
-                    Pending ({users.filter(u => u.status === 'pending').length})
-                </button>
-                <button
-                    className={`filter-btn ${filter === 'approved' ? 'active' : ''}`}
-                    onClick={() => setFilter('approved')}
-                >
-                    Approved ({users.filter(u => u.status === 'approved').length})
-                </button>
-                <button
-                    className={`filter-btn ${filter === 'paused' ? 'active' : ''}`}
-                    onClick={() => setFilter('paused')}
-                >
-                    Paused ({users.filter(u => u.status === 'paused').length})
-                </button>
-            </div>
-
-            {/* Users Table - Desktop */}
-            <div className="users-table-container">
-                <table className="users-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th>Role</th>
-                            <th>Status</th>
-                            <th>Registered</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredUsers.length === 0 ? (
+                {/* Users Table - Desktop */}
+                <div className="users-table-container">
+                    <table className="users-table">
+                        <thead>
                             <tr>
-                                <td colSpan="7" className="no-data">
-                                    No users found
-                                </td>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Registered</th>
+                                <th>Actions</th>
                             </tr>
-                        ) : (
-                            filteredUsers.map((u) => (
-                                <tr key={u._id}>
-                                    <td><strong>{u.name}</strong></td>
-                                    <td>{u.email}</td>
-                                    <td>{u.phone || '-'}</td>
-                                    <td>{getRoleBadge(u.role)}</td>
-                                    <td>{getStatusBadge(u.status)}</td>
-                                    <td>{new Date(u.createdAt).toLocaleDateString()}</td>
-                                    <td>
-                                        <div className="action-buttons">
-                                            {renderUserActions(u)}
-                                        </div>
+                        </thead>
+                        <tbody>
+                            {filteredUsers.length === 0 ? (
+                                <tr>
+                                    <td colSpan="7" className="no-data">
+                                        No users found
                                     </td>
                                 </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
-            </div>
+                            ) : (
+                                filteredUsers.map((u) => (
+                                    <tr key={u._id}>
+                                        <td><strong>{u.name}</strong></td>
+                                        <td>{u.email}</td>
+                                        <td>{u.phone || '-'}</td>
+                                        <td>{getRoleBadge(u.role)}</td>
+                                        <td>{getStatusBadge(u.status)}</td>
+                                        <td>{new Date(u.createdAt).toLocaleDateString()}</td>
+                                        <td>
+                                            <div className="action-buttons">
+                                                {renderUserActions(u)}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div>
 
-            {/* Users Cards - Mobile */}
-            <div className="user-cards-mobile">
-                {filteredUsers.length === 0 ? (
-                    <div className="no-data" style={{ padding: '40px', textAlign: 'center' }}>
-                        No users found
-                    </div>
-                ) : (
-                    filteredUsers.map((u) => (
-                        <div key={u._id} className="user-card-mobile">
-                            <div className="user-card-header">
-                                <h3>{u.name}</h3>
-                                {getRoleBadge(u.role)}
-                            </div>
-
-                            <div className="user-card-info">
-                                <div className="user-card-info-row">
-                                    <span className="user-card-label">Email:</span>
-                                    <span className="user-card-value">{u.email}</span>
-                                </div>
-                                <div className="user-card-info-row">
-                                    <span className="user-card-label">Phone:</span>
-                                    <span className="user-card-value">{u.phone || '-'}</span>
-                                </div>
-                                <div className="user-card-info-row">
-                                    <span className="user-card-label">Status:</span>
-                                    <span className="user-card-value">{getStatusBadge(u.status)}</span>
-                                </div>
-                                <div className="user-card-info-row">
-                                    <span className="user-card-label">Registered:</span>
-                                    <span className="user-card-value">
-                                        {new Date(u.createdAt).toLocaleDateString()}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div className="user-card-actions">
-                                {renderUserActions(u)}
-                            </div>
+                {/* Users Cards - Mobile */}
+                <div className="user-cards-mobile">
+                    {filteredUsers.length === 0 ? (
+                        <div className="no-data" style={{ padding: '40px', textAlign: 'center' }}>
+                            No users found
                         </div>
-                    ))
+                    ) : (
+                        filteredUsers.map((u) => (
+                            <div key={u._id} className="user-card-mobile">
+                                <div className="user-card-header">
+                                    <h3>{u.name}</h3>
+                                    {getRoleBadge(u.role)}
+                                </div>
+
+                                <div className="user-card-info">
+                                    <div className="user-card-info-row">
+                                        <span className="user-card-label">Email:</span>
+                                        <span className="user-card-value">{u.email}</span>
+                                    </div>
+                                    <div className="user-card-info-row">
+                                        <span className="user-card-label">Phone:</span>
+                                        <span className="user-card-value">{u.phone || '-'}</span>
+                                    </div>
+                                    <div className="user-card-info-row">
+                                        <span className="user-card-label">Status:</span>
+                                        <span className="user-card-value">{getStatusBadge(u.status)}</span>
+                                    </div>
+                                    <div className="user-card-info-row">
+                                        <span className="user-card-label">Registered:</span>
+                                        <span className="user-card-value">
+                                            {new Date(u.createdAt).toLocaleDateString()}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div className="user-card-actions">
+                                    {renderUserActions(u)}
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
+
+                {/* Create User Modal */}
+                {showCreateModal && (
+                    <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
+                        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                            <div className="modal-header">
+                                <h2>➕ Create New User</h2>
+                                <button className="modal-close" onClick={() => setShowCreateModal(false)}>
+                                    ✕
+                                </button>
+                            </div>
+                            <form onSubmit={handleCreateUser} className="modal-form">
+                                <div className="form-group">
+                                    <label>Full Name *</label>
+                                    <input
+                                        type="text"
+                                        value={formData.name}
+                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                        placeholder="Enter full name"
+                                        required
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label>Email Address *</label>
+                                    <input
+                                        type="email"
+                                        value={formData.email}
+                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                        placeholder="Enter email"
+                                        required
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label>Phone Number</label>
+                                    <input
+                                        type="tel"
+                                        value={formData.phone}
+                                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                        placeholder="Enter phone number"
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label>Role *</label>
+                                    <select
+                                        value={formData.role}
+                                        onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                                        required
+                                    >
+                                        <option value="user">User</option>
+                                        <option value="superadmin">Super Admin</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label>Password *</label>
+                                    <input
+                                        type="password"
+                                        value={formData.password}
+                                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                        placeholder="Enter password (min 6 characters)"
+                                        required
+                                    />
+                                </div>
+
+                                <div className="info-box-modal">
+                                    <p>✅ User will be created with <strong>Approved</strong> status</p>
+                                </div>
+
+                                <div className="modal-actions">
+                                    <button type="button" onClick={() => setShowCreateModal(false)} className="btn btn-secondary">
+                                        Cancel
+                                    </button>
+                                    <button type="submit" className="btn btn-primary">
+                                        ✅ Create User
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 )}
             </div>
-
-            {/* Create User Modal */}
-            {showCreateModal && (
-                <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                        <div className="modal-header">
-                            <h2>➕ Create New User</h2>
-                            <button className="modal-close" onClick={() => setShowCreateModal(false)}>
-                                ✕
-                            </button>
-                        </div>
-                        <form onSubmit={handleCreateUser} className="modal-form">
-                            <div className="form-group">
-                                <label>Full Name *</label>
-                                <input
-                                    type="text"
-                                    value={formData.name}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    placeholder="Enter full name"
-                                    required
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label>Email Address *</label>
-                                <input
-                                    type="email"
-                                    value={formData.email}
-                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                    placeholder="Enter email"
-                                    required
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label>Phone Number</label>
-                                <input
-                                    type="tel"
-                                    value={formData.phone}
-                                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                    placeholder="Enter phone number"
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label>Role *</label>
-                                <select
-                                    value={formData.role}
-                                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                                    required
-                                >
-                                    <option value="user">User</option>
-                                    <option value="superadmin">Super Admin</option>
-                                </select>
-                            </div>
-
-                            <div className="form-group">
-                                <label>Password *</label>
-                                <input
-                                    type="password"
-                                    value={formData.password}
-                                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                    placeholder="Enter password (min 6 characters)"
-                                    required
-                                />
-                            </div>
-
-                            <div className="info-box-modal">
-                                <p>✅ User will be created with <strong>Approved</strong> status</p>
-                            </div>
-
-                            <div className="modal-actions">
-                                <button type="button" onClick={() => setShowCreateModal(false)} className="btn btn-secondary">
-                                    Cancel
-                                </button>
-                                <button type="submit" className="btn btn-primary">
-                                    ✅ Create User
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
         </div>
     );
 };

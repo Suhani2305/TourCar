@@ -40,7 +40,8 @@
     transition: all 0.3s ease;
     border-left: 5px solid #11120D;
     position: relative;
-    overflow: hidden;
+    box-sizing: border-box;
+    /* Ensure padding doesn't cause overflow */
 }
 
 .stat-card:hover {
@@ -90,12 +91,15 @@
 
 /* Quick Actions */
 .quick-actions {
+    margin-top: 2rem;
+    /* Space from stat cards above */
     margin-bottom: 2rem;
     background: #FFFBF4;
     padding: 2rem;
     border-radius: 1rem;
     box-shadow: 0 6px 12px rgba(17, 18, 13, 0.15);
     border-left: 5px solid #11120D;
+    box-sizing: border-box;
 }
 
 .quick-actions h2 {
@@ -107,8 +111,9 @@
 
 .actions-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 1.25rem;
+    box-sizing: border-box;
 }
 
 .action-btn {
@@ -127,6 +132,9 @@
     gap: 0.75rem;
     box-shadow: 0 6px 12px rgba(17, 18, 13, 0.25);
     text-align: center;
+    box-sizing: border-box;
+    min-width: 0;
+    /* Prevent overflow */
 }
 
 .action-btn:hover {
@@ -136,6 +144,19 @@
 
 .action-btn .icon {
     font-size: 1.5rem;
+}
+
+/* Mobile: Stack buttons vertically */
+@media screen and (max-width: 640px) {
+    .actions-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .action-btn {
+        padding: 1.25rem;
+        font-size: 0.9375rem;
+    }
 }
 
 /* Recent Activity */
