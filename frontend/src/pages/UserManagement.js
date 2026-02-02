@@ -7,8 +7,6 @@ import ConfirmationModal from '../components/ConfirmationModal';
 import '../styles/UserManagement.css';
 
 const UserManagement = () => {
-    const { logout } = useAuth();
-    const navigate = useNavigate();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all');

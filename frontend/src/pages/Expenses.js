@@ -7,7 +7,6 @@ import '../styles/Expenses.css';
 const Expenses = () => {
     const [expenses, setExpenses] = useState([]);
     const [vehicles, setVehicles] = useState([]);
-    const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     // Delete Confirmation Modal State

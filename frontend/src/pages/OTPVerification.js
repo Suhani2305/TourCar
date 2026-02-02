@@ -10,7 +10,7 @@ const OTPVerification = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const email = location.state?.email;
-    const name = location.state?.name;
+
 
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const [loading, setLoading] = useState(false);

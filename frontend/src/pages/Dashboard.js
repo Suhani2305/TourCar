@@ -35,26 +35,7 @@ const Dashboard = () => {
         }
     };
 
-    const formatCurrency = (amount) => {
-        return formatCurrencyShorthand(amount);
-    };
 
-    const formatDateTime = (dateString) => {
-        const date = new Date(dateString);
-        const now = new Date();
-        const diffMs = date - now;
-        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-        const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-
-        if (diffHours < 0) {
-            return 'Starting soon!';
-        } else if (diffHours < 24) {
-            return `in ${diffHours}h ${diffMins}m`;
-        } else {
-            const diffDays = Math.floor(diffHours / 24);
-            return `in ${diffDays} day${diffDays > 1 ? 's' : ''}`;
-        }
-    };
 
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString('en-IN', {
