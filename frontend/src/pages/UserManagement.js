@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 import { authAPI } from '../utils/api';
 import { toast } from 'react-toastify';
 import ConfirmationModal from '../components/ConfirmationModal';

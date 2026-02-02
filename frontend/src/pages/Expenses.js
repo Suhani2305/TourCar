@@ -30,14 +30,12 @@ const Expenses = () => {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const [expRes, vehRes, bookRes] = await Promise.all([
+            const [expRes, vehRes] = await Promise.all([
                 expenseAPI.getAll(),
-                vehicleAPI.getAll(),
-                bookingAPI.getAll()
+                vehicleAPI.getAll()
             ]);
             setExpenses(expRes.data.expenses);
             setVehicles(vehRes.data.vehicles);
-            setBookings(bookRes.data.bookings);
         } catch (error) {
             toast.error('Failed to fetch data');
         } finally {

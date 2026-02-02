@@ -14,9 +14,7 @@ const Navbar = () => {
         navigate('/login');
     };
 
-    const isActive = (path) => {
-        return location.pathname === path ? 'active' : '';
-    };
+
 
     return (
         <nav className="navbar">

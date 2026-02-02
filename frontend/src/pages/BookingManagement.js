@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { bookingAPI, vehicleAPI, authAPI } from '../utils/api';
@@ -8,7 +8,6 @@ import '../styles/BookingManagement.css';
 
 const BookingManagement = () => {
     const { user } = useAuth();
-    const navigate = useNavigate();
     const [bookings, setBookings] = useState([]);
     const [vehicles, setVehicles] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -46,19 +45,7 @@ const BookingManagement = () => {
 
     const statusOptions = ['pending', 'confirmed', 'completed', 'cancelled'];
 
-    useEffect(() => {
-        fetchBookings();
-        fetchVehicles();
-        if (user?.role === 'superadmin') {
-            fetchUsersList();
-        }
-    }, []);
-
-    useEffect(() => {
-        fetchBookings();
-    }, [viewMode, selectedUserId]);
-
-    const fetchBookings = async () => {
+    const fetchBookings = useCallback(async () => {
         try {
             console.log('🔍 Fetching bookings...', { viewMode, selectedUserId, userRole: user?.role });
             const params = {};
@@ -83,25 +70,33 @@ const BookingManagement = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [viewMode, selectedUserId, user?.role]);
 
-    const fetchVehicles = async () => {
+    const fetchVehicles = useCallback(async () => {
         try {
             const response = await vehicleAPI.getAll();
             setVehicles(response.data.vehicles.filter(v => v.status !== 'inactive'));
         } catch (error) {
             console.error('Failed to fetch vehicles');
         }
-    };
+    }, []);
 
-    const fetchUsersList = async () => {
+    const fetchUsersList = useCallback(async () => {
         try {
             const response = await authAPI.getUsersList();
             setUsersList(response.data.users);
         } catch (error) {
             console.error('Failed to fetch users list:', error);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        fetchBookings();
+        fetchVehicles();
+        if (user?.role === 'superadmin') {
+            fetchUsersList();
+        }
+    }, [fetchBookings, fetchVehicles, fetchUsersList, user?.role]);
 
     const handleViewModeChange = (mode) => {
         setViewMode(mode);
