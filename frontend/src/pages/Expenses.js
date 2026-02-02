@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { expenseAPI, vehicleAPI, bookingAPI } from '../utils/api';
+import { expenseAPI, vehicleAPI } from '../utils/api';
 import { toast } from 'react-toastify';
 import ConfirmationModal from '../components/ConfirmationModal';
 import '../styles/Expenses.css';
