@@ -5,7 +5,10 @@ import 'react-toastify/dist/ReactToastify.css';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
-import './styles/App.css'; // Import app-wide layout
+import Sidebar from './components/Sidebar';
+import './styles/App.css';
+import './styles/Sidebar.css';
+import './styles/colors.css';
 
 // Pages
 import Login from './pages/Login';
@@ -17,17 +20,22 @@ import VehicleManagement from './pages/VehicleManagement';
 import BookingManagement from './pages/BookingManagement';
 import CalendarView from './pages/CalendarView';
 import Reports from './pages/Reports';
+import Profile from './pages/Profile';
+import ForgotPassword from './pages/ForgotPassword';
 
 // Layout wrapper with proper structure
 const Layout = ({ children }) => {
     const location = useLocation();
-    const showNavbar = !['/login', '/register', '/verify-otp'].includes(location.pathname);
+    const showNavbar = !['/login', '/register', '/verify-otp', '/forgot-password'].includes(location.pathname);
 
     return (
         <div className="app-wrapper">
             {showNavbar && <Navbar />}
-            <div className={showNavbar ? "app-content" : ""}>
-                {children}
+            <div className="app-body">
+                {showNavbar && <Sidebar />}
+                <div className={showNavbar ? "app-content with-sidebar" : "app-content"}>
+                    {children}
+                </div>
             </div>
         </div>
     );
@@ -35,7 +43,7 @@ const Layout = ({ children }) => {
 
 function App() {
     return (
-        <Router>
+        <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <AuthProvider>
                 <div className="App">
                     <Layout>
@@ -44,6 +52,7 @@ function App() {
                             <Route path="/login" element={<Login />} />
                             <Route path="/register" element={<Register />} />
                             <Route path="/verify-otp" element={<OTPVerification />} />
+                            <Route path="/forgot-password" element={<ForgotPassword />} />
 
                             {/* Protected Routes */}
                             <Route
@@ -101,6 +110,15 @@ function App() {
                                 element={
                                     <ProtectedRoute>
                                         <Reports />
+                                    </ProtectedRoute>
+                                }
+                            />
+
+                            <Route
+                                path="/profile"
+                                element={
+                                    <ProtectedRoute>
+                                        <Profile />
                                     </ProtectedRoute>
                                 }
                             />

@@ -23,6 +23,7 @@ const Reports = () => {
     const [viewMode, setViewMode] = useState('my');
     const [selectedUser, setSelectedUser] = useState('');
     const [users, setUsers] = useState([]);
+    const [showExportDropdown, setShowExportDropdown] = useState(false);
 
     const COLORS = ['#2ecc71', '#f39c12', '#e74c3c', '#3498db', '#9b59b6'];
 
@@ -172,113 +173,121 @@ const Reports = () => {
     return (
         <div className="main-container">
             <div className="reports-container">
-                {/* Header */}
-                <div className="reports-header">
-                    <div className="header-left">
-                        <h1>📊 Reports & Analytics</h1>
-                        <p className="subtitle">Comprehensive business insights and data visualization</p>
-                    </div>
+                {/* Premium Header */}
+                <div className="premium-header">
+                    <h1 className="premium-title">
+                        BUSINESS <span className="accent">ANALYTICS</span>
+                    </h1>
+                    <p className="premium-tagline">COMPREHENSIVE PERFORMANCE INSIGHTS AND DATA VISUALIZATION</p>
+                    <div className="premium-underline"></div>
+                </div>
 
-                    <div className="header-actions">
-                        <button onClick={exportToPDF} className="export-btn pdf-btn">
-                            📄 Export PDF
-                        </button>
-                        <button onClick={exportToExcel} className="export-btn excel-btn">
-                            📊 Export Excel
-                        </button>
+                {/* KPI Cards Grid */}
+                <div className="cards-grid-4" style={{ marginBottom: '2.5rem' }}>
+                    <div className="stat-card" style={{ borderLeftColor: '#4A3728' }}>
+                        <div className="stat-icon-dot revenue"></div>
+                        <div className="stat-content">
+                            <h3>Total Revenue</h3>
+                            <p className="stat-value">₹{revenueData?.totalRevenue?.toLocaleString() || 0}</p>
+                        </div>
+                    </div>
+                    <div className="stat-card" style={{ borderLeftColor: '#D4AF37' }}>
+                        <div className="stat-icon-dot main"></div>
+                        <div className="stat-content">
+                            <h3>Total Bookings</h3>
+                            <p className="stat-value">{revenueData?.bookingCount || 0}</p>
+                        </div>
+                    </div>
+                    <div className="stat-card" style={{ borderLeftColor: '#2D5A27' }}>
+                        <div className="stat-icon-dot growth"></div>
+                        <div className="stat-content">
+                            <h3>Avg Booking</h3>
+                            <p className="stat-value">₹{revenueData?.averageBookingValue?.toLocaleString() || 0}</p>
+                        </div>
+                    </div>
+                    <div className="stat-card" style={{ borderLeftColor: '#1E40AF' }}>
+                        <div className="stat-icon-dot rocket"></div>
+                        <div className="stat-content">
+                            <h3>Growth</h3>
+                            <p className="stat-value">{revenueData?.growthRate || 0}%</p>
+                        </div>
                     </div>
                 </div>
 
-                {/* Filters */}
-                <div className="reports-filters">
-                    <div className="filter-group">
-                        <label>Start Date</label>
-                        <input
-                            type="date"
-                            value={dateRange.startDate}
-                            onChange={(e) => setDateRange({ ...dateRange, startDate: e.target.value })}
-                        />
-                    </div>
-                    <div className="filter-group">
-                        <label>End Date</label>
-                        <input
-                            type="date"
-                            value={dateRange.endDate}
-                            onChange={(e) => setDateRange({ ...dateRange, endDate: e.target.value })}
-                        />
-                    </div>
+                {/* Unified Controls Strip */}
+                <div className="controls-strip reports-filters-row">
+                    <div className="controls-left">
+                        <div className="filter-dropdown-wrapper">
+                            <label>START DATE</label>
+                            <input
+                                type="date"
+                                value={dateRange.startDate}
+                                onChange={(e) => setDateRange({ ...dateRange, startDate: e.target.value })}
+                                className="premium-date-input"
+                            />
+                        </div>
+                        <div className="filter-dropdown-wrapper">
+                            <label>END DATE</label>
+                            <input
+                                type="date"
+                                value={dateRange.endDate}
+                                onChange={(e) => setDateRange({ ...dateRange, endDate: e.target.value })}
+                                className="premium-date-input"
+                            />
+                        </div>
 
-                    {user?.role === 'superadmin' && (
-                        <>
-                            <div className="filter-group">
-                                <label>View Mode</label>
-                                <div className="view-toggle">
-                                    <button
-                                        className={viewMode === 'my' ? 'active' : ''}
-                                        onClick={() => {
+                        {user?.role === 'superadmin' && (
+                            <div className="filter-dropdown-wrapper">
+                                <label>DATA VIEW:</label>
+                                <select
+                                    className="premium-select"
+                                    value={viewMode === 'all' && selectedUser ? selectedUser : viewMode}
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        if (val === 'my') {
                                             setViewMode('my');
                                             setSelectedUser('');
-                                        }}
-                                    >
-                                        My Data
-                                    </button>
-                                    <button
-                                        className={viewMode === 'all' ? 'active' : ''}
-                                        onClick={() => setViewMode('all')}
-                                    >
-                                        All Data
-                                    </button>
-                                </div>
-                            </div>
-
-                            {viewMode === 'all' && (
-                                <div className="filter-group">
-                                    <label>Filter by User</label>
-                                    <select
-                                        value={selectedUser}
-                                        onChange={(e) => setSelectedUser(e.target.value)}
-                                    >
-                                        <option value="">All Users</option>
-                                        {users.map(u => (
+                                        } else if (val === 'all') {
+                                            setViewMode('all');
+                                            setSelectedUser('');
+                                        } else {
+                                            setViewMode('all');
+                                            setSelectedUser(val);
+                                        }
+                                    }}
+                                >
+                                    <option value="my">My Data</option>
+                                    <optgroup label="Global Perspective">
+                                        <option value="all">Global Data (All Staff)</option>
+                                        {users.filter(u => u._id !== user._id).map(u => (
                                             <option key={u._id} value={u._id}>
-                                                {u.name} ({u.email})
+                                                &nbsp;&nbsp;&nbsp;Staff: {u.name}
                                             </option>
                                         ))}
-                                    </select>
+                                    </optgroup>
+                                </select>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="controls-right">
+                        <div className="export-dropdown-wrapper">
+                            <button
+                                onClick={() => setShowExportDropdown(!showExportDropdown)}
+                                className="btn-premium-export"
+                            >
+                                📤 EXPORT
+                            </button>
+                            {showExportDropdown && (
+                                <div className="export-menu">
+                                    <button onClick={() => { exportToPDF(); setShowExportDropdown(false); }}>
+                                        📄 PDF Report
+                                    </button>
+                                    <button onClick={() => { exportToExcel(); setShowExportDropdown(false); }}>
+                                        📊 Excel Data
+                                    </button>
                                 </div>
                             )}
-                        </>
-                    )}
-                </div>
-
-                {/* Revenue Summary Cards */}
-                <div className="summary-cards">
-                    <div className="summary-card revenue-card">
-                        <div className="card-icon">💰</div>
-                        <div className="card-content">
-                            <h3>Total Revenue</h3>
-                            <p className="card-value">₹{revenueData?.totalRevenue?.toLocaleString() || 0}</p>
-                        </div>
-                    </div>
-                    <div className="summary-card bookings-card">
-                        <div className="card-icon">📋</div>
-                        <div className="card-content">
-                            <h3>Total Bookings</h3>
-                            <p className="card-value">{revenueData?.bookingCount || 0}</p>
-                        </div>
-                    </div>
-                    <div className="summary-card average-card">
-                        <div className="card-icon">📈</div>
-                        <div className="card-content">
-                            <h3>Average Booking Value</h3>
-                            <p className="card-value">₹{revenueData?.averageBookingValue?.toLocaleString() || 0}</p>
-                        </div>
-                    </div>
-                    <div className="summary-card growth-card">
-                        <div className="card-icon">🚀</div>
-                        <div className="card-content">
-                            <h3>Growth Rate</h3>
-                            <p className="card-value">{revenueData?.growthRate || 0}%</p>
                         </div>
                     </div>
                 </div>

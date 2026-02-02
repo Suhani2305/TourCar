@@ -121,73 +121,96 @@ const CalendarView = () => {
     return (
         <div className="main-container">
             <div className="calendar-view-container">
-                {/* Header */}
-                <div className="calendar-header">
-                    <div className="header-left">
-                        <h1>📅 Booking Calendar</h1>
-                        <p className="subtitle">View and manage your bookings in calendar format</p>
+                {/* Premium Header */}
+                <div className="premium-header">
+                    <h1 className="premium-title">
+                        BOOKING <span className="accent">CALENDAR</span>
+                    </h1>
+                    <p className="premium-tagline">VIEW AND MANAGE YOUR TOURS IN CALENDAR FORMAT</p>
+                    <div className="premium-underline"></div>
+                </div>
+
+                {/* Filters & Legend Row */}
+                <div className="calendar-controls-row">
+                    <div className="legend-pills">
+                        <span className="legend-pill confirmed">Confirmed</span>
+                        <span className="legend-pill pending">Pending</span>
+                        <span className="legend-pill cancelled">Cancelled</span>
+                        <span className="legend-pill completed">Completed</span>
                     </div>
 
                     {user?.role === 'superadmin' && (
-                        <div className="view-controls">
-                            <div className="view-toggle">
-                                <button
-                                    className={viewMode === 'my' ? 'active' : ''}
-                                    onClick={() => {
+                        <div className="filter-dropdown-wrapper">
+                            <label>DATA VIEW:</label>
+                            <select
+                                className="premium-select"
+                                value={viewMode === 'all' && selectedUser ? selectedUser : viewMode}
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    if (val === 'my') {
                                         setViewMode('my');
                                         setSelectedUser('');
-                                    }}
-                                >
-                                    My Bookings
-                                </button>
-                                <button
-                                    className={viewMode === 'all' ? 'active' : ''}
-                                    onClick={() => setViewMode('all')}
-                                >
-                                    All Bookings
-                                </button>
-                            </div>
-
-                            {viewMode === 'all' && (
-                                <select
-                                    value={selectedUser}
-                                    onChange={(e) => setSelectedUser(e.target.value)}
-                                    className="user-filter"
-                                >
-                                    <option value="">All Users</option>
-                                    {users.map(u => (
+                                    } else if (val === 'all') {
+                                        setViewMode('all');
+                                        setSelectedUser('');
+                                    } else {
+                                        setViewMode('all');
+                                        setSelectedUser(val);
+                                    }
+                                }}
+                            >
+                                <option value="my">My Bookings</option>
+                                <optgroup label="Global Perspective">
+                                    <option value="all">Global Bookings (All Staff)</option>
+                                    {users.filter(u => u._id !== user._id).map(u => (
                                         <option key={u._id} value={u._id}>
-                                            {u.name} ({u.email})
+                                            &nbsp;&nbsp;&nbsp;Staff: {u.name}
                                         </option>
                                     ))}
-                                </select>
-                            )}
+                                </optgroup>
+                            </select>
                         </div>
                     )}
                 </div>
 
-                {/* Legend */}
-                <div className="calendar-legend">
-                    <span className="legend-item">
-                        <span className="color-box confirmed"></span> Confirmed
-                    </span>
-                    <span className="legend-item">
-                        <span className="color-box pending"></span> Pending
-                    </span>
-                    <span className="legend-item">
-                        <span className="color-box cancelled"></span> Cancelled
-                    </span>
-                    <span className="legend-item">
-                        <span className="color-box completed"></span> Completed
-                    </span>
+                {/* Stats Summary - Dashboard Style */}
+                <div className="cards-grid-4" style={{ marginBottom: '2.5rem' }}>
+                    <div className="stat-card">
+                        <div className="stat-icon">📊</div>
+                        <div className="stat-content">
+                            <h3>Month Bookings</h3>
+                            <p className="stat-value">{bookings.length}</p>
+                        </div>
+                    </div>
+                    <div className="stat-card" style={{ borderLeftColor: '#2ecc71' }}>
+                        <div className="stat-icon">✅</div>
+                        <div className="stat-content">
+                            <h3>Confirmed</h3>
+                            <p className="stat-value">{bookings.filter(b => b.status === 'confirmed').length}</p>
+                        </div>
+                    </div>
+                    <div className="stat-card" style={{ borderLeftColor: '#f39c12' }}>
+                        <div className="stat-icon">⏳</div>
+                        <div className="stat-content">
+                            <h3>Pending</h3>
+                            <p className="stat-value">{bookings.filter(b => b.status === 'pending').length}</p>
+                        </div>
+                    </div>
+                    <div className="stat-card" style={{ borderLeftColor: '#4A3728' }}>
+                        <div className="stat-icon">💰</div>
+                        <div className="stat-content">
+                            <h3>Month Revenue</h3>
+                            <p className="stat-value">₹{bookings.reduce((sum, b) => sum + (b.amount || 0), 0).toLocaleString()}</p>
+                        </div>
+                    </div>
                 </div>
 
-                {/* Calendar */}
-                <div className="calendar-wrapper">
+                {/* Calendar Wrapper */}
+                <div className="calendar-main-wrapper">
                     {loading ? (
                         <div className="loading-spinner">
                             <div className="spinner"></div>
-                            <p>Loading bookings...</p>
+                            <p>Loading schedule...</p>
                         </div>
                     ) : (
                         <Calendar
@@ -207,7 +230,7 @@ const CalendarView = () => {
                         <div className="booking-popup" onClick={(e) => e.stopPropagation()}>
                             <div className="popup-header">
                                 <h3>
-                                    Bookings on {format(new Date(selectedDateBookings[0]?.pickupDate), 'MMMM dd, yyyy')}
+                                    Bookings on {selectedDateBookings.length > 0 && format(new Date(selectedDateBookings[0].pickupDate), 'MMMM dd, yyyy')}
                                 </h3>
                                 <button onClick={() => setShowPopup(false)} className="close-btn">×</button>
                             </div>
@@ -237,32 +260,6 @@ const CalendarView = () => {
                         </div>
                     </div>
                 )}
-
-                {/* Stats Summary */}
-                <div className="calendar-stats">
-                    <div className="stat-box">
-                        <span className="stat-number">{bookings.length}</span>
-                        <span className="stat-label">Total Bookings This Month</span>
-                    </div>
-                    <div className="stat-box">
-                        <span className="stat-number">
-                            {bookings.filter(b => b.status === 'confirmed').length}
-                        </span>
-                        <span className="stat-label">Confirmed</span>
-                    </div>
-                    <div className="stat-box">
-                        <span className="stat-number">
-                            {bookings.filter(b => b.status === 'pending').length}
-                        </span>
-                        <span className="stat-label">Pending</span>
-                    </div>
-                    <div className="stat-box">
-                        <span className="stat-number">
-                            ₹{bookings.reduce((sum, b) => sum + (b.amount || 0), 0).toLocaleString()}
-                        </span>
-                        <span className="stat-label">Total Revenue</span>
-                    </div>
-                </div>
             </div>
         </div>
     );

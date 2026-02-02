@@ -4,7 +4,7 @@ const User = require('../models/User');
 const OTP = require('../models/OTP');
 const jwt = require('jsonwebtoken');
 const { protect, authorize } = require('../middleware/auth');
-const { sendWelcomeEmail, sendUserApprovalEmail, sendOTPEmail } = require('../utils/emailService');
+const { sendWelcomeEmail, sendUserApprovalEmail, sendOTPEmail, sendResetPasswordOTPEmail } = require('../utils/emailService');
 
 // Generate JWT Token
 const generateToken = (id) => {
@@ -428,9 +428,6 @@ router.post('/login', async (req, res) => {
     }
 });
 
-// @route   GET /api/auth/me
-// @desc    Get current logged in user
-// @access  Private
 router.get('/me', protect, async (req, res) => {
     try {
         res.status(200).json({
@@ -442,6 +439,215 @@ router.get('/me', protect, async (req, res) => {
             success: false,
             message: 'Error fetching user data'
         });
+    }
+});
+
+// @route   PUT /api/auth/update-profile
+// @desc    Update user profile (name, phone)
+// @access  Private
+router.put('/update-profile', protect, async (req, res) => {
+    try {
+        const { name, phone } = req.body;
+
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        if (name) user.name = name;
+        if (phone) user.phone = phone;
+
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            message: 'Profile updated successfully',
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                phone: user.phone,
+                status: user.status
+            }
+        });
+    } catch (error) {
+        console.error('Update profile error:', error);
+        res.status(500).json({ success: false, message: 'Error updating profile' });
+    }
+});
+
+// @route   POST /api/auth/forgot-password
+// @desc    Send OTP for forgot password
+// @access  Public
+router.post('/forgot-password', async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        if (!email) {
+            return res.status(400).json({ success: false, message: 'Please provide email' });
+        }
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'No user found with this email' });
+        }
+
+        // Generate OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+        // Save OTP to special recovery OTP record or reuse OTP model
+        // Reusing OTP model but with password = 'RECOVERY' to distinguish
+        await OTP.deleteMany({ email });
+        await OTP.create({
+            email,
+            otp,
+            name: user.name,
+            password: 'RECOVERY_REQUEST', // Flag to indicate this is for recovery
+            role: user.role
+        });
+
+        // Send Email
+        await sendResetPasswordOTPEmail(email, otp, user.name);
+
+        res.status(200).json({
+            success: true,
+            message: 'Password reset OTP sent to your email'
+        });
+    } catch (error) {
+        console.error('Forgot password error:', error);
+        res.status(500).json({ success: false, message: 'Error sending reset OTP' });
+    }
+});
+
+// @route   POST /api/auth/verify-reset-otp
+// @desc    Verify OTP for password reset
+// @access  Public
+router.post('/verify-reset-otp', async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+
+        if (!email || !otp) {
+            return res.status(400).json({ success: false, message: 'Please provide email and OTP' });
+        }
+
+        const otpRecord = await OTP.findOne({ email });
+        if (!otpRecord || otpRecord.password !== 'RECOVERY_REQUEST') {
+            return res.status(400).json({ success: false, message: 'Reset request not found or expired' });
+        }
+
+        const isMatch = await otpRecord.compareOTP(otp);
+        if (!isMatch) {
+            return res.status(400).json({ success: false, message: 'Invalid OTP' });
+        }
+
+        // Return a temp recovery token (signed JWT specific for reset)
+        const resetToken = jwt.sign({ email, purpose: 'password_reset' }, process.env.JWT_SECRET, { expiresIn: '10m' });
+
+        res.status(200).json({
+            success: true,
+            message: 'OTP verified successfully',
+            resetToken
+        });
+    } catch (error) {
+        console.error('Verify reset OTP error:', error);
+        res.status(500).json({ success: false, message: 'Error verifying OTP' });
+    }
+});
+
+// @route   POST /api/auth/reset-password
+// @desc    Reset password using reset token
+// @access  Public
+router.post('/reset-password', async (req, res) => {
+    try {
+        const { resetToken, newPassword } = req.body;
+
+        if (!resetToken || !newPassword) {
+            return res.status(400).json({ success: false, message: 'Missing token or password' });
+        }
+
+        const decoded = jwt.verify(resetToken, process.env.JWT_SECRET);
+        if (decoded.purpose !== 'password_reset') {
+            return res.status(400).json({ success: false, message: 'Invalid reset token' });
+        }
+
+        const user = await User.findOne({ email: decoded.email });
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        user.password = newPassword;
+        await user.save();
+
+        // Small cleanup: delete OTP record
+        await OTP.deleteMany({ email: decoded.email });
+
+        res.status(200).json({
+            success: true,
+            message: 'Password reset successful. You can now login.'
+        });
+    } catch (error) {
+        console.error('Reset password error:', error);
+        res.status(400).json({ success: false, message: 'Invalid or expired reset token' });
+    }
+});
+
+// @route   POST /api/auth/profile/send-password-otp
+// @desc    Send OTP to change password from profile
+// @access  Private
+router.post('/profile/send-password-otp', protect, async (req, res) => {
+    try {
+        const user = req.user;
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+        await OTP.deleteMany({ email: user.email });
+        await OTP.create({
+            email: user.email,
+            otp,
+            name: user.name,
+            password: 'PROFILE_CHANGE_REQUEST',
+            role: user.role
+        });
+
+        await sendResetPasswordOTPEmail(user.email, otp, user.name);
+
+        res.status(200).json({
+            success: true,
+            message: 'OTP sent to your email for password change'
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Error sending OTP' });
+    }
+});
+
+// @route   POST /api/auth/profile/change-password-verified
+// @desc    Change password with OTP verification
+// @access  Private
+router.post('/profile/change-password-verified', protect, async (req, res) => {
+    try {
+        const { otp, newPassword } = req.body;
+        const user = await User.findById(req.user._id);
+
+        const otpRecord = await OTP.findOne({ email: user.email });
+        if (!otpRecord || otpRecord.password !== 'PROFILE_CHANGE_REQUEST') {
+            return res.status(400).json({ success: false, message: 'Change request not found' });
+        }
+
+        const isMatch = await otpRecord.compareOTP(otp);
+        if (!isMatch) {
+            return res.status(400).json({ success: false, message: 'Invalid OTP' });
+        }
+
+        user.password = newPassword;
+        await user.save();
+        await OTP.deleteOne({ email: user.email });
+
+        res.status(200).json({
+            success: true,
+            message: 'Password changed successfully'
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Error changing password' });
     }
 });
 

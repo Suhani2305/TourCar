@@ -43,48 +43,88 @@ const Login = () => {
     };
 
     return (
-        <div className="auth-container">
-            <div className="auth-card">
-                <div className="auth-header">
-                    <div className="auth-icon">🔐</div>
-                    <h1>Welcome Back</h1>
-                    <p>Login to Tour Management System</p>
+        <div className="auth-page-wrapper">
+            <div className="auth-container premium-auth">
+                {/* Left Side - Visual Branding */}
+                <div className="auth-decorative-side">
+                    <div className="auth-overlay"></div>
+                    <div className="auth-branding">
+                        <h1 className="brand-logo">TOUR <span className="accent">CAR</span></h1>
+                        <p className="brand-tagline">Premium Fleet & Booking Solutions</p>
+                    </div>
+                    <div className="auth-illustration">
+                        {/* You can add an image or icon here */}
+                        <div className="premium-badge">PREMIUM ACCESS</div>
+                    </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="auth-form">
-                    <div className="form-group">
-                        <label htmlFor="email">Email Address</label>
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            placeholder="Enter your email"
-                            required
-                        />
+                {/* Right Side - Login Form */}
+                <div className="auth-form-side">
+                    <div className="auth-card">
+                        <div className="auth-header">
+                            <div className="auth-icon-wrapper">
+                                <span className="auth-icon-dot"></span>
+                            </div>
+                            <h1>Welcome Back</h1>
+                            <p>Enter your credentials to access the dashboard</p>
+                        </div>
+
+                        <form onSubmit={handleSubmit} className="auth-form">
+                            <div className="form-group premium-group">
+                                <label htmlFor="email">Email Address</label>
+                                <div className="input-with-icon">
+                                    <input
+                                        type="email"
+                                        id="email"
+                                        name="email"
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                        placeholder="name@company.com"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="form-group premium-group">
+                                <label htmlFor="password">Password</label>
+                                <div className="input-with-icon">
+                                    <input
+                                        type="password"
+                                        id="password"
+                                        name="password"
+                                        value={formData.password}
+                                        onChange={handleChange}
+                                        placeholder="••••••••"
+                                        required
+                                    />
+                                </div>
+                                <div className="forgot-password-link-container">
+                                    <Link to="/forgot-password" style={{
+                                        color: '#D4AF37',
+                                        textDecoration: 'none',
+                                        fontSize: '0.85rem',
+                                        marginTop: '0.5rem',
+                                        display: 'block',
+                                        textAlign: 'right'
+                                    }}>
+                                        Forgot Password?
+                                    </Link>
+                                </div>
+                            </div>
+
+                            <button type="submit" className="btn-auth-submit" disabled={loading}>
+                                {loading ? (
+                                    <span className="loader-small"></span>
+                                ) : (
+                                    <>SIGN IN <span className="btn-arrow">→</span></>
+                                )}
+                            </button>
+                        </form>
+
+                        <div className="auth-footer">
+                            <p>New to the system? <Link to="/register" className="auth-link">Create Account</Link></p>
+                        </div>
                     </div>
-
-                    <div className="form-group">
-                        <label htmlFor="password">Password</label>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            placeholder="Enter your password"
-                            required
-                        />
-                    </div>
-
-                    <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
-                        {loading ? '🔄 Logging in...' : '🚀 Login'}
-                    </button>
-                </form>
-
-                <div className="auth-footer">
-                    <p>Don't have an account? <Link to="/register">Register here</Link></p>
                 </div>
             </div>
         </div>

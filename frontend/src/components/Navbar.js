@@ -7,111 +7,56 @@ const Navbar = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { user, logout } = useAuth();
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
 
     const handleLogout = () => {
         logout();
         navigate('/login');
-        setMobileMenuOpen(false);
     };
 
     const isActive = (path) => {
         return location.pathname === path ? 'active' : '';
     };
 
-    const handleNavClick = (path) => {
-        navigate(path);
-        setMobileMenuOpen(false);
-    };
-
-    const toggleMobileMenu = () => {
-        setMobileMenuOpen(!mobileMenuOpen);
-    };
-
     return (
         <nav className="navbar">
             <div className="navbar-container">
-                {/* Brand */}
-                <div className="navbar-brand" onClick={() => handleNavClick('/dashboard')}>
-                    <span className="brand-icon">🚗</span>
-                    <span className="brand-text">Tour Management</span>
+                {/* Brand - Only visible on mobile/small screens via CSS */}
+                <div className="navbar-brand mobile-only" onClick={() => navigate('/dashboard')}>
+                    <span className="navbar-brand-dot"></span>
+                    <span className="brand-text">TOUR <span className="accent">CAR</span></span>
                 </div>
 
-                {/* Hamburger Menu Button */}
-                <button
-                    className={`hamburger-btn ${mobileMenuOpen ? 'active' : ''}`}
-                    onClick={toggleMobileMenu}
-                    aria-label="Toggle menu"
-                >
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-
-                {/* Navigation Links */}
-                <div className={`navbar-links ${mobileMenuOpen ? 'mobile-active' : ''}`}>
-                    <button
-                        className={`nav-link ${isActive('/dashboard')}`}
-                        onClick={() => handleNavClick('/dashboard')}
-                    >
-                        <span className="nav-icon">🏠</span>
-                        <span className="nav-text">Dashboard</span>
-                    </button>
-
-                    <button
-                        className={`nav-link ${isActive('/bookings')}`}
-                        onClick={() => handleNavClick('/bookings')}
-                    >
-                        <span className="nav-icon">📅</span>
-                        <span className="nav-text">Bookings</span>
-                    </button>
-
-                    <button
-                        className={`nav-link ${isActive('/calendar')}`}
-                        onClick={() => handleNavClick('/calendar')}
-                    >
-                        <span className="nav-icon">📆</span>
-                        <span className="nav-text">Calendar</span>
-                    </button>
-
-                    <button
-                        className={`nav-link ${isActive('/reports')}`}
-                        onClick={() => handleNavClick('/reports')}
-                    >
-                        <span className="nav-icon">📊</span>
-                        <span className="nav-text">Reports</span>
-                    </button>
-
-                    <button
-                        className={`nav-link ${isActive('/vehicles')}`}
-                        onClick={() => handleNavClick('/vehicles')}
-                    >
-                        <span className="nav-icon">🚙</span>
-                        <span className="nav-text">Vehicles</span>
-                    </button>
-
-                    {user?.role === 'superadmin' && (
-                        <button
-                            className={`nav-link ${isActive('/admin/users')}`}
-                            onClick={() => handleNavClick('/admin/users')}
-                        >
-                            <span className="nav-icon">👥</span>
-                            <span className="nav-text">Users</span>
-                        </button>
-                    )}
-                </div>
-
-                {/* User Section */}
+                {/* User Section - Right */}
                 <div className="navbar-user">
-                    <div className="user-info">
-                        <span className="user-name">{user?.name}</span>
-                        <span className="user-role">
-                            {user?.role === 'superadmin' ? '👑 Admin' : '👤 User'}
-                        </span>
+                    <div className="user-profile" onClick={() => setDropdownOpen(!dropdownOpen)}>
+                        <div className="user-avatar-mini">
+                            {user?.name?.charAt(0).toUpperCase() || 'U'}
+                        </div>
+                        <div className="user-info-text">
+                            <span className="user-name">{user?.name}</span>
+                            <span className="user-role">
+                                {user?.role === 'superadmin' ? 'Admin' : 'Staff'}
+                            </span>
+                        </div>
+                        <span className={`dropdown-arrow ${dropdownOpen ? 'open' : ''}`}>▼</span>
                     </div>
-                    <button className="logout-btn" onClick={handleLogout}>
-                        🚪 Logout
-                    </button>
+
+                    {dropdownOpen && (
+                        <div className="user-dropdown">
+                            <div className="dropdown-header">
+                                <p className="dropdown-user-name">{user?.name}</p>
+                                <p className="dropdown-user-email">{user?.email}</p>
+                            </div>
+                            <div className="dropdown-divider"></div>
+                            <button className="dropdown-item" onClick={() => { navigate('/profile'); setDropdownOpen(false); }}>
+                                👤 My Profile
+                            </button>
+                            <button className="dropdown-item logout" onClick={handleLogout}>
+                                🚪 Log Out
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
         </nav>

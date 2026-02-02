@@ -34,14 +34,20 @@
 /* Stats Cards - Uses cards-grid-4 from App.css */
 .stat-card {
     background: #FFFBF4;
-    padding: 1.75rem;
+    padding: 1.25rem 1.5rem;
     border-radius: 0.875rem;
     box-shadow: 0 6px 12px rgba(17, 18, 13, 0.15);
     transition: all 0.3s ease;
     border-left: 5px solid #11120D;
     position: relative;
     box-sizing: border-box;
-    /* Ensure padding doesn't cause overflow */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    /* Content Left, Icon Right */
+    flex-direction: row-reverse;
+    /* Swap visual order */
+    gap: 1rem;
 }
 
 .stat-card:hover {
@@ -65,28 +71,78 @@
     border-left-color: #f39c12;
 }
 
-.stat-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    display: inline-block;
+/* Stat Icon Dots */
+.stat-icon-dot {
+    width: 12px;
+    height: 12px;
+    background: #4A3728;
+    border-radius: 50%;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.stat-icon-dot::after {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    border: 2px solid rgba(74, 55, 40, 0.2);
+    border-radius: 50%;
+}
+
+.stat-icon-dot.main {
+    background: #4A3728;
+}
+
+.stat-icon-dot.revenue {
+    background: #2ecc71;
+}
+
+.stat-icon-dot.revenue::after {
+    border-color: rgba(46, 204, 113, 0.2);
+}
+
+.stat-icon-dot.pending {
+    background: #f39c12;
+}
+
+.stat-icon-dot.pending::after {
+    border-color: rgba(243, 156, 18, 0.2);
+}
+
+.stat-content {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
 }
 
 .stat-content h3 {
-    margin: 0 0 0.625rem 0;
-    font-size: 0.875rem;
-    color: #565449;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-weight: 700;
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 600;
 }
 
-.stat-content .stat-value,
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0.25rem 0 0 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .stat-content p {
     margin: 0;
-    font-size: 2.5rem;
+    font-size: 1.75rem;
     font-weight: 800;
     color: #11120D;
-    line-height: 1.1;
+    line-height: 1.2;
 }
 
 /* Quick Actions */
@@ -330,20 +386,20 @@
     }
 
     .stat-card {
-        padding: 1.5rem;
+        padding: 0.75rem 1rem;
+        gap: 0.5rem;
     }
 
     .stat-icon {
-        font-size: 2.25rem;
+        font-size: 1.5rem;
     }
 
     .stat-content h3 {
-        font-size: 0.8125rem;
+        font-size: 0.7rem;
     }
 
-    .stat-content .stat-value,
-    .stat-content p {
-        font-size: 1.875rem;
+    .stat-value {
+        font-size: 1.2rem;
     }
 
     .quick-actions,

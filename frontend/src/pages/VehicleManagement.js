@@ -182,124 +182,113 @@ const VehicleManagement = () => {
     return (
         <div className="main-container">
             <div className="vehicle-management-container">
-                {/* Header */}
-                <div className="page-header">
-                    <div>
-                        <h1>🚗 Vehicle Management</h1>
-                        <p>Manage your fleet of vehicles</p>
-                    </div>
-                    <div className="header-actions">
-                        {user?.role === 'superadmin' && (
-                            <div className="view-mode-toggle">
-                                <button
-                                    className={`toggle-btn ${viewMode === 'my' ? 'active' : ''}`}
-                                    onClick={() => handleViewModeChange('my')}
-                                >
-                                    📋 My Vehicles
-                                </button>
-                                <button
-                                    className={`toggle-btn ${viewMode === 'all' ? 'active' : ''}`}
-                                    onClick={() => handleViewModeChange('all')}
-                                >
-                                    🌐 All Vehicles
-                                </button>
-                            </div>
-                        )}
-                        <button onClick={() => setShowModal(true)} className="btn btn-primary">
-                            ➕ Add Vehicle
-                        </button>
-                    </div>
+                {/* Premium Header */}
+                <div className="premium-header">
+                    <h1 className="premium-title">
+                        VEHICLE <span className="accent">FLEET</span>
+                    </h1>
+                    <p className="premium-tagline">MANAGE YOUR PREMIUM COLLECTION OF TOUR VEHICLES</p>
+                    <div className="premium-underline"></div>
                 </div>
 
-                {/* Stats */}
-                <div className="stats-grid">
-                    <div className="stat-card stat-total">
-                        <div className="stat-icon">🚗</div>
+                {/* Stats Grid - Dashboard Style */}
+                <div className="cards-grid-4" style={{ marginBottom: '2.5rem' }}>
+                    <div className="stat-card">
+                        <div className="stat-icon-dot main"></div>
                         <div className="stat-content">
-                            <h3>{vehicles.length}</h3>
-                            <p>Total Vehicles</p>
+                            <h3>Total Fleet</h3>
+                            <p className="stat-value">{vehicles.length}</p>
                         </div>
                     </div>
-                    <div className="stat-card stat-available">
-                        <div className="stat-icon">✅</div>
+                    <div className="stat-card" style={{ borderLeftColor: '#2D5A27' }}>
+                        <div className="stat-icon-dot approved"></div>
                         <div className="stat-content">
-                            <h3>{vehicles.filter(v => v.status === 'available').length}</h3>
-                            <p>Available</p>
+                            <h3>Available</h3>
+                            <p className="stat-value">{vehicles.filter(v => v.status === 'available').length}</p>
                         </div>
                     </div>
-                    <div className="stat-card stat-booked">
-                        <div className="stat-icon">📅</div>
+                    <div className="stat-card" style={{ borderLeftColor: '#D4AF37' }}>
+                        <div className="stat-icon-dot in-use"></div>
                         <div className="stat-content">
-                            <h3>{vehicles.filter(v => v.status === 'booked').length}</h3>
-                            <p>Booked</p>
+                            <h3>In Use</h3>
+                            <p className="stat-value">{vehicles.filter(v => v.status === 'booked').length}</p>
                         </div>
                     </div>
-                    <div className="stat-card stat-maintenance">
-                        <div className="stat-icon">🔧</div>
+                    <div className="stat-card" style={{ borderLeftColor: '#8B0000' }}>
+                        <div className="stat-icon-dot service"></div>
                         <div className="stat-content">
-                            <h3>{vehicles.filter(v => v.status === 'maintenance').length}</h3>
-                            <p>Maintenance</p>
+                            <h3>Service</h3>
+                            <p className="stat-value">{vehicles.filter(v => v.status === 'maintenance').length}</p>
                         </div>
                     </div>
                 </div>
 
+                {/* Unified Controls Strip */}
+                <div className="controls-strip">
+                    <div className="controls-left">
+                        <div className="search-box-premium">
+                            <span className="search-icon">🔍</span>
+                            <input
+                                type="text"
+                                placeholder="Search by number, brand, or model..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
 
-                {/* Filter Buttons */}
-                <div className="filter-buttons">
-                    <button
-                        className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
-                        onClick={() => setFilter('all')}
-                    >
-                        All ({vehicles.length})
-                    </button>
-                    <button
-                        className={`filter-btn ${filter === 'available' ? 'active' : ''}`}
-                        onClick={() => setFilter('available')}
-                    >
-                        Available ({vehicles.filter(v => v.status === 'available').length})
-                    </button>
-                    <button
-                        className={`filter-btn ${filter === 'booked' ? 'active' : ''}`}
-                        onClick={() => setFilter('booked')}
-                    >
-                        Booked ({vehicles.filter(v => v.status === 'booked').length})
-                    </button>
-                    <button
-                        className={`filter-btn ${filter === 'maintenance' ? 'active' : ''}`}
-                        onClick={() => setFilter('maintenance')}
-                    >
-                        Maintenance ({vehicles.filter(v => v.status === 'maintenance').length})
-                    </button>
-                </div>
-
-                {/* Search and User Filter */}
-                <div className="controls-section">
-                    <div className="search-box">
-                        <input
-                            type="text"
-                            placeholder="🔍 Search by number, brand, or model..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                    </div>
-
-                    {/* User Filter for Super Admin in 'All' mode */}
-                    {user?.role === 'superadmin' && viewMode === 'all' && (
-                        <div className="user-filter">
+                        <div className="filter-dropdown-wrapper">
+                            <label>FILTER:</label>
                             <select
-                                value={selectedUserId}
-                                onChange={(e) => setSelectedUserId(e.target.value)}
-                                className="user-filter-select"
+                                className="premium-select"
+                                value={filter}
+                                onChange={(e) => setFilter(e.target.value)}
                             >
-                                <option value="">👥 All Users</option>
-                                {usersList.map((u) => (
-                                    <option key={u._id} value={u._id}>
-                                        {u.name} ({u.email})
-                                    </option>
-                                ))}
+                                <option value="all">All Status</option>
+                                <option value="available">Available</option>
+                                <option value="booked">Booked</option>
+                                <option value="maintenance">Maintenance</option>
+                                <option value="inactive">Inactive</option>
                             </select>
                         </div>
-                    )}
+
+                        {user?.role === 'superadmin' && (
+                            <div className="filter-dropdown-wrapper">
+                                <label>DATA VIEW:</label>
+                                <select
+                                    className="premium-select"
+                                    value={viewMode === 'all' && selectedUserId ? selectedUserId : viewMode}
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        if (val === 'my') {
+                                            handleViewModeChange('my');
+                                        } else if (val === 'all') {
+                                            handleViewModeChange('all');
+                                            setSelectedUserId('');
+                                        } else {
+                                            handleViewModeChange('all');
+                                            setSelectedUserId(val);
+                                        }
+                                    }}
+                                >
+                                    <option value="my">My Fleet</option>
+                                    <optgroup label="Global Perspective">
+                                        <option value="all">Global Fleet (All Staff)</option>
+                                        {usersList.filter(u => u._id !== user._id).map(u => (
+                                            <option key={u._id} value={u._id}>
+                                                &nbsp;&nbsp;&nbsp;Staff: {u.name}
+                                            </option>
+                                        ))}
+                                    </optgroup>
+                                </select>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="controls-right">
+                        <button onClick={() => setShowModal(true)} className="btn-premium-add">
+                            ➕ ADD NEW VEHICLE
+                        </button>
+                    </div>
                 </div>
 
                 {/* Vehicles Grid - Desktop & Tablet */}
@@ -377,7 +366,7 @@ const VehicleManagement = () => {
                     <div className="modal-overlay" onClick={handleCloseModal}>
                         <div className="modal-content modal-large" onClick={(e) => e.stopPropagation()}>
                             <div className="modal-header">
-                                <h2>{editingVehicle ? '✏️ Edit Vehicle' : '➕ Add New Vehicle'}</h2>
+                                <h2>{editingVehicle ? 'Edit Vehicle' : 'Add New Vehicle'}</h2>
                                 <button className="modal-close" onClick={handleCloseModal}>✕</button>
                             </div>
 

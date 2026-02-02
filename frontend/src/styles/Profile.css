@@ -1,0 +1,192 @@
+.profile-container {
+    animation: fadeIn 0.5s ease;
+}
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 2.5rem;
+    margin-top: 2rem;
+}
+
+.profile-card {
+    background: white;
+    border-radius: 2rem;
+    padding: 2.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    border: 1.5px solid var(--border-light);
+}
+
+.profile-card-header {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.profile-avatar-large {
+    width: 100px;
+    height: 100px;
+    background: #4A3728;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: 800;
+    box-shadow: 0 10px 25px rgba(74, 55, 40, 0.2);
+    border: 5px solid white;
+}
+
+.profile-header-text h2 {
+    margin: 0 0 0.5rem 0;
+    font-size: 2rem;
+    color: #4A3728;
+    font-weight: 800;
+}
+
+.role-badge {
+    padding: 0.4rem 1rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.role-badge.superadmin {
+    background: rgba(74, 55, 40, 0.1);
+    color: #4A3728;
+}
+
+.role-badge.user {
+    background: rgba(17, 18, 13, 0.1);
+    color: #565449;
+}
+
+.profile-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.profile-form label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--text-secondary);
+    margin-bottom: 0.6rem;
+    letter-spacing: 1px;
+}
+
+.profile-form input {
+    width: 100%;
+    padding: 0.875rem 1.25rem;
+    border: 1.5px solid var(--border-light);
+    border-radius: 12px;
+    background: var(--bg-lightest);
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.profile-form input:focus {
+    outline: none;
+    border-color: #4A3728;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(74, 55, 40, 0.1);
+}
+
+.profile-form input:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+    background: var(--bg-light);
+}
+
+.form-group-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.profile-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.btn-edit-profile,
+.btn-save,
+.btn-change-password {
+    background: #4A3728;
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    letter-spacing: 1px;
+}
+
+.btn-save {
+    background: #2D5A27;
+}
+
+.btn-edit-profile:hover,
+.btn-save:hover,
+.btn-change-password:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.security-card .card-title {
+    margin-bottom: 2rem;
+}
+
+.security-card h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #4A3728;
+}
+
+.security-card p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.btn-change-password {
+    width: 100%;
+    margin-top: 1rem;
+}
+
+/* Responsive */
+@media screen and (max-width: 1024px) {
+    .profile-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .profile-card {
+        padding: 1.5rem;
+    }
+
+    .form-group-row {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-avatar-large {
+        width: 80px;
+        height: 80px;
+        font-size: 2.5rem;
+    }
+
+    .profile-header-text h2 {
+        font-size: 1.5rem;
+    }
+}

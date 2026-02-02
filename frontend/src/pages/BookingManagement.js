@@ -209,15 +209,15 @@ const BookingManagement = () => {
 
     const getStatusBadge = (status) => {
         const badges = {
-            pending: { class: 'badge-warning', icon: '⏳', text: 'Pending' },
-            confirmed: { class: 'badge-success', icon: '✅', text: 'Confirmed' },
-            completed: { class: 'badge-info', icon: '🎉', text: 'Completed' },
-            cancelled: { class: 'badge-danger', icon: '❌', text: 'Cancelled' }
+            pending: { class: 'badge-warning', text: 'Pending' },
+            confirmed: { class: 'badge-success', text: 'Confirmed' },
+            completed: { class: 'badge-info', text: 'Completed' },
+            cancelled: { class: 'badge-danger', text: 'Cancelled' }
         };
         const badge = badges[status] || badges.pending;
         return (
             <span className={`badge ${badge.class}`}>
-                {badge.icon} {badge.text}
+                {badge.text}
             </span>
         );
     };
@@ -247,124 +247,113 @@ const BookingManagement = () => {
     return (
         <div className="main-container">
             <div className="booking-management-container">
-                {/* Header */}
-                <div className="page-header">
-                    <div>
-                        <h1>📅 Booking Management</h1>
-                        <p>Manage vehicle bookings and reservations</p>
-                    </div>
-                    <div className="header-actions">
-                        {user?.role === 'superadmin' && (
-                            <div className="view-mode-toggle">
-                                <button
-                                    className={`toggle-btn ${viewMode === 'my' ? 'active' : ''}`}
-                                    onClick={() => handleViewModeChange('my')}
-                                >
-                                    📋 My Bookings
-                                </button>
-                                <button
-                                    className={`toggle-btn ${viewMode === 'all' ? 'active' : ''}`}
-                                    onClick={() => handleViewModeChange('all')}
-                                >
-                                    🌐 All Bookings
-                                </button>
-                            </div>
-                        )}
-                        <button onClick={() => setShowModal(true)} className="btn btn-primary">
-                            ➕ New Booking
-                        </button>
-                    </div>
+                {/* Premium Header */}
+                <div className="premium-header">
+                    <h1 className="premium-title">
+                        BOOKING <span className="accent">MANAGEMENT</span>
+                    </h1>
+                    <p className="premium-tagline">MANAGE VEHICLE BOOKINGS AND RESERVATIONS</p>
+                    <div className="premium-underline"></div>
                 </div>
 
-                {/* Stats */}
-                <div className="stats-grid">
-                    <div className="stat-card stat-total">
-                        <div className="stat-icon">📊</div>
+                {/* Stats Grid - Dashboard Style */}
+                <div className="cards-grid-4" style={{ marginBottom: '2.5rem' }}>
+                    <div className="stat-card">
+                        <div className="stat-icon-dot main"></div>
                         <div className="stat-content">
-                            <h3>{bookings.length}</h3>
-                            <p>Total Bookings</p>
+                            <h3>Total Bookings</h3>
+                            <p className="stat-value">{bookings.length}</p>
                         </div>
                     </div>
-                    <div className="stat-card stat-pending">
-                        <div className="stat-icon">⏳</div>
+                    <div className="stat-card" style={{ borderLeftColor: '#D4AF37' }}>
+                        <div className="stat-icon-dot pending"></div>
                         <div className="stat-content">
-                            <h3>{bookings.filter(b => b.status === 'pending').length}</h3>
-                            <p>Pending</p>
+                            <h3>Pending</h3>
+                            <p className="stat-value">{bookings.filter(b => b.status === 'pending').length}</p>
                         </div>
                     </div>
-                    <div className="stat-card stat-confirmed">
-                        <div className="stat-icon">✅</div>
+                    <div className="stat-card" style={{ borderLeftColor: '#2D5A27' }}>
+                        <div className="stat-icon-dot approved"></div>
                         <div className="stat-content">
-                            <h3>{bookings.filter(b => b.status === 'confirmed').length}</h3>
-                            <p>Confirmed</p>
+                            <h3>Confirmed</h3>
+                            <p className="stat-value">{bookings.filter(b => b.status === 'confirmed').length}</p>
                         </div>
                     </div>
-                    <div className="stat-card stat-completed">
-                        <div className="stat-icon">🎉</div>
+                    <div className="stat-card" style={{ borderLeftColor: '#1E40AF' }}>
+                        <div className="stat-icon-dot completed"></div>
                         <div className="stat-content">
-                            <h3>{bookings.filter(b => b.status === 'completed').length}</h3>
-                            <p>Completed</p>
+                            <h3>Completed</h3>
+                            <p className="stat-value">{bookings.filter(b => b.status === 'completed').length}</p>
                         </div>
                     </div>
                 </div>
 
+                {/* Unified Controls Strip */}
+                <div className="controls-strip">
+                    <div className="controls-left">
+                        <div className="search-box-premium">
+                            <span className="search-icon">🔍</span>
+                            <input
+                                type="text"
+                                placeholder="Search by number, customer, vehicle..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
 
-                {/* Filter Buttons */}
-                <div className="filter-buttons">
-                    <button
-                        className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
-                        onClick={() => setFilter('all')}
-                    >
-                        All ({bookings.length})
-                    </button>
-                    <button
-                        className={`filter-btn ${filter === 'pending' ? 'active' : ''}`}
-                        onClick={() => setFilter('pending')}
-                    >
-                        Pending ({bookings.filter(b => b.status === 'pending').length})
-                    </button>
-                    <button
-                        className={`filter-btn ${filter === 'confirmed' ? 'active' : ''}`}
-                        onClick={() => setFilter('confirmed')}
-                    >
-                        Confirmed ({bookings.filter(b => b.status === 'confirmed').length})
-                    </button>
-                    <button
-                        className={`filter-btn ${filter === 'completed' ? 'active' : ''}`}
-                        onClick={() => setFilter('completed')}
-                    >
-                        Completed ({bookings.filter(b => b.status === 'completed').length})
-                    </button>
-                </div>
-
-                {/* Search and User Filter */}
-                <div className="controls-section">
-                    <div className="search-box">
-                        <input
-                            type="text"
-                            placeholder="🔍 Search by booking number, customer, phone, or vehicle..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                    </div>
-
-                    {/* User Filter for Super Admin in 'All' mode */}
-                    {user?.role === 'superadmin' && viewMode === 'all' && (
-                        <div className="user-filter">
+                        <div className="filter-dropdown-wrapper">
+                            <label>FILTER:</label>
                             <select
-                                value={selectedUserId}
-                                onChange={(e) => setSelectedUserId(e.target.value)}
-                                className="user-filter-select"
+                                className="premium-select"
+                                value={filter}
+                                onChange={(e) => setFilter(e.target.value)}
                             >
-                                <option value="">👥 All Users</option>
-                                {usersList.map((u) => (
-                                    <option key={u._id} value={u._id}>
-                                        {u.name} ({u.email})
-                                    </option>
-                                ))}
+                                <option value="all">All Status</option>
+                                <option value="pending">Pending</option>
+                                <option value="confirmed">Confirmed</option>
+                                <option value="completed">Completed</option>
+                                <option value="cancelled">Cancelled</option>
                             </select>
                         </div>
-                    )}
+
+                        {user?.role === 'superadmin' && (
+                            <div className="filter-dropdown-wrapper">
+                                <label>DATA VIEW:</label>
+                                <select
+                                    className="premium-select"
+                                    value={viewMode === 'all' && selectedUserId ? selectedUserId : viewMode}
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        if (val === 'my') {
+                                            handleViewModeChange('my');
+                                        } else if (val === 'all') {
+                                            handleViewModeChange('all');
+                                            setSelectedUserId('');
+                                        } else {
+                                            handleViewModeChange('all');
+                                            setSelectedUserId(val);
+                                        }
+                                    }}
+                                >
+                                    <option value="my">My Bookings</option>
+                                    <optgroup label="Global Perspective">
+                                        <option value="all">All Bookings (Global)</option>
+                                        {usersList.filter(u => u._id !== user._id).map(u => (
+                                            <option key={u._id} value={u._id}>
+                                                &nbsp;&nbsp;&nbsp;Staff: {u.name}
+                                            </option>
+                                        ))}
+                                    </optgroup>
+                                </select>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="controls-right">
+                        <button onClick={() => setShowModal(true)} className="btn-premium-add">
+                            NEW BOOKING
+                        </button>
+                    </div>
                 </div>
 
                 {/* Bookings List */}
@@ -384,7 +373,7 @@ const BookingManagement = () => {
 
                                 <div className="booking-card-body">
                                     <div className="booking-section">
-                                        <h4>🚗 Vehicle Details</h4>
+                                        <h4>Vehicle Details</h4>
                                         <div className="info-grid">
                                             <div className="info-item">
                                                 <span className="label">Vehicle:</span>
@@ -398,7 +387,7 @@ const BookingManagement = () => {
                                     </div>
 
                                     <div className="booking-section">
-                                        <h4>👤 Customer Details</h4>
+                                        <h4>Customer Details</h4>
                                         <div className="info-grid">
                                             <div className="info-item">
                                                 <span className="label">Name:</span>
@@ -418,7 +407,7 @@ const BookingManagement = () => {
                                     </div>
 
                                     <div className="booking-section">
-                                        <h4>📅 Booking Period</h4>
+                                        <h4>Booking Period</h4>
                                         <div className="date-range">
                                             <div className="date-item">
                                                 <span className="date-label">From:</span>
@@ -436,7 +425,7 @@ const BookingManagement = () => {
                                     </div>
 
                                     <div className="booking-section">
-                                        <h4>📍 Location Details</h4>
+                                        <h4>Location Details</h4>
                                         <div className="info-grid">
                                             <div className="info-item">
                                                 <span className="label">Pickup:</span>
@@ -453,7 +442,7 @@ const BookingManagement = () => {
 
                                     {(booking.totalAmount || booking.advanceAmount) && (
                                         <div className="booking-section">
-                                            <h4>💰 Payment Details</h4>
+                                            <h4>Payment Details</h4>
                                             <div className="info-grid">
                                                 {booking.totalAmount && (
                                                     <div className="info-item">
@@ -511,13 +500,13 @@ const BookingManagement = () => {
                     <div className="modal-overlay" onClick={handleCloseModal}>
                         <div className="modal-content modal-large" onClick={(e) => e.stopPropagation()}>
                             <div className="modal-header">
-                                <h2>{editingBooking ? '✏️ Edit Booking' : '➕ New Booking'}</h2>
+                                <h2>{editingBooking ? 'Edit Booking' : 'New Booking'}</h2>
                                 <button className="modal-close" onClick={handleCloseModal}>✕</button>
                             </div>
 
                             <form onSubmit={handleSubmit} className="modal-form">
                                 <div className="form-section">
-                                    <h3>🚗 Vehicle Selection</h3>
+                                    <h3>Vehicle Selection</h3>
                                     <div className="form-group">
                                         <label>Vehicle *</label>
                                         <select
@@ -536,7 +525,7 @@ const BookingManagement = () => {
                                 </div>
 
                                 <div className="form-section">
-                                    <h3>👤 Customer Information</h3>
+                                    <h3>Customer Information</h3>
                                     <div className="form-row">
                                         <div className="form-group">
                                             <label>Customer Name *</label>
@@ -571,7 +560,7 @@ const BookingManagement = () => {
                                 </div>
 
                                 <div className="form-section">
-                                    <h3>📅 Booking Dates</h3>
+                                    <h3>Booking Dates</h3>
                                     <div className="form-row">
                                         <div className="form-group">
                                             <label>Start Date *</label>
@@ -597,7 +586,7 @@ const BookingManagement = () => {
                                 </div>
 
                                 <div className="form-section">
-                                    <h3>📍 Location Details</h3>
+                                    <h3>Location Details</h3>
                                     <div className="form-row">
                                         <div className="form-group">
                                             <label>Pickup Location *</label>

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { authAPI } from '../utils/api';
 import { toast } from 'react-toastify';
+import ConfirmationModal from '../components/ConfirmationModal';
 import '../styles/UserManagement.css';
 
 const UserManagement = () => {
@@ -11,6 +12,7 @@ const UserManagement = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all');
+    const [searchTerm, setSearchTerm] = useState('');
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
@@ -18,6 +20,13 @@ const UserManagement = () => {
         password: '',
         phone: '',
         role: 'user'
+    });
+    const [confModal, setConfModal] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        onConfirm: () => { },
+        type: 'danger'
     });
 
     useEffect(() => {
@@ -54,36 +63,61 @@ const UserManagement = () => {
         }
     };
 
-    const handleApprove = async (userId) => {
-        try {
-            await authAPI.approveUser(userId);
-            toast.success('User approved successfully!');
-            fetchUsers();
-        } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to approve user');
-        }
-    };
-
-    const handlePause = async (userId) => {
-        try {
-            await authAPI.pauseUser(userId);
-            toast.success('User paused successfully!');
-            fetchUsers();
-        } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to pause user');
-        }
-    };
-
-    const handleDelete = async (userId) => {
-        if (window.confirm('Are you sure you want to delete this user?')) {
-            try {
-                await authAPI.deleteUser(userId);
-                toast.success('User deleted successfully!');
-                fetchUsers();
-            } catch (error) {
-                toast.error(error.response?.data?.message || 'Failed to delete user');
+    const handleApprove = (userId) => {
+        setConfModal({
+            isOpen: true,
+            title: 'Approve Staff Member',
+            message: 'Are you sure you want to approve this staff account? They will gain access to the system.',
+            type: 'confirm',
+            onConfirm: async () => {
+                try {
+                    await authAPI.approveUser(userId);
+                    toast.success('User approved successfully!');
+                    fetchUsers();
+                } catch (error) {
+                    toast.error(error.response?.data?.message || 'Failed to approve user');
+                }
+                setConfModal(prev => ({ ...prev, isOpen: false }));
             }
-        }
+        });
+    };
+
+    const handlePause = (userId) => {
+        setConfModal({
+            isOpen: true,
+            title: 'Pause Staff Member',
+            message: 'Are you sure you want to pause this staff account? They will lose access temporarily.',
+            type: 'danger',
+            onConfirm: async () => {
+                try {
+                    await authAPI.pauseUser(userId);
+                    toast.success('User paused successfully!');
+                    fetchUsers();
+                } catch (error) {
+                    toast.error(error.response?.data?.message || 'Failed to pause user');
+                }
+                setConfModal(prev => ({ ...prev, isOpen: false }));
+            }
+        });
+    };
+
+    const handleDelete = (userId) => {
+        setConfModal({
+            isOpen: true,
+            title: 'Delete Staff Member',
+            message: 'Are you sure you want to permanently delete this account? This action cannot be undone.',
+            type: 'danger',
+            onConfirm: async () => {
+                try {
+                    await authAPI.deleteUser(userId);
+                    toast.success('User deleted successfully!');
+                    fetchUsers();
+                } catch (error) {
+                    toast.error(error.response?.data?.message || 'Failed to delete user');
+                }
+                setConfModal(prev => ({ ...prev, isOpen: false }));
+            }
+        });
     };
 
     const handleLogout = () => {
@@ -92,29 +126,32 @@ const UserManagement = () => {
     };
 
     const filteredUsers = users.filter(u => {
-        if (filter === 'all') return true;
-        return u.status === filter;
+        const matchesFilter = filter === 'all' || u.status === filter;
+        const matchesSearch =
+            u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            u.email.toLowerCase().includes(searchTerm.toLowerCase());
+        return matchesFilter && matchesSearch;
     });
 
     const getStatusBadge = (status) => {
         const badges = {
-            pending: { class: 'badge-warning', icon: '⏳', text: 'Pending' },
-            approved: { class: 'badge-success', icon: '✅', text: 'Approved' },
-            paused: { class: 'badge-danger', icon: '⏸️', text: 'Paused' }
+            pending: { class: 'badge-warning', text: 'Pending' },
+            approved: { class: 'badge-success', text: 'Approved' },
+            paused: { class: 'badge-danger', text: 'Paused' }
         };
         const badge = badges[status] || badges.pending;
         return (
             <span className={`badge ${badge.class}`}>
-                {badge.icon} {badge.text}
+                <span className="badge-dot"></span> {badge.text}
             </span>
         );
     };
 
     const getRoleBadge = (role) => {
         return role === 'superadmin' ? (
-            <span className="badge badge-primary">👑 Super Admin</span>
+            <span className="badge badge-primary">Admin</span>
         ) : (
-            <span className="badge badge-secondary">👤 User</span>
+            <span className="badge badge-secondary">Staff</span>
         );
     };
 
@@ -129,35 +166,35 @@ const UserManagement = () => {
                     <button
                         className="btn-action btn-approve"
                         onClick={() => handleApprove(u._id)}
-                        title="Approve User"
                     >
-                        ✅
+                        <span className="btn-icon">✅</span>
+                        <span className="btn-label">Approve</span>
                     </button>
                 )}
                 {u.status === 'approved' && (
                     <button
                         className="btn-action btn-pause"
                         onClick={() => handlePause(u._id)}
-                        title="Pause User"
                     >
-                        ⏸️
+                        <span className="btn-icon">⏸️</span>
+                        <span className="btn-label">Pause</span>
                     </button>
                 )}
                 {u.status === 'paused' && (
                     <button
                         className="btn-action btn-approve"
                         onClick={() => handleApprove(u._id)}
-                        title="Reactivate User"
                     >
-                        ▶️
+                        <span className="btn-icon">▶️</span>
+                        <span className="btn-label">Activate</span>
                     </button>
                 )}
                 <button
                     className="btn-action btn-delete"
                     onClick={() => handleDelete(u._id)}
-                    title="Delete User"
                 >
-                    🗑️
+                    <span className="btn-icon">🗑️</span>
+                    <span className="btn-label">Delete</span>
                 </button>
             </>
         );
@@ -174,77 +211,80 @@ const UserManagement = () => {
     return (
         <div className="main-container">
             <div className="user-management-container">
-                {/* Header */}
-                <div className="page-header">
-                    <div>
-                        <h1>👥 User Management</h1>
-                        <p>Manage user accounts and approvals</p>
+                {/* Premium Header */}
+                <div className="premium-header">
+                    <h1 className="premium-title">
+                        STAFF <span className="accent">MANAGEMENT</span>
+                    </h1>
+                    <p className="premium-tagline">MANAGE STAFF ACCOUNTS AND ACCESS PERMISSIONS</p>
+                    <div className="premium-underline"></div>
+                </div>
+
+                {/* Stats Grid - Dashboard Style */}
+                <div className="cards-grid-4" style={{ marginBottom: '2.5rem' }}>
+                    <div className="stat-card">
+                        <div className="stat-icon-dot"></div>
+                        <div className="stat-content">
+                            <h3>Total Staff</h3>
+                            <p className="stat-value">{users.length}</p>
+                        </div>
                     </div>
-                    <div className="header-actions">
-                        <button onClick={() => setShowCreateModal(true)} className="btn btn-primary">
-                            ➕ Create User
+                    <div className="stat-card" style={{ borderLeftColor: '#D4AF37' }}>
+                        <div className="stat-icon-dot pending"></div>
+                        <div className="stat-content">
+                            <h3>Pending</h3>
+                            <p className="stat-value">{users.filter(u => u.status === 'pending').length}</p>
+                        </div>
+                    </div>
+                    <div className="stat-card" style={{ borderLeftColor: '#2D5A27' }}>
+                        <div className="stat-icon-dot approved"></div>
+                        <div className="stat-content">
+                            <h3>Approved</h3>
+                            <p className="stat-value">{users.filter(u => u.status === 'approved').length}</p>
+                        </div>
+                    </div>
+                    <div className="stat-card" style={{ borderLeftColor: '#8B0000' }}>
+                        <div className="stat-icon-dot paused"></div>
+                        <div className="stat-content">
+                            <h3>Paused</h3>
+                            <p className="stat-value">{users.filter(u => u.status === 'paused').length}</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Unified Controls Strip */}
+                <div className="controls-strip">
+                    <div className="controls-left">
+                        <div className="search-box-premium">
+                            <span className="search-icon">🔍</span>
+                            <input
+                                type="text"
+                                placeholder="Search staff name or email..."
+                                value={searchTerm || ''}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                        <div className="filter-dropdown-wrapper">
+                            <label htmlFor="user-filter">STATUS:</label>
+                            <select
+                                id="user-filter"
+                                className="premium-select"
+                                value={filter}
+                                onChange={(e) => setFilter(e.target.value)}
+                            >
+                                <option value="all">All ({users.length})</option>
+                                <option value="pending">Pending ({users.filter(u => u.status === 'pending').length})</option>
+                                <option value="approved">Approved ({users.filter(u => u.status === 'approved').length})</option>
+                                <option value="paused">Paused ({users.filter(u => u.status === 'paused').length})</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div className="controls-right">
+                        <button onClick={() => setShowCreateModal(true)} className="btn-premium-add">
+                            CREATE NEW STAFF
                         </button>
                     </div>
-                </div>
-
-                {/* Stats Grid */}
-                <div className="stats-grid">
-                    <div className="stat-card stat-total">
-                        <div className="stat-icon">📊</div>
-                        <div className="stat-content">
-                            <h3>{users.length}</h3>
-                            <p>Total Users</p>
-                        </div>
-                    </div>
-                    <div className="stat-card stat-pending">
-                        <div className="stat-icon">⏳</div>
-                        <div className="stat-content">
-                            <h3>{users.filter(u => u.status === 'pending').length}</h3>
-                            <p>Pending Approval</p>
-                        </div>
-                    </div>
-                    <div className="stat-card stat-approved">
-                        <div className="stat-icon">✅</div>
-                        <div className="stat-content">
-                            <h3>{users.filter(u => u.status === 'approved').length}</h3>
-                            <p>Approved</p>
-                        </div>
-                    </div>
-                    <div className="stat-card stat-paused">
-                        <div className="stat-icon">⏸️</div>
-                        <div className="stat-content">
-                            <h3>{users.filter(u => u.status === 'paused').length}</h3>
-                            <p>Paused</p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Filter Section */}
-                <div className="filter-section">
-                    <button
-                        className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
-                        onClick={() => setFilter('all')}
-                    >
-                        All Users ({users.length})
-                    </button>
-                    <button
-                        className={`filter-btn ${filter === 'pending' ? 'active' : ''}`}
-                        onClick={() => setFilter('pending')}
-                    >
-                        Pending ({users.filter(u => u.status === 'pending').length})
-                    </button>
-                    <button
-                        className={`filter-btn ${filter === 'approved' ? 'active' : ''}`}
-                        onClick={() => setFilter('approved')}
-                    >
-                        Approved ({users.filter(u => u.status === 'approved').length})
-                    </button>
-                    <button
-                        className={`filter-btn ${filter === 'paused' ? 'active' : ''}`}
-                        onClick={() => setFilter('paused')}
-                    >
-                        Paused ({users.filter(u => u.status === 'paused').length})
-                    </button>
                 </div>
 
                 {/* Users Table - Desktop */}
@@ -332,7 +372,6 @@ const UserManagement = () => {
                     )}
                 </div>
 
-                {/* Create User Modal */}
                 {showCreateModal && (
                     <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
                         <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -407,13 +446,22 @@ const UserManagement = () => {
                                         Cancel
                                     </button>
                                     <button type="submit" className="btn btn-primary">
-                                        ✅ Create User
+                                        Create User
                                     </button>
                                 </div>
                             </form>
                         </div>
                     </div>
                 )}
+
+                <ConfirmationModal
+                    isOpen={confModal.isOpen}
+                    title={confModal.title}
+                    message={confModal.message}
+                    onConfirm={confModal.onConfirm}
+                    onCancel={() => setConfModal(prev => ({ ...prev, isOpen: false }))}
+                    type={confModal.type}
+                />
             </div>
         </div>
     );

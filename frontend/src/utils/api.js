@@ -37,7 +37,14 @@ export const authAPI = {
     createUser: (data) => api.post('/auth/create-user', data),
     approveUser: (id) => api.put(`/auth/users/${id}/approve`),
     pauseUser: (id) => api.put(`/auth/users/${id}/pause`),
-    deleteUser: (id) => api.delete(`/auth/users/${id}`)
+    deleteUser: (id) => api.delete(`/auth/users/${id}`),
+    // Profile & Password Recovery
+    updateProfile: (data) => api.put('/auth/update-profile', data),
+    forgotPassword: (email) => api.post('/auth/forgot-password', { email }),
+    verifyResetOTP: (data) => api.post('/auth/verify-reset-otp', data),
+    resetPassword: (data) => api.post('/auth/reset-password', data),
+    sendProfilePasswordOTP: () => api.post('/auth/profile/send-password-otp'),
+    changePasswordVerified: (data) => api.post('/auth/profile/change-password-verified', data)
 };
 
 // Vehicle API calls

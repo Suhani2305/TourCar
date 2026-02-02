@@ -78,9 +78,12 @@ const Dashboard = () => {
 
     return (
         <div className="main-container">
-            <div className="dashboard-header">
-                <h1>👋 Welcome, {user?.name}!</h1>
-                <p>Here's your tour management overview</p>
+            <div className="premium-header">
+                <h1 className="premium-title">
+                    DASHBOARD <span className="accent">OVERVIEW</span>
+                </h1>
+                <p className="premium-tagline">YOUR TOUR BUSINESS AT A GLANCE</p>
+                <div className="premium-underline"></div>
             </div>
 
             {loading ? (
@@ -93,7 +96,7 @@ const Dashboard = () => {
                     {/* Stats Cards */}
                     <div className="cards-grid-4">
                         <div className="stat-card stat-bookings">
-                            <div className="stat-icon">📅</div>
+                            <div className="stat-icon-dot main"></div>
                             <div className="stat-content">
                                 <h3>Total Bookings</h3>
                                 <p className="stat-value">{stats.totalBookings}</p>
@@ -101,7 +104,7 @@ const Dashboard = () => {
                         </div>
 
                         <div className="stat-card stat-revenue">
-                            <div className="stat-icon">💰</div>
+                            <div className="stat-icon-dot revenue"></div>
                             <div className="stat-content">
                                 <h3>Total Revenue</h3>
                                 <p className="stat-value">{formatCurrency(stats.totalRevenue)}</p>
@@ -109,7 +112,7 @@ const Dashboard = () => {
                         </div>
 
                         <div className="stat-card stat-today">
-                            <div className="stat-icon">📆</div>
+                            <div className="stat-icon-dot main"></div>
                             <div className="stat-content">
                                 <h3>Today's Bookings</h3>
                                 <p className="stat-value">{stats.todayBookings}</p>
@@ -117,7 +120,7 @@ const Dashboard = () => {
                         </div>
 
                         <div className="stat-card stat-upcoming">
-                            <div className="stat-icon">⏰</div>
+                            <div className="stat-icon-dot pending"></div>
                             <div className="stat-content">
                                 <h3>Upcoming (48h)</h3>
                                 <p className="stat-value">{stats.upcomingCount}</p>
@@ -129,7 +132,7 @@ const Dashboard = () => {
                     {stats.upcomingBookings && stats.upcomingBookings.length > 0 && (
                         <div className="upcoming-bookings-panel">
                             <div className="panel-header">
-                                <h2>🔔 Upcoming Bookings (Next 48 Hours)</h2>
+                                <h2>Upcoming Bookings (Next 48 Hours)</h2>
                                 <span className="badge">{stats.upcomingBookings.length}</span>
                             </div>
                             <div className="upcoming-bookings-list">
@@ -149,13 +152,13 @@ const Dashboard = () => {
                                             </div>
                                             <div className="booking-meta">
                                                 <span className="vehicle-info">
-                                                    🚗 {booking.vehicle?.registrationNumber} - {booking.vehicle?.model}
+                                                    {booking.vehicle?.registrationNumber} - {booking.vehicle?.model}
                                                 </span>
                                                 <span className="date-info">
-                                                    📅 {formatDate(booking.startDate)} at {formatTime(booking.pickupTime)}
+                                                    {formatDate(booking.startDate)} at {formatTime(booking.pickupTime)}
                                                 </span>
                                                 <span className="location-info">
-                                                    📍 {booking.pickupLocation}
+                                                    {booking.pickupLocation}
                                                 </span>
                                             </div>
                                             <div className="booking-status-badge">
@@ -178,14 +181,12 @@ const Dashboard = () => {
                                 className="action-btn btn-bookings"
                                 onClick={() => navigate('/bookings')}
                             >
-                                <span className="btn-icon">📅</span>
                                 <span className="btn-text">Manage Bookings</span>
                             </button>
                             <button
                                 className="action-btn btn-vehicles"
                                 onClick={() => navigate('/vehicles')}
                             >
-                                <span className="btn-icon">🚗</span>
                                 <span className="btn-text">Manage Vehicles</span>
                             </button>
                             {user?.role === 'superadmin' && (
@@ -193,7 +194,6 @@ const Dashboard = () => {
                                     className="action-btn btn-users"
                                     onClick={() => navigate('/users')}
                                 >
-                                    <span className="btn-icon">👥</span>
                                     <span className="btn-text">Manage Users</span>
                                 </button>
                             )}

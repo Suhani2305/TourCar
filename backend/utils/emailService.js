@@ -225,10 +225,62 @@ const sendOTPEmail = async (email, otp, name) => {
   }
 };
 
+// Send OTP email for password reset
+const sendResetPasswordOTPEmail = async (email, otp, name) => {
+  try {
+    const transporter = createTransporter();
+
+    const mailOptions = {
+      from: process.env.EMAIL_FROM,
+      to: email,
+      subject: 'Password Reset OTP - Tour Management System',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
+            <h1 style="color: white; margin: 0;">🔐 Password Reset</h1>
+          </div>
+          
+          <div style="background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
+            <p style="font-size: 16px; color: #374151;">Dear ${name || 'User'},</p>
+            <p style="font-size: 16px; color: #374151;">You requested to reset your password for Tour Management System.</p>
+            <p style="font-size: 16px; color: #374151;">Please use the following OTP to reset your password:</p>
+            
+            <div style="background: #f3f4f6; padding: 25px; border-radius: 8px; margin: 25px 0; text-align: center;">
+              <div style="font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #e74c3c; font-family: 'Courier New', monospace;">
+                ${otp}
+              </div>
+            </div>
+            
+            <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; border-radius: 4px;">
+              <p style="margin: 0; color: #92400e; font-size: 14px;">
+                ⏰ <strong>This OTP will expire in 10 minutes</strong>
+              </p>
+            </div>
+            
+            <p style="font-size: 16px; color: #374151;">If you did not request a password reset, please ignore this email or contact support if you have concerns.</p>
+            
+            <p style="font-size: 14px; color: #9ca3af; margin-top: 30px; text-align: center;">
+              This is an automated email. Please do not reply.
+            </p>
+          </div>
+        </div>
+      `
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log('✅ Reset OTP email sent to:', email);
+    return true;
+  } catch (error) {
+    console.error('Error sending reset OTP email:', error);
+    return false;
+  }
+};
+
 module.exports = {
   sendBookingConfirmation,
   sendBookingReminder,
   sendUserApprovalEmail,
   sendWelcomeEmail,
-  sendOTPEmail
+  sendOTPEmail,
+  sendResetPasswordOTPEmail
 };

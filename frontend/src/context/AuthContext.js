@@ -16,23 +16,24 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [token, setToken] = useState(localStorage.getItem('token'));
 
+    const checkAuth = async () => {
+        const storedToken = localStorage.getItem('token');
+        if (storedToken) {
+            try {
+                const response = await authAPI.getMe();
+                setUser(response.data.user);
+                setToken(storedToken);
+            } catch (error) {
+                localStorage.removeItem('token');
+                setToken(null);
+                setUser(null);
+            }
+        }
+        setLoading(false);
+    };
+
     // Check if user is logged in on mount
     useEffect(() => {
-        const checkAuth = async () => {
-            const storedToken = localStorage.getItem('token');
-            if (storedToken) {
-                try {
-                    const response = await authAPI.getMe();
-                    setUser(response.data.user);
-                    setToken(storedToken);
-                } catch (error) {
-                    localStorage.removeItem('token');
-                    setToken(null);
-                    setUser(null);
-                }
-            }
-            setLoading(false);
-        };
         checkAuth();
     }, []);
 
@@ -70,6 +71,7 @@ export const AuthProvider = ({ children }) => {
         login,
         register,
         logout,
+        checkAuth,
         isAuthenticated: !!token && !!user,
         isSuperAdmin: user?.role === 'superadmin'
     };
