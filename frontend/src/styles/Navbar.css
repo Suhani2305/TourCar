@@ -258,8 +258,24 @@
     }
 
     .user-info-text {
+        display: none;
+        /* Hide by default on mobile */
+        position: absolute;
+        top: 110%;
+        right: 0;
+        background: #4A3728;
+        padding: 0.5rem 0.8rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        z-index: 1002;
+        white-space: nowrap;
+        flex-direction: column;
+    }
+
+    .user-profile:hover .user-info-text,
+    .user-profile:active .user-info-text {
         display: flex;
-        /* Show name and role on mobile too */
+        /* Show on hover/tap */
     }
 
     .user-name,
@@ -269,10 +285,12 @@
 
     .user-name {
         font-size: 0.8rem;
+        font-weight: 700;
     }
 
     .user-role {
         font-size: 0.65rem;
+        opacity: 0.8;
     }
 
     .dropdown-arrow {
@@ -280,8 +298,21 @@
     }
 
     .user-profile {
-        padding: 0.4rem;
-        background: rgba(255, 255, 255, 0.1);
-        border: none;
+        padding: 0;
+        background: rgba(255, 255, 255, 0.15);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .user-avatar-mini {
+        margin: 0;
+        width: 32px;
+        height: 32px;
+        box-shadow: none;
     }
 }

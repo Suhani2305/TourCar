@@ -62,9 +62,6 @@ const Login = () => {
                 <div className="auth-form-side">
                     <div className="auth-card">
                         <div className="auth-header">
-                            <div className="auth-icon-wrapper">
-                                <span className="auth-icon-dot"></span>
-                            </div>
                             <h1>Welcome Back</h1>
                             <p>Enter your credentials to access the dashboard</p>
                         </div>

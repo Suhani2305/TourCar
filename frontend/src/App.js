@@ -22,6 +22,8 @@ import CalendarView from './pages/CalendarView';
 import Reports from './pages/Reports';
 import Profile from './pages/Profile';
 import ForgotPassword from './pages/ForgotPassword';
+import Expenses from './pages/Expenses';
+import DocumentVault from './pages/DocumentVault';
 
 // Layout wrapper with proper structure
 const Layout = ({ children }) => {
@@ -119,6 +121,22 @@ function App() {
                                 element={
                                     <ProtectedRoute>
                                         <Profile />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/expenses"
+                                element={
+                                    <ProtectedRoute>
+                                        <Expenses />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/vault"
+                                element={
+                                    <ProtectedRoute>
+                                        <DocumentVault />
                                     </ProtectedRoute>
                                 }
                             />

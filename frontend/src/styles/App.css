@@ -452,3 +452,350 @@ body {
         display: block;
     }
 }
+
+/* ===========================
+   GLOBAL PREMIUM UI COMPONENTS
+   =========================== */
+
+/* Global Buttons */
+.btn {
+    padding: 0.75rem 1.5rem;
+    /* Reduced */
+    border-radius: 0.75rem;
+    /* Reduced */
+    font-weight: 800;
+    font-size: 0.85rem;
+    /* Reduced */
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-primary {
+    background: #4A3728 !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(74, 55, 40, 0.2);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(74, 55, 40, 0.3);
+    background: #11120D !important;
+}
+
+.btn-secondary {
+    background: #FDF4E3 !important;
+    color: #4A3728 !important;
+    border: 1.5px solid #D8CFBC !important;
+}
+
+.btn-secondary:hover {
+    background: #D8CFBC !important;
+}
+
+.btn-danger {
+    background: #e74c3c !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.2);
+}
+
+.btn-danger:hover {
+    background: #c0392b !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(231, 76, 60, 0.3);
+}
+
+/* Delete Confirmation Modal Specifics */
+.modal-content.modal-danger {
+    max-width: 420px !important;
+    border-radius: 2.5rem !important;
+    overflow: hidden !important;
+    border: none !important;
+    box-shadow: 0 30px 60px -12px rgba(231, 76, 60, 0.25), 0 18px 36px -18px rgba(0, 0, 0, 0.3) !important;
+    background: white !important;
+}
+
+.modal-content.modal-danger .modal-header {
+    background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+    padding: 1.5rem 2rem !important;
+    border-bottom: none !important;
+}
+
+.modal-content.modal-danger .modal-header h2 {
+    color: white !important;
+    font-size: 1.3rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.5px !important;
+    text-transform: uppercase !important;
+}
+
+.delete-warning-body {
+    padding: 3.5rem 2.5rem 1.5rem 2.5rem !important;
+    text-align: center;
+}
+
+.delete-warning-icon {
+    font-size: 4.5rem;
+    margin-bottom: 2rem;
+    display: block;
+    animation: pulseDanger 2s infinite;
+}
+
+@keyframes pulseDanger {
+    0% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 0 rgba(231, 76, 60, 0));
+    }
+
+    50% {
+        transform: scale(1.05);
+        filter: drop-shadow(0 10px 20px rgba(231, 76, 60, 0.2));
+    }
+
+    100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 0 rgba(231, 76, 60, 0));
+    }
+}
+
+.delete-warning-body h3 {
+    font-family: 'Outfit', sans-serif !important;
+    font-size: 1.75rem !important;
+    font-weight: 900 !important;
+    color: #11120D !important;
+    margin-bottom: 1rem !important;
+    letter-spacing: -0.5px;
+}
+
+.delete-warning-body p {
+    color: #6a685a !important;
+    font-size: 1rem !important;
+    line-height: 1.7 !important;
+    font-weight: 500 !important;
+}
+
+.modal-content.modal-danger .modal-actions {
+    background: #FFFCF7 !important;
+    padding: 2rem 2.5rem 3rem 2.5rem !important;
+    border-top: 1px solid #F0EAD6 !important;
+    margin-top: 0.5rem;
+}
+
+/* Modals */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(17, 18, 13, 0.7);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2500;
+    padding: 1rem;
+}
+
+.modal-content.modal-large {
+    background: white !important;
+    width: 100% !important;
+    max-width: 650px !important;
+    /* Reduced max-width */
+    border-radius: 2rem !important;
+    overflow: hidden !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35) !important;
+    animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalPop {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.modal-header {
+    background: #4A3728 !important;
+    color: white !important;
+    padding: 1.5rem 2rem !important;
+    /* Reduced padding */
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    border-bottom: 1.5px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.modal-header h2 {
+    margin: 0 !important;
+    font-size: 1.4rem !important;
+    /* Reduced font-size */
+    font-family: 'Playfair Display', serif !important;
+    font-weight: 900 !important;
+    letter-spacing: -0.5px;
+}
+
+.modal-close {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: none !important;
+    color: white !important;
+    width: 38px !important;
+    /* Reduced size */
+    height: 38px !important;
+    border-radius: 10px !important;
+    cursor: pointer !important;
+    font-size: 1.1rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.3s;
+}
+
+.modal-close:hover {
+    background: #e74c3c !important;
+    transform: rotate(90deg);
+}
+
+.modal-form {
+    padding: 1.75rem 2.25rem !important;
+    /* Reduced padding */
+    max-height: 75vh;
+    overflow-y: auto;
+}
+
+/* Form Sections & Fields */
+.form-section {
+    margin-bottom: 1.75rem !important;
+    /* Reduced margin */
+}
+
+.form-section h3 {
+    font-size: 0.8rem !important;
+    /* Reduced font-size */
+    text-transform: uppercase !important;
+    letter-spacing: 1.5px !important;
+    color: #4A3728 !important;
+    margin-bottom: 1rem !important;
+    font-weight: 900 !important;
+    border-left: 4px solid #4A3728 !important;
+    padding-left: 0.85rem !important;
+}
+
+.form-row {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem !important;
+    /* Reduced gap */
+    margin-bottom: 1rem !important;
+}
+
+.form-group {
+    margin-bottom: 1.25rem !important;
+    /* Reduced margin */
+}
+
+.form-group label {
+    display: block !important;
+    font-size: 0.75rem !important;
+    /* Reduced font-size */
+    font-weight: 900 !important;
+    color: #565449 !important;
+    margin-bottom: 0.5rem !important;
+    text-transform: uppercase !important;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100% !important;
+    padding: 0.75rem 1rem !important;
+    /* Reduced padding */
+    border: 1.5px solid #D8CFBC !important;
+    border-radius: 0.85rem !important;
+    background: #FFFBF4 !important;
+    color: #11120D !important;
+    font-family: inherit !important;
+    font-weight: 700 !important;
+    font-size: 0.9rem !important;
+    /* Reduced font-size */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none !important;
+    border-color: #4A3728 !important;
+    background: white !important;
+    box-shadow: 0 0 0 4px rgba(74, 55, 40, 0.1) !important;
+    transform: translateY(-1px);
+}
+
+/* UNIFORM BUTTONS ACTION BAR */
+.modal-actions {
+    padding: 1.25rem 2.25rem !important;
+    /* Reduced padding */
+    background: #FFFBF4 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    gap: 1rem !important;
+    border-top: 1.5px solid #D8CFBC !important;
+}
+
+.modal-actions .btn {
+    flex: 1 !important;
+    min-height: 48px !important;
+    /* Reduced height */
+    max-width: 180px !important;
+    /* Reduced width */
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.8rem !important;
+    line-height: 1.1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    border-radius: 12px !important;
+    white-space: normal !important;
+}
+
+@media screen and (max-width: 768px) {
+    .modal-content.modal-large {
+        width: 95% !important;
+        border-radius: 1.5rem !important;
+    }
+
+    .modal-form {
+        padding: 1.25rem 1.75rem !important;
+    }
+}
+
+@media screen and (max-width: 640px) {
+    .form-row {
+        grid-template-columns: 1fr !important;
+        gap: 0.75rem !important;
+    }
+
+    .modal-actions {
+        padding: 1.25rem !important;
+        gap: 0.75rem !important;
+    }
+
+    .modal-actions .btn {
+        min-height: 44px !important;
+        font-size: 0.75rem !important;
+        padding: 0.4rem !important;
+    }
+}

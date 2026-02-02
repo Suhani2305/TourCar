@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+export const STORAGE_URL = API_URL.replace('/api', '');
 
 // Create axios instance
 const api = axios.create({
@@ -72,6 +73,25 @@ export const bookingAPI = {
     getRevenueReport: (params) => api.get('/reports/revenue', { params }), // Revenue report
     getBookingAnalytics: (params) => api.get('/reports/booking-analytics', { params }), // Booking analytics
     getVehicleUtilization: (params) => api.get('/reports/vehicle-utilization', { params }) // Vehicle utilization
+};
+
+// Expense API calls
+export const expenseAPI = {
+    getAll: () => api.get('/expenses'),
+    create: (data) => api.post('/expenses', data),
+    delete: (id) => api.delete(`/expenses/${id}`)
+};
+
+// Document API calls
+export const documentAPI = {
+    getAll: () => api.get('/documents'),
+    uploadImage: (formData) => api.post('/documents/upload', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    }),
+    create: (data) => api.post('/documents', data),
+    delete: (id) => api.delete(`/documents/${id}`)
 };
 
 export default api;

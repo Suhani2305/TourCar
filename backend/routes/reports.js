@@ -11,10 +11,15 @@ router.get('/revenue', protect, async (req, res) => {
     try {
         const { startDate, endDate, viewMode, userId } = req.query;
 
+        const start = new Date(startDate);
+        start.setHours(0, 0, 0, 0);
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+
         let query = {
-            createdAt: {
-                $gte: new Date(startDate),
-                $lte: new Date(endDate)
+            startDate: {
+                $gte: start,
+                $lte: end
             }
         };
 
@@ -29,21 +34,24 @@ router.get('/revenue', protect, async (req, res) => {
             }
         }
 
-        const bookings = await Booking.find(query);
+        const bookings = await Booking.find(query).populate('vehicle', 'vehicleNumber model brand registrationNumber');
 
-        // Calculate revenue metrics
-        const totalRevenue = bookings.reduce((sum, b) => sum + (b.amount || 0), 0);
-        const bookingCount = bookings.length;
-        const averageBookingValue = bookingCount > 0 ? totalRevenue / bookingCount : 0;
+        // Calculate revenue metrics (ONLY COMPLETED TRIPS)
+        const completedBookings = bookings.filter(b => b.status === 'completed');
+        const totalRevenue = completedBookings.reduce((sum, b) => sum + (b.totalAmount || 0), 0);
+        const bookingCount = bookings.length; // Count all non-cancelled? Or all? Usually all for analytics.
+        const averageBookingValue = completedBookings.length > 0 ? totalRevenue / completedBookings.length : 0;
 
         // Daily revenue breakdown
         const dailyRevenue = {};
         bookings.forEach(booking => {
-            const date = booking.createdAt.toISOString().split('T')[0];
-            if (!dailyRevenue[date]) {
-                dailyRevenue[date] = 0;
+            if (booking.status === 'completed') {
+                const date = booking.startDate.toISOString().split('T')[0];
+                if (!dailyRevenue[date]) {
+                    dailyRevenue[date] = 0;
+                }
+                dailyRevenue[date] += booking.totalAmount || 0;
             }
-            dailyRevenue[date] += booking.amount || 0;
         });
 
         const dailyRevenueArray = Object.entries(dailyRevenue).map(([date, revenue]) => ({
@@ -51,26 +59,30 @@ router.get('/revenue', protect, async (req, res) => {
             revenue
         })).sort((a, b) => new Date(a.date) - new Date(b.date));
 
-        // Growth rate (compare with previous period)
-        const previousPeriodStart = new Date(startDate);
-        const previousPeriodEnd = new Date(endDate);
-        const daysDiff = Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24));
-        previousPeriodStart.setDate(previousPeriodStart.getDate() - daysDiff);
-        previousPeriodEnd.setDate(previousPeriodEnd.getDate() - daysDiff);
+        // Growth rate (compare with identical duration before current period)
+        const durationMs = end - start;
+        const previousPeriodEnd = new Date(start.getTime() - 1);
+        const previousPeriodStart = new Date(previousPeriodEnd.getTime() - durationMs);
 
         const previousQuery = {
             ...query,
-            createdAt: {
+            startDate: {
                 $gte: previousPeriodStart,
                 $lte: previousPeriodEnd
             }
         };
 
         const previousBookings = await Booking.find(previousQuery);
-        const previousRevenue = previousBookings.reduce((sum, b) => sum + (b.amount || 0), 0);
-        const growthRate = previousRevenue > 0
-            ? ((totalRevenue - previousRevenue) / previousRevenue * 100).toFixed(2)
-            : 0;
+        const prevComp = previousBookings.filter(b => b.status === 'completed');
+        const previousRevenue = prevComp.reduce((sum, b) => sum + (b.totalAmount || 0), 0);
+
+        // Calculate growth rate as a number
+        let growthRate = 0;
+        if (previousRevenue > 0) {
+            growthRate = parseFloat(((totalRevenue - previousRevenue) / previousRevenue * 100).toFixed(2));
+        } else if (totalRevenue > 0) {
+            growthRate = 100;
+        }
 
         res.status(200).json({
             success: true,
@@ -78,7 +90,8 @@ router.get('/revenue', protect, async (req, res) => {
             bookingCount,
             averageBookingValue: Math.round(averageBookingValue),
             dailyRevenue: dailyRevenueArray,
-            growthRate
+            growthRate,
+            bookings: bookings.sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
         });
     } catch (error) {
         console.error('Error fetching revenue report:', error);
@@ -97,10 +110,15 @@ router.get('/booking-analytics', protect, async (req, res) => {
     try {
         const { startDate, endDate, viewMode, userId } = req.query;
 
+        const start = new Date(startDate);
+        start.setHours(0, 0, 0, 0);
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+
         let query = {
-            createdAt: {
-                $gte: new Date(startDate),
-                $lte: new Date(endDate)
+            startDate: {
+                $gte: start,
+                $lte: end
             }
         };
 
@@ -140,7 +158,7 @@ router.get('/booking-analytics', protect, async (req, res) => {
                 };
             }
             customerBookings[booking.customerName].bookings++;
-            customerBookings[booking.customerName].revenue += booking.amount || 0;
+            customerBookings[booking.customerName].revenue += booking.totalAmount || 0;
         });
 
         const topCustomers = Object.values(customerBookings)
@@ -170,10 +188,15 @@ router.get('/vehicle-utilization', protect, async (req, res) => {
     try {
         const { startDate, endDate, viewMode, userId } = req.query;
 
+        const start = new Date(startDate);
+        start.setHours(0, 0, 0, 0);
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+
         let query = {
-            createdAt: {
-                $gte: new Date(startDate),
-                $lte: new Date(endDate)
+            startDate: {
+                $gte: start,
+                $lte: end
             }
         };
 
@@ -203,7 +226,7 @@ router.get('/vehicle-utilization', protect, async (req, res) => {
                 };
             }
             vehicleStats[vehicleNumber].bookings++;
-            vehicleStats[vehicleNumber].revenue += booking.amount || 0;
+            vehicleStats[vehicleNumber].revenue += booking.totalAmount || 0;
 
             // Calculate days (approximation)
             if (booking.startDate && booking.endDate) {

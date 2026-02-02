@@ -257,77 +257,8 @@
     background: #95a5a6;
 }
 
-/* Modal & Form - Re-using logic for consistency */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(17, 18, 13, 0.7);
-    backdrop-filter: blur(5px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 2000;
-}
+/* Modal & Form - Now using Global Premium UI in App.css */
 
-.modal-content.modal-large {
-    background: white;
-    width: 90%;
-    max-width: 650px;
-    border-radius: 2rem;
-    padding: 0;
-    overflow: hidden;
-}
-
-.modal-header {
-    background: #4A3728;
-    color: white;
-    padding: 1.5rem 2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.modal-form {
-    padding: 2.5rem;
-    max-height: 80vh;
-    overflow-y: auto;
-}
-
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-    margin-bottom: 1.25rem;
-}
-
-.form-group label {
-    display: block;
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--text-secondary);
-    margin-bottom: 0.5rem;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-    width: 100%;
-    padding: 0.8rem 1.25rem;
-    border: 1.5px solid var(--border-light);
-    border-radius: 12px;
-    background: var(--bg-lightest);
-}
-
-.modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    padding: 1.5rem 2.5rem;
-    background: var(--bg-lightest);
-}
 
 /* Mobile Adjustments */
 @media screen and (max-width: 768px) {

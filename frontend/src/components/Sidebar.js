@@ -35,14 +35,14 @@ const Sidebar = () => {
                         className={`sidebar-link ${isActive('/dashboard')}`}
                         onClick={() => navigate('/dashboard')}
                     >
-                        <span className="sidebar-icon">🏠</span>
+                        <span className="sidebar-icon icon-dashboard">🏠</span>
                         <span className="sidebar-text">Dashboard</span>
                     </button>
                     <button
                         className={`sidebar-link ${isActive('/calendar')}`}
                         onClick={() => navigate('/calendar')}
                     >
-                        <span className="sidebar-icon">📆</span>
+                        <span className="sidebar-icon icon-calendar">🗓️</span>
                         <span className="sidebar-text">Calendar</span>
                     </button>
                 </div>
@@ -53,14 +53,14 @@ const Sidebar = () => {
                         className={`sidebar-link ${isActive('/bookings')}`}
                         onClick={() => navigate('/bookings')}
                     >
-                        <span className="sidebar-icon">📅</span>
+                        <span className="sidebar-icon icon-bookings">📋</span>
                         <span className="sidebar-text">Bookings</span>
                     </button>
                     <button
                         className={`sidebar-link ${isActive('/vehicles')}`}
                         onClick={() => navigate('/vehicles')}
                     >
-                        <span className="sidebar-icon">🚙</span>
+                        <span className="sidebar-icon icon-vehicles">🚙</span>
                         <span className="sidebar-text">Vehicles</span>
                     </button>
                     {user?.role === 'superadmin' && (
@@ -68,7 +68,7 @@ const Sidebar = () => {
                             className={`sidebar-link ${isActive('/admin/users')}`}
                             onClick={() => navigate('/admin/users')}
                         >
-                            <span className="sidebar-icon">👥</span>
+                            <span className="sidebar-icon icon-users">👥</span>
                             <span className="sidebar-text">Users</span>
                         </button>
                     )}
@@ -76,8 +76,22 @@ const Sidebar = () => {
                         className={`sidebar-link ${isActive('/reports')}`}
                         onClick={() => navigate('/reports')}
                     >
-                        <span className="sidebar-icon">📊</span>
+                        <span className="sidebar-icon icon-reports">📊</span>
                         <span className="sidebar-text">Reports</span>
+                    </button>
+                    <button
+                        className={`sidebar-link ${isActive('/expenses')}`}
+                        onClick={() => navigate('/expenses')}
+                    >
+                        <span className="sidebar-icon icon-expenses">⛽</span>
+                        <span className="sidebar-text">Expenses</span>
+                    </button>
+                    <button
+                        className={`sidebar-link ${isActive('/vault')}`}
+                        onClick={() => navigate('/vault')}
+                    >
+                        <span className="sidebar-icon icon-vault">📂</span>
+                        <span className="sidebar-text">Documents</span>
                     </button>
                 </div>
 
@@ -87,7 +101,7 @@ const Sidebar = () => {
                         className={`sidebar-link ${isActive('/profile')}`}
                         onClick={() => navigate('/profile')}
                     >
-                        <span className="sidebar-icon">👤</span>
+                        <span className="sidebar-icon icon-profile">👤</span>
                         <span className="sidebar-text">My Profile</span>
                     </button>
                 </div>

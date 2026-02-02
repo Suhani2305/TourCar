@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { vehicleAPI, authAPI } from '../utils/api';
 import { toast } from 'react-toastify';
+import ConfirmationModal from '../components/ConfirmationModal';
 import '../styles/VehicleManagement.css';
 
 const VehicleManagement = () => {
@@ -14,6 +15,12 @@ const VehicleManagement = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [editingVehicle, setEditingVehicle] = useState(null);
+
+    // Delete Confirmation Modal State
+    const [deleteModal, setDeleteModal] = useState({
+        isOpen: false,
+        vehicleId: null
+    });
 
     // Super Admin dual view states
     const [viewMode, setViewMode] = useState('my'); // 'my' or 'all'
@@ -114,15 +121,14 @@ const VehicleManagement = () => {
         setShowModal(true);
     };
 
-    const handleDelete = async (id) => {
-        if (window.confirm('Are you sure you want to delete this vehicle?')) {
-            try {
-                await vehicleAPI.delete(id);
-                toast.success('Vehicle deleted successfully!');
-                fetchVehicles();
-            } catch (error) {
-                toast.error(error.response?.data?.message || 'Failed to delete vehicle');
-            }
+    const handleDelete = async () => {
+        try {
+            await vehicleAPI.delete(deleteModal.vehicleId);
+            toast.success('Vehicle deleted successfully!');
+            setDeleteModal({ isOpen: false, vehicleId: null });
+            fetchVehicles();
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to delete vehicle');
         }
     };
 
@@ -350,7 +356,7 @@ const VehicleManagement = () => {
                                     </button>
                                     <button
                                         className="btn-action btn-delete"
-                                        onClick={() => handleDelete(vehicle._id)}
+                                        onClick={() => setDeleteModal({ isOpen: true, vehicleId: vehicle._id })}
                                         title="Delete Vehicle"
                                     >
                                         🗑️ Delete
@@ -360,6 +366,18 @@ const VehicleManagement = () => {
                         ))
                     )}
                 </div>
+
+                {/* Premium Delete Confirmation Modal */}
+                <ConfirmationModal
+                    isOpen={deleteModal.isOpen}
+                    title="Delete Vehicle"
+                    message="Are you sure you want to permanently delete this vehicle from your fleet? This action cannot be undone."
+                    onConfirm={handleDelete}
+                    onCancel={() => setDeleteModal({ isOpen: false, vehicleId: null })}
+                    type="danger"
+                    confirmText="Delete"
+                    cancelText="Cancel"
+                />
 
                 {/* Add/Edit Modal */}
                 {showModal && (

@@ -46,19 +46,23 @@
 }
 
 .legend-pill.confirmed {
-    background: #2ecc71;
+    background: #27ae60;
+    /* Darker green */
 }
 
 .legend-pill.pending {
-    background: #f39c12;
+    background: #e67e22;
+    /* Darker orange */
 }
 
 .legend-pill.cancelled {
-    background: #e74c3c;
+    background: #c0392b;
+    /* Darker red */
 }
 
 .legend-pill.completed {
-    background: #3498db;
+    background: #2980b9;
+    /* Darker blue */
 }
 
 /* View Toggle */
@@ -173,17 +177,23 @@
     border-radius: 12px;
 }
 
-/* Tile Dynamic Backgrounds */
+/* Tile Dynamic Backgrounds - Darker and more prominent */
 .has-confirmed {
-    background: rgba(46, 204, 113, 0.08) !important;
+    background: rgba(39, 174, 96, 0.25) !important;
+    /* Darker green with more opacity */
+    border: 2px solid rgba(39, 174, 96, 0.4) !important;
 }
 
 .has-pending {
-    background: rgba(243, 156, 18, 0.08) !important;
+    background: rgba(230, 126, 34, 0.25) !important;
+    /* Darker orange with more opacity */
+    border: 2px solid rgba(230, 126, 34, 0.4) !important;
 }
 
 .has-cancelled {
-    background: rgba(231, 76, 60, 0.08) !important;
+    background: rgba(192, 57, 43, 0.25) !important;
+    /* Darker red with more opacity */
+    border: 2px solid rgba(192, 57, 43, 0.4) !important;
 }
 
 /* Booking Badge */
@@ -286,10 +296,32 @@
     border-radius: 1rem;
     padding: 1.25rem;
     transition: transform 0.2s;
+    border-left: 5px solid transparent;
 }
 
 .popup-booking-card:hover {
     transform: scale(1.02);
+}
+
+/* Status-based card backgrounds */
+.popup-booking-card.status-confirmed {
+    background: rgba(39, 174, 96, 0.1);
+    border-left-color: #27ae60;
+}
+
+.popup-booking-card.status-pending {
+    background: rgba(230, 126, 34, 0.1);
+    border-left-color: #e67e22;
+}
+
+.popup-booking-card.status-cancelled {
+    background: rgba(192, 57, 43, 0.1);
+    border-left-color: #c0392b;
+}
+
+.popup-booking-card.status-completed {
+    background: rgba(41, 128, 185, 0.1);
+    border-left-color: #2980b9;
 }
 
 .booking-header-row {
@@ -365,6 +397,40 @@
     .calendar-controls-row {
         flex-direction: column;
         align-items: flex-start;
+    }
+
+    /* Legend Pills - Single Row on Mobile */
+    .legend-pills {
+        width: 100%;
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 0.5rem;
+        padding-bottom: 0.5rem;
+        /* Add scrollbar styling for better UX */
+        scrollbar-width: thin;
+        scrollbar-color: #4A3728 var(--bg-light);
+    }
+
+    .legend-pills::-webkit-scrollbar {
+        height: 4px;
+    }
+
+    .legend-pills::-webkit-scrollbar-track {
+        background: var(--bg-light);
+        border-radius: 10px;
+    }
+
+    .legend-pills::-webkit-scrollbar-thumb {
+        background: #4A3728;
+        border-radius: 10px;
+    }
+
+    .legend-pill {
+        flex-shrink: 0;
+        white-space: nowrap;
+        font-size: 0.75rem;
+        padding: 0.35rem 0.85rem;
     }
 
     .header-actions {

@@ -374,67 +374,79 @@ const UserManagement = () => {
 
                 {showCreateModal && (
                     <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
-                        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-content modal-large" onClick={(e) => e.stopPropagation()}>
                             <div className="modal-header">
-                                <h2>➕ Create New User</h2>
+                                <h2>Create New Staff</h2>
                                 <button className="modal-close" onClick={() => setShowCreateModal(false)}>
                                     ✕
                                 </button>
                             </div>
                             <form onSubmit={handleCreateUser} className="modal-form">
-                                <div className="form-group">
-                                    <label>Full Name *</label>
-                                    <input
-                                        type="text"
-                                        value={formData.name}
-                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                        placeholder="Enter full name"
-                                        required
-                                    />
+                                <div className="form-section">
+                                    <h3>Basic Identity</h3>
+                                    <div className="form-row">
+                                        <div className="form-group">
+                                            <label>Full Name *</label>
+                                            <input
+                                                type="text"
+                                                value={formData.name}
+                                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                                placeholder="Enter full name"
+                                                required
+                                            />
+                                        </div>
+                                        <div className="form-group">
+                                            <label>Email Address *</label>
+                                            <input
+                                                type="email"
+                                                value={formData.email}
+                                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                                placeholder="Enter email"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <div className="form-group">
-                                    <label>Email Address *</label>
-                                    <input
-                                        type="email"
-                                        value={formData.email}
-                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                        placeholder="Enter email"
-                                        required
-                                    />
+                                <div className="form-section">
+                                    <h3>Contact & Security</h3>
+                                    <div className="form-row">
+                                        <div className="form-group">
+                                            <label>Phone Number</label>
+                                            <input
+                                                type="tel"
+                                                value={formData.phone}
+                                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                                placeholder="Enter phone number"
+                                            />
+                                        </div>
+                                        <div className="form-group">
+                                            <label>Password *</label>
+                                            <input
+                                                type="password"
+                                                value={formData.password}
+                                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                                placeholder="Min 6 characters"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <div className="form-group">
-                                    <label>Phone Number</label>
-                                    <input
-                                        type="tel"
-                                        value={formData.phone}
-                                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                        placeholder="Enter phone number"
-                                    />
-                                </div>
-
-                                <div className="form-group">
-                                    <label>Role *</label>
-                                    <select
-                                        value={formData.role}
-                                        onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                                        required
-                                    >
-                                        <option value="user">User</option>
-                                        <option value="superadmin">Super Admin</option>
-                                    </select>
-                                </div>
-
-                                <div className="form-group">
-                                    <label>Password *</label>
-                                    <input
-                                        type="password"
-                                        value={formData.password}
-                                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                        placeholder="Enter password (min 6 characters)"
-                                        required
-                                    />
+                                <div className="form-section">
+                                    <h3>Access Level</h3>
+                                    <div className="form-group">
+                                        <label>Role *</label>
+                                        <select
+                                            value={formData.role}
+                                            onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                                            required
+                                            className="premium-select"
+                                        >
+                                            <option value="user">Staff / Driver</option>
+                                            <option value="superadmin">System Admin</option>
+                                        </select>
+                                    </div>
                                 </div>
 
                                 <div className="info-box-modal">
@@ -446,7 +458,7 @@ const UserManagement = () => {
                                         Cancel
                                     </button>
                                     <button type="submit" className="btn btn-primary">
-                                        Create User
+                                        Create Account
                                     </button>
                                 </div>
                             </form>

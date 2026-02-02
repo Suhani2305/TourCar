@@ -108,7 +108,7 @@ router.get('/calendar', protect, async (req, res) => {
 
         // Date range filter
         if (startDate && endDate) {
-            query.pickupDate = {
+            query.startDate = {
                 $gte: new Date(startDate),
                 $lte: new Date(endDate)
             };
@@ -192,7 +192,7 @@ router.get('/stats/dashboard', protect, async (req, res) => {
         // Total bookings count
         const totalBookings = await Booking.countDocuments(baseQuery);
 
-        // Total revenue (sum of totalAmount from completed bookings)
+        // Total revenue (sum of totalAmount from ONLY completed bookings)
         const revenueResult = await Booking.aggregate([
             { $match: { ...baseQuery, status: 'completed' } },
             { $group: { _id: null, total: { $sum: '$totalAmount' } } }

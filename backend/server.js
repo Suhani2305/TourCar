@@ -19,6 +19,7 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use('/uploads', express.static(require('path').join(__dirname, 'uploads')));
 
 // Request logging middleware
 app.use((req, res, next) => {
@@ -39,6 +40,8 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/vehicles', require('./routes/vehicles'));
 app.use('/api/bookings', require('./routes/bookings'));
+app.use('/api/expenses', require('./routes/expenses'));
+app.use('/api/documents', require('./routes/documents'));
 app.use('/api/reports', require('./routes/reports'));
 
 // Error handling middleware

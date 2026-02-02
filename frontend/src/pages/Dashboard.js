@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { bookingAPI } from '../utils/api';
+import { formatCurrencyShorthand } from '../utils/format';
 import '../styles/Dashboard.css';
 
 const Dashboard = () => {
@@ -35,11 +36,7 @@ const Dashboard = () => {
     };
 
     const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('en-IN', {
-            style: 'currency',
-            currency: 'INR',
-            maximumFractionDigits: 0
-        }).format(amount);
+        return formatCurrencyShorthand(amount);
     };
 
     const formatDateTime = (dateString) => {
@@ -76,6 +73,19 @@ const Dashboard = () => {
         });
     };
 
+    const handleCall = (phone) => {
+        window.open(`tel:${phone}`, '_self');
+    };
+
+    const handleWhatsApp = (phone, name, bookingNum) => {
+        const message = encodeURIComponent(`Hello ${name}, I am your driver for Booking #${bookingNum}. See you soon!`);
+        window.open(`https://wa.me/91${phone}?text=${message}`, '_blank');
+    };
+
+    const handleNavigate = (location) => {
+        window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`, '_blank');
+    };
+
     return (
         <div className="main-container">
             <div className="premium-header">
@@ -107,7 +117,7 @@ const Dashboard = () => {
                             <div className="stat-icon-dot revenue"></div>
                             <div className="stat-content">
                                 <h3>Total Revenue</h3>
-                                <p className="stat-value">{formatCurrency(stats.totalRevenue)}</p>
+                                <p className="stat-value">{formatCurrencyShorthand(stats.totalRevenue)}</p>
                             </div>
                         </div>
 
@@ -128,39 +138,58 @@ const Dashboard = () => {
                         </div>
                     </div>
 
-                    {/* Upcoming Bookings Notification Panel */}
+                    {/* Today's Agenda / Upcoming Bookings */}
                     {stats.upcomingBookings && stats.upcomingBookings.length > 0 && (
-                        <div className="upcoming-bookings-panel">
+                        <div className="upcoming-bookings-panel agenda-section">
                             <div className="panel-header">
-                                <h2>Upcoming Bookings (Next 48 Hours)</h2>
-                                <span className="badge">{stats.upcomingBookings.length}</span>
+                                <h2>📅 Today's Agenda & Duty List</h2>
+                                <span className="badge-count">{stats.upcomingBookings.length} Active Duties</span>
                             </div>
-                            <div className="upcoming-bookings-list">
+                            <div className="upcoming-bookings-list agenda-list">
                                 {stats.upcomingBookings.map((booking) => (
                                     <div
                                         key={booking._id}
-                                        className="upcoming-booking-card"
-                                        onClick={() => navigate('/bookings')}
+                                        className="upcoming-booking-card agenda-card"
                                     >
-                                        <div className="booking-time-badge">
-                                            {formatDateTime(booking.startDate)}
+                                        <div className="booking-time-badge agenda-time">
+                                            {formatDate(booking.startDate)} | {formatTime(booking.pickupTime)}
                                         </div>
                                         <div className="booking-details">
                                             <div className="booking-main-info">
-                                                <h4>{booking.customerName}</h4>
+                                                <h4>👤 {booking.customerName}</h4>
                                                 <span className="booking-number">#{booking.bookingNumber}</span>
                                             </div>
                                             <div className="booking-meta">
-                                                <span className="vehicle-info">
-                                                    {booking.vehicle?.registrationNumber} - {booking.vehicle?.model}
-                                                </span>
-                                                <span className="date-info">
-                                                    {formatDate(booking.startDate)} at {formatTime(booking.pickupTime)}
-                                                </span>
                                                 <span className="location-info">
-                                                    {booking.pickupLocation}
+                                                    📍 <strong>Pickup:</strong> {booking.pickupLocation}
+                                                </span>
+                                                <span className="vehicle-info">
+                                                    🚗 {booking.vehicle?.registrationNumber} ({booking.vehicle?.brand} {booking.vehicle?.model})
                                                 </span>
                                             </div>
+
+                                            {/* Action Bar for Mobile/Driver Ease */}
+                                            <div className="driver-action-bar">
+                                                <button
+                                                    className="driver-btn btn-call"
+                                                    onClick={(e) => { e.stopPropagation(); handleCall(booking.customerPhone); }}
+                                                >
+                                                    📞 Call
+                                                </button>
+                                                <button
+                                                    className="driver-btn btn-whatsapp"
+                                                    onClick={(e) => { e.stopPropagation(); handleWhatsApp(booking.customerPhone, booking.customerName, booking.bookingNumber); }}
+                                                >
+                                                    💬 WhatsApp
+                                                </button>
+                                                <button
+                                                    className="driver-btn btn-nav"
+                                                    onClick={(e) => { e.stopPropagation(); handleNavigate(booking.pickupLocation); }}
+                                                >
+                                                    📍 Navigate
+                                                </button>
+                                            </div>
+
                                             <div className="booking-status-badge">
                                                 <span className={`status-pill status-${booking.status}`}>
                                                     {booking.status.toUpperCase()}
@@ -192,7 +221,7 @@ const Dashboard = () => {
                             {user?.role === 'superadmin' && (
                                 <button
                                     className="action-btn btn-users"
-                                    onClick={() => navigate('/users')}
+                                    onClick={() => navigate('/admin/users')}
                                 >
                                     <span className="btn-text">Manage Users</span>
                                 </button>

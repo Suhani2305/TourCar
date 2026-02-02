@@ -6,12 +6,20 @@ import {
     XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+import { formatCurrencyShorthand } from '../utils/format';
 import '../styles/Reports.css';
 
 const Reports = () => {
     const { user } = useAuth();
+
+    // Custom formatter for numbers (no special symbols to avoid PDF glitches)
+    const formatNumber = (num) => {
+        if (!num) return '0';
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
+
     const [loading, setLoading] = useState(false);
     const [dateRange, setDateRange] = useState({
         startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
@@ -23,7 +31,7 @@ const Reports = () => {
     const [viewMode, setViewMode] = useState('my');
     const [selectedUser, setSelectedUser] = useState('');
     const [users, setUsers] = useState([]);
-    const [showExportDropdown, setShowExportDropdown] = useState(false);
+    // Removed showExportDropdown state as buttons are now separate
 
     const COLORS = ['#2ecc71', '#f39c12', '#e74c3c', '#3498db', '#9b59b6'];
 
@@ -77,52 +85,60 @@ const Reports = () => {
     };
 
     const exportToPDF = () => {
-        const doc = new jsPDF();
+        const doc = new jsPDF('l', 'mm', 'a4'); // Landscape for more columns
 
         // Title
-        doc.setFontSize(20);
-        doc.text('Tour Management - Reports', 14, 20);
+        doc.setFontSize(22);
+        doc.setTextColor(74, 55, 40); // #4A3728
+        doc.text('TOURCAR - BUSINESS REPORT', 14, 20);
 
         // Date Range
         doc.setFontSize(10);
-        doc.text(`Period: ${dateRange.startDate} to ${dateRange.endDate}`, 14, 30);
+        doc.setTextColor(100);
+        doc.text(`Period: ${dateRange.startDate} to ${dateRange.endDate}`, 14, 28);
+        doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 33);
 
-        // Revenue Summary
+        // Summary KPI Table
+        autoTable(doc, {
+            startY: 40,
+            head: [['Total Revenue', 'Total Bookings', 'Avg Booking Value', 'Growth Rate']],
+            body: [[
+                `INR ${formatNumber(revenueData?.totalRevenue)}`,
+                revenueData?.bookingCount || 0,
+                `INR ${formatNumber(revenueData?.averageBookingValue)}`,
+                `${revenueData?.growthRate || 0}%`
+            ]],
+            headStyles: { fillColor: [74, 55, 40], halign: 'center' },
+            bodyStyles: { halign: 'center', fontSize: 11 },
+            columnStyles: {
+                0: { halign: 'left' },
+                3: { fontStyle: 'bold', textColor: revenueData?.growthRate >= 0 ? [39, 174, 96] : [231, 76, 60] }
+            }
+        });
+
+        // Detailed Bookings Table
         doc.setFontSize(14);
-        doc.text('Revenue Summary', 14, 45);
-        doc.autoTable({
-            startY: 50,
-            head: [['Metric', 'Value']],
-            body: [
-                ['Total Revenue', `₹${revenueData?.totalRevenue?.toLocaleString() || 0}`],
-                ['Total Bookings', revenueData?.bookingCount || 0],
-                ['Average Booking Value', `₹${revenueData?.averageBookingValue?.toLocaleString() || 0}`]
-            ]
-        });
+        doc.setTextColor(74, 55, 40);
+        doc.text('Detailed Booking Log', 14, doc.lastAutoTable.finalY + 15);
 
-        // Booking Stats
-        let finalY = doc.lastAutoTable.finalY + 10;
-        doc.text('Booking Statistics', 14, finalY);
-        doc.autoTable({
-            startY: finalY + 5,
-            head: [['Status', 'Count']],
-            body: Object.entries(bookingStats?.byStatus || {}).map(([status, count]) => [
-                status.charAt(0).toUpperCase() + status.slice(1),
-                count
-            ])
-        });
-
-        // Vehicle Utilization
-        finalY = doc.lastAutoTable.finalY + 10;
-        doc.text('Top Vehicles', 14, finalY);
-        doc.autoTable({
-            startY: finalY + 5,
-            head: [['Vehicle', 'Bookings', 'Revenue']],
-            body: (vehicleUtilization?.topVehicles || []).slice(0, 5).map(v => [
-                v.vehicleNumber,
-                v.bookings,
-                `₹${v.revenue?.toLocaleString()}`
-            ])
+        autoTable(doc, {
+            startY: doc.lastAutoTable.finalY + 20,
+            head: [['Date', 'Booking #', 'Customer', 'Vehicle', 'Pickup', 'Drop', 'Status', 'Revenue']],
+            body: (revenueData?.bookings || []).map(b => [
+                new Date(b.startDate).toLocaleDateString(),
+                b.bookingNumber,
+                b.customerName,
+                b.vehicle?.vehicleNumber || 'N/A',
+                b.pickupLocation,
+                b.dropLocation,
+                b.status.toUpperCase(),
+                `INR ${formatNumber(b.totalAmount)}`
+            ]),
+            headStyles: { fillColor: [74, 55, 40] },
+            alternateRowStyles: { fillColor: [250, 243, 224] },
+            columnStyles: {
+                7: { halign: 'right' }
+            }
         });
 
         doc.save(`tour_report_${dateRange.startDate}_to_${dateRange.endDate}.pdf`);
@@ -131,32 +147,45 @@ const Reports = () => {
     const exportToExcel = () => {
         const wb = XLSX.utils.book_new();
 
-        // Revenue Sheet
-        const revenueSheet = XLSX.utils.json_to_sheet([
-            { Metric: 'Total Revenue', Value: `₹${revenueData?.totalRevenue || 0}` },
+        // Summary Data
+        const summaryData = [
+            { 'Report Title': 'TOURCAR BUSINESS REPORT' },
+            { 'Period': `${dateRange.startDate} to ${dateRange.endDate}` },
+            {},
+            { Metric: 'Total Revenue', Value: revenueData?.totalRevenue || 0 },
             { Metric: 'Total Bookings', Value: revenueData?.bookingCount || 0 },
-            { Metric: 'Average Booking Value', Value: `₹${revenueData?.averageBookingValue || 0}` }
-        ]);
-        XLSX.utils.book_append_sheet(wb, revenueSheet, 'Revenue');
+            { Metric: 'Average Booking Value', Value: revenueData?.averageBookingValue || 0 },
+            { Metric: 'Growth Rate', Value: `${revenueData?.growthRate || 0}%` }
+        ];
+        const summarySheet = XLSX.utils.json_to_sheet(summaryData);
+        XLSX.utils.book_append_sheet(wb, summarySheet, 'Summary');
 
-        // Booking Stats Sheet
-        const statsSheet = XLSX.utils.json_to_sheet(
-            Object.entries(bookingStats?.byStatus || {}).map(([status, count]) => ({
-                Status: status.charAt(0).toUpperCase() + status.slice(1),
-                Count: count
-            }))
-        );
-        XLSX.utils.book_append_sheet(wb, statsSheet, 'Booking Stats');
+        // Detailed Bookings Sheet
+        const detailedBookings = (revenueData?.bookings || []).map(b => ({
+            'Date': new Date(b.startDate).toLocaleDateString(),
+            'Booking Number': b.bookingNumber,
+            'Customer Name': b.customerName,
+            'Vehicle Number': b.vehicle?.vehicleNumber || 'N/A',
+            'Vehicle Details': `${b.vehicle?.brand || ''} ${b.vehicle?.model || ''}`,
+            'Pickup Location': b.pickupLocation,
+            'Drop Location': b.dropLocation,
+            'Status': b.status.toUpperCase(),
+            'Revenue (INR)': b.totalAmount || 0,
+            'Advance Amount': b.advanceAmount || 0
+        }));
+        const bookingSheet = XLSX.utils.json_to_sheet(detailedBookings);
+        XLSX.utils.book_append_sheet(wb, bookingSheet, 'All Bookings');
 
         // Vehicle Utilization Sheet
         const vehicleSheet = XLSX.utils.json_to_sheet(
-            (vehicleUtilization?.topVehicles || []).map(v => ({
+            (vehicleUtilization?.vehicles || []).map(v => ({
                 'Vehicle Number': v.vehicleNumber,
-                'Bookings': v.bookings,
-                'Revenue': v.revenue
+                'Total Bookings': v.bookings,
+                'Total Revenue': v.revenue,
+                'Utilization %': v.utilizationRate?.toFixed(2)
             }))
         );
-        XLSX.utils.book_append_sheet(wb, vehicleSheet, 'Vehicles');
+        XLSX.utils.book_append_sheet(wb, vehicleSheet, 'Vehicle Performance');
 
         XLSX.writeFile(wb, `tour_report_${dateRange.startDate}_to_${dateRange.endDate}.xlsx`);
     };
@@ -188,7 +217,7 @@ const Reports = () => {
                         <div className="stat-icon-dot revenue"></div>
                         <div className="stat-content">
                             <h3>Total Revenue</h3>
-                            <p className="stat-value">₹{revenueData?.totalRevenue?.toLocaleString() || 0}</p>
+                            <p className="stat-value">{formatCurrencyShorthand(revenueData?.totalRevenue)}</p>
                         </div>
                     </div>
                     <div className="stat-card" style={{ borderLeftColor: '#D4AF37' }}>
@@ -202,7 +231,7 @@ const Reports = () => {
                         <div className="stat-icon-dot growth"></div>
                         <div className="stat-content">
                             <h3>Avg Booking</h3>
-                            <p className="stat-value">₹{revenueData?.averageBookingValue?.toLocaleString() || 0}</p>
+                            <p className="stat-value">{formatCurrencyShorthand(revenueData?.averageBookingValue)}</p>
                         </div>
                     </div>
                     <div className="stat-card" style={{ borderLeftColor: '#1E40AF' }}>
@@ -270,25 +299,13 @@ const Reports = () => {
                         )}
                     </div>
 
-                    <div className="controls-right">
-                        <div className="export-dropdown-wrapper">
-                            <button
-                                onClick={() => setShowExportDropdown(!showExportDropdown)}
-                                className="btn-premium-export"
-                            >
-                                📤 EXPORT
-                            </button>
-                            {showExportDropdown && (
-                                <div className="export-menu">
-                                    <button onClick={() => { exportToPDF(); setShowExportDropdown(false); }}>
-                                        📄 PDF Report
-                                    </button>
-                                    <button onClick={() => { exportToExcel(); setShowExportDropdown(false); }}>
-                                        📊 Excel Data
-                                    </button>
-                                </div>
-                            )}
-                        </div>
+                    <div className="controls-right export-buttons-group">
+                        <button onClick={exportToPDF} className="btn-premium-export btn-pdf">
+                            📄 PDF
+                        </button>
+                        <button onClick={exportToExcel} className="btn-premium-export btn-excel">
+                            📊 Excel
+                        </button>
                     </div>
                 </div>
 
@@ -302,7 +319,12 @@ const Reports = () => {
                                 <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis dataKey="date" />
                                 <YAxis />
-                                <Tooltip formatter={(value) => `₹${value.toLocaleString()}`} />
+                                <Tooltip
+                                    formatter={(value) => {
+                                        if (typeof value === 'number') return formatCurrencyShorthand(value);
+                                        return String(value || '');
+                                    }}
+                                />
                                 <Legend />
                                 <Line type="monotone" dataKey="revenue" stroke="#2ecc71" strokeWidth={2} />
                             </LineChart>
@@ -315,23 +337,28 @@ const Reports = () => {
                         <ResponsiveContainer width="100%" height={300}>
                             <PieChart>
                                 <Pie
-                                    data={Object.entries(bookingStats?.byStatus || {}).map(([name, value]) => ({
-                                        name: name.charAt(0).toUpperCase() + name.slice(1),
-                                        value
-                                    }))}
+                                    data={Object.entries(bookingStats?.byStatus || {})
+                                        .map(([name, value]) => ({
+                                            name: name.charAt(0).toUpperCase() + name.slice(1),
+                                            value
+                                        }))
+                                        .filter(item => item.value > 0)}
                                     cx="50%"
                                     cy="50%"
-                                    labelLine={false}
-                                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                                    outerRadius={100}
+                                    labelLine={true}
+                                    label={({ percent }) => percent ? `${(percent * 100).toFixed(0)}%` : ''}
+                                    outerRadius={80}
                                     fill="#8884d8"
                                     dataKey="value"
                                 >
-                                    {Object.keys(bookingStats?.byStatus || {}).map((_, index) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                    ))}
+                                    {Object.entries(bookingStats?.byStatus || {})
+                                        .filter(([_, value]) => value > 0)
+                                        .map((_, index) => (
+                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        ))}
                                 </Pie>
                                 <Tooltip />
+                                <Legend verticalAlign="bottom" height={36} />
                             </PieChart>
                         </ResponsiveContainer>
                     </div>
@@ -344,7 +371,12 @@ const Reports = () => {
                                 <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis dataKey="vehicleNumber" />
                                 <YAxis />
-                                <Tooltip formatter={(value) => `₹${value.toLocaleString()}`} />
+                                <Tooltip
+                                    formatter={(value) => {
+                                        if (typeof value === 'number') return formatCurrencyShorthand(value);
+                                        return String(value || '');
+                                    }}
+                                />
                                 <Legend />
                                 <Bar dataKey="revenue" fill="#3498db" />
                                 <Bar dataKey="bookings" fill="#f39c12" />
@@ -371,7 +403,7 @@ const Reports = () => {
                                     <tr key={v._id}>
                                         <td>{v.vehicleNumber}</td>
                                         <td>{v.bookings}</td>
-                                        <td>₹{v.revenue?.toLocaleString()}</td>
+                                        <td>{formatCurrencyShorthand(v.revenue)}</td>
                                         <td>
                                             <div className="utilization-bar">
                                                 <div

@@ -101,12 +101,86 @@
 
 .sidebar-icon {
     font-size: 1.25rem;
-    filter: grayscale(1);
     transition: all 0.3s ease;
+    display: inline-block;
 }
 
+/* Colorful Icons */
+.icon-dashboard {
+    text-shadow: 0 0 10px rgba(52, 152, 219, 0.4);
+}
+
+/* Blue */
+.icon-calendar {
+    text-shadow: 0 0 10px rgba(231, 76, 60, 0.4);
+}
+
+/* Red */
+.icon-bookings {
+    text-shadow: 0 0 10px rgba(241, 196, 15, 0.4);
+}
+
+/* Yellow */
+.icon-vehicles {
+    text-shadow: 0 0 10px rgba(46, 204, 113, 0.4);
+}
+
+/* Green */
+.icon-users {
+    text-shadow: 0 0 10px rgba(155, 89, 182, 0.4);
+}
+
+/* Purple */
+.icon-reports {
+    text-shadow: 0 0 10px rgba(230, 126, 34, 0.4);
+}
+
+/* Orange */
+.icon-profile {
+    text-shadow: 0 0 10px rgba(149, 165, 166, 0.4);
+}
+
+/* Gray */
+
 .sidebar-link.active .sidebar-icon {
-    filter: grayscale(0);
+    transform: scale(1.2);
+    filter: drop-shadow(0 0 5px currentColor);
+}
+
+.sidebar-link.active .sidebar-icon.icon-dashboard {
+    color: #3498db;
+}
+
+.sidebar-link.active .sidebar-icon.icon-calendar {
+    color: #e74c3c;
+}
+
+.sidebar-link.active .sidebar-icon.icon-bookings {
+    color: #f1c40f;
+}
+
+.sidebar-link.active .sidebar-icon.icon-vehicles {
+    color: #2ecc71;
+}
+
+.sidebar-link.active .sidebar-icon.icon-users {
+    color: #9b59b6;
+}
+
+.sidebar-link.active .sidebar-icon.icon-reports {
+    color: #e67e24;
+}
+
+.sidebar-link.active .sidebar-icon.icon-profile {
+    color: #ecf0f1;
+}
+
+.sidebar-link.active .sidebar-icon.icon-expenses {
+    color: #e74c3c;
+}
+
+.sidebar-link.active .sidebar-icon.icon-vault {
+    color: #f1c40f;
 }
 
 /* Footer Profile Section */
@@ -238,8 +312,8 @@
 
     .sidebar-section {
         margin: 0;
-        display: flex;
-        gap: 0.5rem;
+        display: contents;
+        /* Makes sidebar-links behave as direct children of sidebar-content */
     }
 
     .section-title {
@@ -250,6 +324,9 @@
         margin: 0;
         border-radius: 0.5rem;
         padding: 0.5rem;
+        flex: 1;
+        /* Stretch to fill space */
+        justify-content: center;
         width: auto;
     }
 }

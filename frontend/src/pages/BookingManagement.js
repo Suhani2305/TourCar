@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { bookingAPI, vehicleAPI, authAPI } from '../utils/api';
 import { toast } from 'react-toastify';
+import ConfirmationModal from '../components/ConfirmationModal';
 import '../styles/BookingManagement.css';
 
 const BookingManagement = () => {
@@ -15,6 +16,12 @@ const BookingManagement = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [editingBooking, setEditingBooking] = useState(null);
+
+    // Delete Confirmation Modal State
+    const [deleteModal, setDeleteModal] = useState({
+        isOpen: false,
+        bookingId: null
+    });
 
     // Super Admin dual view states
     const [viewMode, setViewMode] = useState('my'); // 'my' or 'all'
@@ -148,16 +155,15 @@ const BookingManagement = () => {
         setShowModal(true);
     };
 
-    const handleDelete = async (id) => {
-        if (window.confirm('Are you sure you want to delete this booking?')) {
-            try {
-                await bookingAPI.delete(id);
-                toast.success('Booking deleted successfully!');
-                fetchBookings();
-                fetchVehicles();
-            } catch (error) {
-                toast.error(error.response?.data?.message || 'Failed to delete booking');
-            }
+    const handleDelete = async () => {
+        try {
+            await bookingAPI.delete(deleteModal.bookingId);
+            toast.success('Booking deleted successfully!');
+            setDeleteModal({ isOpen: false, bookingId: null });
+            fetchBookings();
+            fetchVehicles();
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to delete booking');
         }
     };
 
@@ -189,6 +195,19 @@ const BookingManagement = () => {
             advanceAmount: '',
             notes: ''
         });
+    };
+
+    const handleCall = (phone) => {
+        window.open(`tel:${phone}`, '_self');
+    };
+
+    const handleWhatsApp = (phone, name, bookingNum) => {
+        const message = encodeURIComponent(`Hello ${name}, I am your driver for Booking #${bookingNum}. See you soon!`);
+        window.open(`https://wa.me/91${phone}?text=${message}`, '_blank');
+    };
+
+    const handleNavigate = (location) => {
+        window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`, '_blank');
     };
     const handleCloseModal = () => {
         setShowModal(false);
@@ -459,6 +478,27 @@ const BookingManagement = () => {
                                             </div>
                                         </div>
                                     )}
+                                    {/* Action Bar for Drivers */}
+                                    <div className="driver-action-bar" style={{ padding: '0 1.25rem 1.25rem 1.25rem' }}>
+                                        <button
+                                            className="driver-btn btn-call"
+                                            onClick={() => handleCall(booking.customerPhone)}
+                                        >
+                                            📞 Call
+                                        </button>
+                                        <button
+                                            className="driver-btn btn-whatsapp"
+                                            onClick={() => handleWhatsApp(booking.customerPhone, booking.customerName, booking.bookingNumber)}
+                                        >
+                                            💬 WhatsApp
+                                        </button>
+                                        <button
+                                            className="driver-btn btn-nav"
+                                            onClick={() => handleNavigate(booking.pickupLocation)}
+                                        >
+                                            📍 Navigate
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <div className="booking-card-actions">
@@ -484,7 +524,7 @@ const BookingManagement = () => {
                                     </button>
                                     <button
                                         className="btn-action btn-delete"
-                                        onClick={() => handleDelete(booking._id)}
+                                        onClick={() => setDeleteModal({ isOpen: true, bookingId: booking._id })}
                                         title="Delete Booking"
                                     >
                                         🗑️ Delete
@@ -494,6 +534,18 @@ const BookingManagement = () => {
                         ))
                     )}
                 </div>
+
+                {/* Premium Delete Confirmation Modal */}
+                <ConfirmationModal
+                    isOpen={deleteModal.isOpen}
+                    title="Delete Booking"
+                    message="Are you sure you want to permanently remove this booking record? This action cannot be undone and will free up the vehicle."
+                    onConfirm={handleDelete}
+                    onCancel={() => setDeleteModal({ isOpen: false, bookingId: null })}
+                    type="danger"
+                    confirmText="Delete"
+                    cancelText="Cancel"
+                />
 
                 {/* Add/Edit Modal */}
                 {showModal && (
@@ -629,7 +681,7 @@ const BookingManagement = () => {
                                 </div>
 
                                 <div className="form-section">
-                                    <h3>💰 Payment Details</h3>
+                                    <h3>Payment Details</h3>
                                     <div className="form-row">
                                         <div className="form-group">
                                             <label>Total Amount (₹)</label>
@@ -681,7 +733,7 @@ const BookingManagement = () => {
                                         Cancel
                                     </button>
                                     <button type="submit" className="btn btn-primary">
-                                        {editingBooking ? '✅ Update Booking' : '✅ Create Booking'}
+                                        {editingBooking ? 'Update Booking' : 'Create Booking'}
                                     </button>
                                 </div>
                             </form>

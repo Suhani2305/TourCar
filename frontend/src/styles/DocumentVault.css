@@ -1,0 +1,302 @@
+/* Document Vault Premium Styles */
+.vault-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2.5rem;
+    margin-top: 2rem;
+}
+
+.doc-card {
+    background: white;
+    border-radius: 2rem;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    border: 1px solid #D8CFBC;
+    transition: all 0.3s ease;
+}
+
+.doc-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 25px 50px rgba(74, 55, 40, 0.15);
+}
+
+.doc-type-badge {
+    position: absolute;
+    top: 1.25rem;
+    left: 1.25rem;
+    background: white;
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    z-index: 5;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.doc-preview-area {
+    width: 100%;
+    height: 200px;
+    background: #FDF4E3;
+    position: relative;
+    overflow: hidden;
+}
+
+.doc-preview-area img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.doc-card:hover .doc-preview-area img {
+    transform: scale(1.1);
+}
+
+.dual-side-indicator {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    background: rgba(74, 55, 40, 0.9);
+    color: white;
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.doc-details {
+    padding: 1.75rem;
+    background: white;
+}
+
+.doc-details h3 {
+    margin: 0;
+    font-size: 1.15rem;
+    color: #11120D;
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+}
+
+.doc-category-name {
+    margin: 0.35rem 0 1rem;
+    color: #4A3728;
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.7;
+}
+
+.expiry-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: #E8F5E9;
+    color: #2E7D32;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.expiry-tag.expired {
+    background: #FFEBEE;
+    color: #C62828;
+}
+
+.doc-actions-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(74, 55, 40, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    opacity: 0;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(4px);
+    z-index: 10;
+}
+
+.doc-card:hover .doc-actions-overlay {
+    opacity: 1;
+}
+
+.btn-icon-view,
+.btn-icon-delete {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 1.25rem;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-icon-view:hover {
+    transform: scale(1.1);
+    background: #FDF4E3;
+}
+
+.btn-icon-delete:hover {
+    transform: scale(1.1);
+    background: #FFEBEE;
+    color: #C62828 !important;
+}
+
+/* Upload UI in Modal */
+.upload-preview-box {
+    margin-top: 1rem;
+}
+
+.file-upload-label {
+    display: block;
+    border: 2px dashed #D8CFBC;
+    border-radius: 1.5rem;
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: #FFFBF4;
+}
+
+.file-upload-label:hover {
+    border-color: #4A3728;
+    background: #FDF4E3;
+}
+
+.upload-placeholder span {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+    display: block;
+}
+
+.upload-placeholder p {
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #4A3728;
+    text-transform: uppercase;
+}
+
+.preview-container {
+    position: relative;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    height: 140px;
+    border: 2px solid #4A3728;
+}
+
+.preview-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.remove-photo {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(231, 76, 60, 0.9);
+    color: white;
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+}
+
+.summary-pill {
+    padding: 0.6rem 1.5rem;
+    background: #FDF4E3;
+    border: 1.5px solid #D8CFBC;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    color: #4A3728;
+}
+
+.no-data-card {
+    grid-column: 1 / -1;
+    background: white;
+    padding: 5rem 2rem;
+    border-radius: 2.5rem;
+    text-align: center;
+    border: 2px dashed #D8CFBC;
+}
+
+.no-data-icon {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.3;
+}
+
+.no-data-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+}
+
+.no-data-card p {
+    color: #565449;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+/* Zoom Slider Premium */
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 8px;
+    background: #D8CFBC;
+    border-radius: 10px;
+    outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #4A3728;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+    background: #11120D;
+}
+
+@media screen and (max-width: 640px) {
+    .preview-container {
+        height: 120px;
+    }
+
+    .vault-grid {
+        grid-template-columns: 1fr;
+    }
+}

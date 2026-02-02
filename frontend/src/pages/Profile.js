@@ -120,7 +120,7 @@ const Profile = () => {
                             <div className="profile-header-text">
                                 <h2>{user?.name}</h2>
                                 <span className={`role-badge ${user?.role}`}>
-                                    {user?.role === 'superadmin' ? '👑 Administrator' : '👤 Staff Member'}
+                                    {user?.role === 'superadmin' ? 'Administrator' : 'Staff Member'}
                                 </span>
                             </div>
                         </div>

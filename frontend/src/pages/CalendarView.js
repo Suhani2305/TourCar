@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { bookingAPI } from '../utils/api';
 import Calendar from 'react-calendar';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
+import { formatCurrencyShorthand } from '../utils/format';
 import 'react-calendar/dist/Calendar.css';
 import '../styles/CalendarView.css';
 
@@ -17,14 +18,7 @@ const CalendarView = () => {
     const [selectedUser, setSelectedUser] = useState('');
     const [users, setUsers] = useState([]);
 
-    useEffect(() => {
-        fetchCalendarBookings();
-        if (user?.role === 'superadmin') {
-            fetchUsers();
-        }
-    }, [date, viewMode, selectedUser]);
-
-    const fetchUsers = async () => {
+    const fetchUsers = useCallback(async () => {
         try {
             const response = await bookingAPI.getAllUsers();
             if (response.data.success) {
@@ -33,9 +27,9 @@ const CalendarView = () => {
         } catch (error) {
             console.error('Error fetching users:', error);
         }
-    };
+    }, []);
 
-    const fetchCalendarBookings = async () => {
+    const fetchCalendarBookings = useCallback(async () => {
         try {
             setLoading(true);
             const monthStart = startOfMonth(date);
@@ -62,12 +56,19 @@ const CalendarView = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [date, viewMode, selectedUser, user?.role]);
+
+    useEffect(() => {
+        fetchCalendarBookings();
+        if (user?.role === 'superadmin') {
+            fetchUsers();
+        }
+    }, [date, viewMode, selectedUser, user?.role, fetchCalendarBookings, fetchUsers]);
 
     const getBookingsForDate = (selectedDate) => {
         const dateStr = format(selectedDate, 'yyyy-MM-dd');
         return bookings.filter(booking => {
-            const bookingDate = booking.pickupDate.split('T')[0];
+            const bookingDate = booking.startDate.split('T')[0];
             return bookingDate === dateStr;
         });
     };
@@ -110,10 +111,10 @@ const CalendarView = () => {
 
     const getStatusColor = (status) => {
         const colors = {
-            confirmed: '#2ecc71',
-            pending: '#f39c12',
-            cancelled: '#e74c3c',
-            completed: '#3498db'
+            confirmed: '#27ae60',  // Darker green
+            pending: '#e67e22',    // Darker orange
+            cancelled: '#c0392b',  // Darker red
+            completed: '#2980b9'   // Darker blue
         };
         return colors[status] || '#95a5a6';
     };
@@ -130,6 +131,39 @@ const CalendarView = () => {
                     <div className="premium-underline"></div>
                 </div>
 
+
+
+                {/* Stats Summary - Dashboard Style */}
+                <div className="cards-grid-4" style={{ marginBottom: '2.5rem' }}>
+                    <div className="stat-card">
+                        <div className="stat-icon">📊</div>
+                        <div className="stat-content">
+                            <h3>Month Bookings</h3>
+                            <p className="stat-value">{bookings.length}</p>
+                        </div>
+                    </div>
+                    <div className="stat-card" style={{ borderLeftColor: '#2ecc71' }}>
+                        <div className="stat-icon">✅</div>
+                        <div className="stat-content">
+                            <h3>Confirmed</h3>
+                            <p className="stat-value">{bookings.filter(b => b.status === 'confirmed').length}</p>
+                        </div>
+                    </div>
+                    <div className="stat-card" style={{ borderLeftColor: '#f39c12' }}>
+                        <div className="stat-icon">⏳</div>
+                        <div className="stat-content">
+                            <h3>Pending</h3>
+                            <p className="stat-value">{bookings.filter(b => b.status === 'pending').length}</p>
+                        </div>
+                    </div>
+                    <div className="stat-card" style={{ borderLeftColor: '#4A3728' }}>
+                        <div className="stat-icon">💰</div>
+                        <div className="stat-content">
+                            <h3>Month Revenue</h3>
+                            <p className="stat-value">{formatCurrencyShorthand(bookings.filter(b => b.status === 'completed').reduce((sum, b) => sum + (b.totalAmount || 0), 0))}</p>
+                        </div>
+                    </div>
+                </div>
                 {/* Filters & Legend Row */}
                 <div className="calendar-controls-row">
                     <div className="legend-pills">
@@ -173,38 +207,6 @@ const CalendarView = () => {
                     )}
                 </div>
 
-                {/* Stats Summary - Dashboard Style */}
-                <div className="cards-grid-4" style={{ marginBottom: '2.5rem' }}>
-                    <div className="stat-card">
-                        <div className="stat-icon">📊</div>
-                        <div className="stat-content">
-                            <h3>Month Bookings</h3>
-                            <p className="stat-value">{bookings.length}</p>
-                        </div>
-                    </div>
-                    <div className="stat-card" style={{ borderLeftColor: '#2ecc71' }}>
-                        <div className="stat-icon">✅</div>
-                        <div className="stat-content">
-                            <h3>Confirmed</h3>
-                            <p className="stat-value">{bookings.filter(b => b.status === 'confirmed').length}</p>
-                        </div>
-                    </div>
-                    <div className="stat-card" style={{ borderLeftColor: '#f39c12' }}>
-                        <div className="stat-icon">⏳</div>
-                        <div className="stat-content">
-                            <h3>Pending</h3>
-                            <p className="stat-value">{bookings.filter(b => b.status === 'pending').length}</p>
-                        </div>
-                    </div>
-                    <div className="stat-card" style={{ borderLeftColor: '#4A3728' }}>
-                        <div className="stat-icon">💰</div>
-                        <div className="stat-content">
-                            <h3>Month Revenue</h3>
-                            <p className="stat-value">₹{bookings.reduce((sum, b) => sum + (b.amount || 0), 0).toLocaleString()}</p>
-                        </div>
-                    </div>
-                </div>
-
                 {/* Calendar Wrapper */}
                 <div className="calendar-main-wrapper">
                     {loading ? (
@@ -230,13 +232,13 @@ const CalendarView = () => {
                         <div className="booking-popup" onClick={(e) => e.stopPropagation()}>
                             <div className="popup-header">
                                 <h3>
-                                    Bookings on {selectedDateBookings.length > 0 && format(new Date(selectedDateBookings[0].pickupDate), 'MMMM dd, yyyy')}
+                                    Bookings on {selectedDateBookings.length > 0 && format(new Date(selectedDateBookings[0].startDate), 'MMMM dd, yyyy')}
                                 </h3>
                                 <button onClick={() => setShowPopup(false)} className="close-btn">×</button>
                             </div>
                             <div className="popup-content">
                                 {selectedDateBookings.map(booking => (
-                                    <div key={booking._id} className="popup-booking-card">
+                                    <div key={booking._id} className={`popup-booking-card status-${booking.status}`}>
                                         <div className="booking-header-row">
                                             <span className="booking-number">{booking.bookingNumber}</span>
                                             <span
@@ -248,11 +250,11 @@ const CalendarView = () => {
                                         </div>
                                         <div className="booking-details">
                                             <p><strong>Customer:</strong> {booking.customerName}</p>
-                                            <p><strong>Vehicle:</strong> {booking.vehicleNumber}</p>
-                                            <p><strong>Pickup Time:</strong> {booking.pickupTime}</p>
-                                            <p><strong>Drop Time:</strong> {booking.dropTime}</p>
-                                            <p><strong>Destination:</strong> {booking.destination}</p>
-                                            <p><strong>Amount:</strong> ₹{booking.amount?.toLocaleString()}</p>
+                                            <p><strong>Vehicle:</strong> {booking.vehicle?.vehicleNumber || 'N/A'}</p>
+                                            <p><strong>Pickup Time:</strong> {booking.pickupTime || 'Not specified'}</p>
+                                            <p><strong>Drop Time:</strong> {booking.dropTime || 'Not specified'}</p>
+                                            <p><strong>Drop Location:</strong> {booking.dropLocation || booking.pickupLocation}</p>
+                                            <p><strong>Amount:</strong> {formatCurrencyShorthand(booking.totalAmount)}</p>
                                         </div>
                                     </div>
                                 ))}
