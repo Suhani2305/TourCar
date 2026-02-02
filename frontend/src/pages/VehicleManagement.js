@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { vehicleAPI, authAPI } from '../utils/api';
@@ -8,7 +8,6 @@ import '../styles/VehicleManagement.css';
 
 const VehicleManagement = () => {
     const { user } = useAuth();
-    const navigate = useNavigate();
     const [vehicles, setVehicles] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all');
@@ -41,18 +40,7 @@ const VehicleManagement = () => {
     const vehicleTypes = ['Sedan', 'SUV', 'Mini Bus', 'Bus', 'Luxury Car', 'Tempo Traveller', 'Other'];
     const statusOptions = ['available', 'booked', 'maintenance', 'inactive'];
 
-    useEffect(() => {
-        fetchVehicles();
-        if (user?.role === 'superadmin') {
-            fetchUsersList();
-        }
-    }, []);
-
-    useEffect(() => {
-        fetchVehicles();
-    }, [viewMode, selectedUserId]);
-
-    const fetchVehicles = async () => {
+    const fetchVehicles = useCallback(async () => {
         try {
             const params = {};
 
@@ -68,16 +56,23 @@ const VehicleManagement = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [user?.role, viewMode, selectedUserId]);
 
-    const fetchUsersList = async () => {
+    const fetchUsersList = useCallback(async () => {
         try {
             const response = await authAPI.getUsersList();
             setUsersList(response.data.users);
         } catch (error) {
             console.error('Failed to fetch users list:', error);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        fetchVehicles();
+        if (user?.role === 'superadmin') {
+            fetchUsersList();
+        }
+    }, [fetchVehicles, fetchUsersList, user?.role]);
 
     const handleViewModeChange = (mode) => {
         setViewMode(mode);

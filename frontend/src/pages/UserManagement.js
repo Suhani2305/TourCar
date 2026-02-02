@@ -7,7 +7,7 @@ import ConfirmationModal from '../components/ConfirmationModal';
 import '../styles/UserManagement.css';
 
 const UserManagement = () => {
-    const { user, logout } = useAuth();
+    const { logout } = useAuth();
     const navigate = useNavigate();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -120,10 +120,7 @@ const UserManagement = () => {
         });
     };
 
-    const handleLogout = () => {
-        logout();
-        navigate('/login');
-    };
+
 
     const filteredUsers = users.filter(u => {
         const matchesFilter = filter === 'all' || u.status === filter;

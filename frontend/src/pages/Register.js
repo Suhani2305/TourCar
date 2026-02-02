@@ -44,7 +44,7 @@ const Register = () => {
             const { confirmPassword, ...registerData } = formData;
 
             // Send OTP instead of direct registration
-            const response = await register(registerData, true); // true = send OTP mode
+            await register(registerData, true); // true = send OTP mode
 
             toast.success('OTP sent to your email! Please verify.');
 

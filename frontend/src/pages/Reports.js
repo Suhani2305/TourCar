@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { bookingAPI } from '../utils/api';
 import {
@@ -35,14 +35,7 @@ const Reports = () => {
 
     const COLORS = ['#2ecc71', '#f39c12', '#e74c3c', '#3498db', '#9b59b6'];
 
-    useEffect(() => {
-        fetchReports();
-        if (user?.role === 'superadmin') {
-            fetchUsers();
-        }
-    }, [dateRange, viewMode, selectedUser]);
-
-    const fetchUsers = async () => {
+    const fetchUsers = useCallback(async () => {
         try {
             const response = await bookingAPI.getAllUsers();
             if (response.data.success) {
@@ -51,9 +44,9 @@ const Reports = () => {
         } catch (error) {
             console.error('Error fetching users:', error);
         }
-    };
+    }, []);
 
-    const fetchReports = async () => {
+    const fetchReports = useCallback(async () => {
         try {
             setLoading(true);
             const params = {
@@ -82,7 +75,14 @@ const Reports = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [dateRange, viewMode, selectedUser, user?.role]);
+
+    useEffect(() => {
+        fetchReports();
+        if (user?.role === 'superadmin') {
+            fetchUsers();
+        }
+    }, [fetchReports, fetchUsers, user?.role]);
 
     const exportToPDF = () => {
         const doc = new jsPDF('l', 'mm', 'a4'); // Landscape for more columns
