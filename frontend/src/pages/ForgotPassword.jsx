@@ -14,6 +14,9 @@ const ForgotPassword = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [resetToken, setResetToken] = useState('');
 
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
     const handleSendOTP = async (e) => {
         e.preventDefault();
         try {
@@ -72,7 +75,7 @@ const ForgotPassword = () => {
 
     return (
         <div className="auth-page-wrapper">
-            <div className="auth-container premium-auth" style={{ minHeight: '500px' }}>
+            <div className="auth-container premium-auth">
                 <div className="auth-form-side" style={{ width: '100%' }}>
                     <div className="auth-card" style={{ maxWidth: '450px', margin: '0 auto' }}>
                         <div className="auth-header">
@@ -88,14 +91,16 @@ const ForgotPassword = () => {
                             <form onSubmit={handleSendOTP} className="auth-form">
                                 <div className="form-group premium-group">
                                     <label>Email Address</label>
-                                    <input
-                                        type="email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        placeholder="name@company.com"
-                                        required
-                                        disabled={loading}
-                                    />
+                                    <div className="input-with-icon">
+                                        <input
+                                            type="email"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            placeholder="name@company.com"
+                                            required
+                                            disabled={loading}
+                                        />
+                                    </div>
                                 </div>
                                 <button type="submit" className="btn-auth-submit" disabled={loading}>
                                     {loading ? 'SENDING...' : 'SEND OTP'}
@@ -110,16 +115,18 @@ const ForgotPassword = () => {
                             <form onSubmit={handleVerifyOTP} className="auth-form">
                                 <div className="form-group premium-group">
                                     <label>Enter 6-Digit OTP</label>
-                                    <input
-                                        type="text"
-                                        value={otp}
-                                        onChange={(e) => setOtp(e.target.value)}
-                                        placeholder="123456"
-                                        maxLength="6"
-                                        required
-                                        style={{ textAlign: 'center', fontSize: '1.5rem', letterSpacing: '8px' }}
-                                        disabled={loading}
-                                    />
+                                    <div className="input-with-icon">
+                                        <input
+                                            type="text"
+                                            value={otp}
+                                            onChange={(e) => setOtp(e.target.value)}
+                                            placeholder="123456"
+                                            maxLength="6"
+                                            required
+                                            style={{ textAlign: 'center', fontSize: '1.5rem', letterSpacing: '8px' }}
+                                            disabled={loading}
+                                        />
+                                    </div>
                                 </div>
                                 <button type="submit" className="btn-auth-submit" disabled={loading}>
                                     {loading ? 'VERIFYING...' : 'VERIFY OTP'}
@@ -136,25 +143,63 @@ const ForgotPassword = () => {
                             <form onSubmit={handleResetPassword} className="auth-form">
                                 <div className="form-group premium-group">
                                     <label>New Password</label>
-                                    <input
-                                        type="password"
-                                        value={newPassword}
-                                        onChange={(e) => setNewPassword(e.target.value)}
-                                        placeholder="••••••••"
-                                        required
-                                        disabled={loading}
-                                    />
+                                    <div className="input-with-icon">
+                                        <input
+                                            type={showPassword ? "text" : "password"}
+                                            value={newPassword}
+                                            onChange={(e) => setNewPassword(e.target.value)}
+                                            placeholder="••••••••"
+                                            required
+                                            disabled={loading}
+                                        />
+                                        <button
+                                            type="button"
+                                            className="password-toggle"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                        >
+                                            {showPassword ? (
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <path d="M17.94 17.94A10.07 10.07 0 0112 19c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"></path>
+                                                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                                                </svg>
+                                            ) : (
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                    <circle cx="12" cy="12" r="3"></circle>
+                                                </svg>
+                                            )}
+                                        </button>
+                                    </div>
                                 </div>
                                 <div className="form-group premium-group">
                                     <label>Confirm New Password</label>
-                                    <input
-                                        type="password"
-                                        value={confirmPassword}
-                                        onChange={(e) => setConfirmPassword(e.target.value)}
-                                        placeholder="••••••••"
-                                        required
-                                        disabled={loading}
-                                    />
+                                    <div className="input-with-icon">
+                                        <input
+                                            type={showConfirmPassword ? "text" : "password"}
+                                            value={confirmPassword}
+                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                            placeholder="••••••••"
+                                            required
+                                            disabled={loading}
+                                        />
+                                        <button
+                                            type="button"
+                                            className="password-toggle"
+                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        >
+                                            {showConfirmPassword ? (
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <path d="M17.94 17.94A10.07 10.07 0 0112 19c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"></path>
+                                                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                                                </svg>
+                                            ) : (
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                    <circle cx="12" cy="12" r="3"></circle>
+                                                </svg>
+                                            )}
+                                        </button>
+                                    </div>
                                 </div>
                                 <button type="submit" className="btn-auth-submit" disabled={loading}>
                                     {loading ? 'RESETTING...' : 'RESET PASSWORD'}

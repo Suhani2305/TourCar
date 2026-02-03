@@ -169,9 +169,6 @@ const OTPVerification = () => {
                 <div className="auth-form-side">
                     <div className="auth-card otp-card">
                         <div className="auth-header">
-                            <div className="auth-icon-wrapper">
-                                <span className="auth-icon">📧</span>
-                            </div>
                             <h1>Verify Your Email</h1>
                             <p>We've sent a 6-digit verification code to</p>
                             <p className="email-highlight">{email}</p>
