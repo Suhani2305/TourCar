@@ -18,15 +18,9 @@
         "xlsx": "^0.18.5"
     },
     "scripts": {
-        "start": "react-scripts start",
-        "build": "react-scripts build",
-        "test": "react-scripts test",
-        "eject": "react-scripts eject"
-    },
-    "eslintConfig": {
-        "extends": [
-            "react-app"
-        ]
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview"
     },
     "browserslist": {
         "production": [
@@ -41,6 +35,7 @@
         ]
     },
     "devDependencies": {
-        "react-scripts": "^5.0.1"
+        "vite": "^5.0.10",
+        "@vitejs/plugin-react": "^4.2.1"
     }
 }
