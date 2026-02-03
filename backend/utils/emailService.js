@@ -13,16 +13,16 @@ const getTransporter = () => {
   if (!transporter) {
     transporter = nodemailer.createTransport({
       host: 'smtp-relay.brevo.com', // Explicitly use Brevo
-      port: 587, // Standard secure SMTP port that works on Vercel
+      port: 2525, // Port 2525 is often more reliable on cloud hosting than 587
       secure: false, // true for 465, false for other ports
       auth: {
         user: process.env.EMAIL_USER, // Your Brevo login email
         pass: process.env.EMAIL_PASSWORD // Your Brevo SMTP Key (XS...)
       },
-      // Connection timeouts to prevent serverless function hangs
-      connectionTimeout: 10000,
-      greetingTimeout: 10000,
-      socketTimeout: 10000
+      // Increase timeouts significantly to handle network lag
+      connectionTimeout: 60000, // 60 seconds
+      greetingTimeout: 30000, // 30 seconds
+      socketTimeout: 60000 // 60 seconds
     });
 
     // Verify connection configuration
