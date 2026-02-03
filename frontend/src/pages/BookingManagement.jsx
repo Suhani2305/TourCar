@@ -50,8 +50,13 @@ const BookingManagement = () => {
             const params = {};
 
             // Super admin filtering logic
-            if (user?.role === 'superadmin' && viewMode === 'all' && selectedUserId) {
-                params.createdBy = selectedUserId;
+            if (user?.role === 'superadmin') {
+                const currentUserId = user._id || user.id;
+                if (viewMode === 'my') {
+                    params.createdBy = currentUserId;
+                } else if (viewMode === 'all' && selectedUserId) {
+                    params.createdBy = selectedUserId;
+                }
             }
 
             console.log('📡 API call params:', params);
@@ -69,7 +74,7 @@ const BookingManagement = () => {
         } finally {
             setLoading(false);
         }
-    }, [viewMode, selectedUserId, user?.role]);
+    }, [viewMode, selectedUserId, user?.role, user?._id]);
 
     const fetchVehicles = useCallback(async () => {
         try {
@@ -211,11 +216,17 @@ const BookingManagement = () => {
 
     const filteredBookings = bookings.filter(b => {
         const matchesFilter = filter === 'all' || b.status === filter;
+
+        if (!searchTerm) return matchesFilter;
+
+        const term = searchTerm.toLowerCase();
         const matchesSearch =
-            b.bookingNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            b.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            b.customerPhone.includes(searchTerm) ||
-            b.vehicle.vehicleNumber.toLowerCase().includes(searchTerm.toLowerCase());
+            (b.bookingNumber?.toLowerCase() || '').includes(term) ||
+            (b.customerName?.toLowerCase() || '').includes(term) ||
+            (b.customerPhone || '').includes(term) ||
+            (b.vehicle?.vehicleNumber?.toLowerCase() || '').includes(term) ||
+            (b.vehicle?.type?.toLowerCase() || '').includes(term) ||
+            (b.vehicle?.brand?.toLowerCase() || '').includes(term);
 
         return matchesFilter && matchesSearch;
     });
@@ -436,6 +447,21 @@ const BookingManagement = () => {
                                             </div>
                                         </div>
                                     </div>
+
+                                    {/* Show Creator Badge for Super Admin */}
+                                    {user?.role === 'superadmin' && booking.createdBy && (
+                                        <div className="booking-creator-badge" style={{ marginTop: '1rem', padding: '0.5rem', backgroundColor: '#f8fafc', borderRadius: '6px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', color: '#64748b' }}>
+                                            <span>👤 Booked by:</span>
+                                            <span style={{ fontWeight: '600', color: '#0f172a' }}>
+                                                {(booking.createdBy._id === (user._id || user.id) || booking.createdBy === (user._id || user.id)) ? (
+                                                    <span style={{ color: '#2563eb' }}>You</span>
+                                                ) : (
+                                                    booking.createdBy.name || 'Unknown'
+                                                )}
+                                            </span>
+                                            {booking.createdBy.role && <span style={{ fontSize: '0.75rem', padding: '2px 6px', backgroundColor: '#e2e8f0', borderRadius: '4px' }}>{booking.createdBy.role}</span>}
+                                        </div>
+                                    )}
 
                                     <div className="booking-section">
                                         <h4>Location Details</h4>

@@ -38,10 +38,12 @@ router.get('/', protect, async (req, res) => {
         // Role-based filtering: Users see only their bookings, Super Admin sees all
         if (req.user.role !== 'superadmin') {
             query.createdBy = req.user._id;
-        } else if (createdBy) {
-            // Super admin can filter by specific user
+        } else if (createdBy && createdBy !== 'all' && createdBy !== 'my') {
+            // Super admin can filter by specific user ID
             query.createdBy = createdBy;
         }
+
+        console.log('Final Query:', JSON.stringify(query));
 
         if (status) {
             query.status = status;
