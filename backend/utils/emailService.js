@@ -11,13 +11,23 @@ let transporter = null;
 // Vercel compatible configuration (Port 587)
 const getTransporter = () => {
   if (!transporter) {
+    // DEBUG: Log loaded credentials (masked) to help debug Auth Failed
+    const emailUser = process.env.EMAIL_USER ? process.env.EMAIL_USER.trim() : '';
+    const emailPass = process.env.EMAIL_PASSWORD ? process.env.EMAIL_PASSWORD.trim() : '';
+
+    console.log('--- EMAIL AUTH DEBUG ---');
+    console.log(`Email User: ${emailUser}`);
+    console.log(`Password Type: ${emailPass.startsWith('xsmtp') ? 'SMTP Key (Good)' : 'Unknown (Check Key)'}`);
+    console.log(`Password Length: ${emailPass.length}`);
+    console.log('------------------------');
+
     transporter = nodemailer.createTransport({
       host: 'smtp-relay.brevo.com', // Explicitly use Brevo
       port: 2525, // Port 2525 is often more reliable on cloud hosting than 587
       secure: false, // true for 465, false for other ports
       auth: {
-        user: process.env.EMAIL_USER, // Your Brevo login email
-        pass: process.env.EMAIL_PASSWORD // Your Brevo SMTP Key (XS...)
+        user: emailUser,
+        pass: emailPass
       },
       // Increase timeouts significantly to handle network lag
       connectionTimeout: 60000, // 60 seconds
