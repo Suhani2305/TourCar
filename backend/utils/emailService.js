@@ -4,23 +4,43 @@ const nodemailer = require('nodemailer');
 console.log('Nodemailer imported:', typeof nodemailer);
 console.log('createTransport exists:', typeof nodemailer.createTransport);
 
-// Create transporter
-const createTransporter = () => {
-  return nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: process.env.EMAIL_PORT,
-    secure: false,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASSWORD
-    }
-  });
+// Singleton transporter instance
+let transporter = null;
+
+// Create transporter using Brevo (Sendinblue)
+// Vercel compatible configuration (Port 587)
+const getTransporter = () => {
+  if (!transporter) {
+    transporter = nodemailer.createTransport({
+      host: 'smtp-relay.brevo.com', // Explicitly use Brevo
+      port: 587, // Standard secure SMTP port that works on Vercel
+      secure: false, // true for 465, false for other ports
+      auth: {
+        user: process.env.EMAIL_USER, // Your Brevo login email
+        pass: process.env.EMAIL_PASSWORD // Your Brevo SMTP Key (XS...)
+      },
+      // Connection timeouts to prevent serverless function hangs
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 10000
+    });
+
+    // Verify connection configuration
+    transporter.verify(function (error, success) {
+      if (error) {
+        console.error('Brevo SMTP connection error:', error);
+      } else {
+        console.log('Connected to Brevo SMTP server');
+      }
+    });
+  }
+  return transporter;
 };
 
 // Send booking confirmation email
 const sendBookingConfirmation = async (booking, customerEmail) => {
   try {
-    const transporter = createTransporter();
+    const transporter = getTransporter();
 
     const mailOptions = {
       from: process.env.EMAIL_FROM,
@@ -60,7 +80,7 @@ const sendBookingConfirmation = async (booking, customerEmail) => {
 // Send booking reminder
 const sendBookingReminder = async (booking, customerEmail) => {
   try {
-    const transporter = createTransporter();
+    const transporter = getTransporter();
 
     const mailOptions = {
       from: process.env.EMAIL_FROM,
@@ -97,7 +117,7 @@ const sendBookingReminder = async (booking, customerEmail) => {
 // Send user approval email
 const sendUserApprovalEmail = async (user) => {
   try {
-    const transporter = createTransporter();
+    const transporter = getTransporter();
 
     const mailOptions = {
       from: process.env.EMAIL_FROM,
@@ -133,7 +153,7 @@ const sendUserApprovalEmail = async (user) => {
 // Send welcome email on registration
 const sendWelcomeEmail = async (user) => {
   try {
-    const transporter = createTransporter();
+    const transporter = getTransporter();
 
     const mailOptions = {
       from: process.env.EMAIL_FROM,
@@ -168,7 +188,7 @@ const sendWelcomeEmail = async (user) => {
 // Send OTP email for registration
 const sendOTPEmail = async (email, otp, name) => {
   try {
-    const transporter = createTransporter();
+    const transporter = getTransporter();
 
     const mailOptions = {
       from: process.env.EMAIL_FROM,
@@ -228,7 +248,7 @@ const sendOTPEmail = async (email, otp, name) => {
 // Send OTP email for password reset
 const sendResetPasswordOTPEmail = async (email, otp, name) => {
   try {
-    const transporter = createTransporter();
+    const transporter = getTransporter();
 
     const mailOptions = {
       from: process.env.EMAIL_FROM,
