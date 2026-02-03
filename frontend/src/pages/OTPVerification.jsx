@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import axios from 'axios';
+import { authAPI } from '../utils/api';
 import '../styles/OTPVerification.css';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const OTPVerification = () => {
     const navigate = useNavigate();
@@ -103,7 +101,7 @@ const OTPVerification = () => {
 
         setLoading(true);
         try {
-            const response = await axios.post(`${API_URL}/auth/verify-otp`, {
+            const response = await authAPI.verifyOTP({
                 email,
                 otp: otpString
             });
@@ -129,7 +127,7 @@ const OTPVerification = () => {
 
         setLoading(true);
         try {
-            const response = await axios.post(`${API_URL}/auth/resend-otp`, { email });
+            const response = await authAPI.resendOTP({ email }); // Fixed passing specific property if API expects object, or 'email' directly if API expects string. authAPI.resendOTP takes object {email} in api.js line 33.
 
             if (response.data.success) {
                 toast.success('New OTP sent to your email!');
