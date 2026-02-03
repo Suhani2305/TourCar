@@ -13,19 +13,24 @@ const ForgotPassword = () => {
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [resetToken, setResetToken] = useState('');
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
 
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const handleSendOTP = async (e) => {
         e.preventDefault();
+        setError('');
+        setSuccess('');
         try {
             setLoading(true);
             await authAPI.forgotPassword(email);
-            toast.success('OTP sent to your email!');
+            setSuccess('OTP sent to your email!');
             setStep(2);
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to send OTP');
+            const message = error.response?.data?.message || 'Failed to send OTP';
+            setError(message);
         } finally {
             setLoading(false);
         }
@@ -33,16 +38,19 @@ const ForgotPassword = () => {
 
     const handleVerifyOTP = async (e) => {
         e.preventDefault();
+        setError('');
+        setSuccess('');
         try {
             setLoading(true);
             const response = await authAPI.verifyResetOTP({ email, otp });
             if (response.data.success) {
                 setResetToken(response.data.resetToken);
-                toast.success('OTP Verified!');
+                setSuccess('OTP Verified!');
                 setStep(3);
             }
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Invalid OTP');
+            const message = error.response?.data?.message || 'Invalid OTP';
+            setError(message);
         } finally {
             setLoading(false);
         }
@@ -50,12 +58,14 @@ const ForgotPassword = () => {
 
     const handleResetPassword = async (e) => {
         e.preventDefault();
+        setError('');
+        setSuccess('');
         if (newPassword !== confirmPassword) {
-            toast.error('Passwords do not match');
+            setError('Passwords do not match');
             return;
         }
         if (newPassword.length < 6) {
-            toast.error('Password must be at least 6 characters');
+            setError('Password must be at least 6 characters');
             return;
         }
 
@@ -63,11 +73,12 @@ const ForgotPassword = () => {
             setLoading(true);
             const response = await authAPI.resetPassword({ resetToken, newPassword });
             if (response.data.success) {
-                toast.success('Password reset successfully! Please login.');
+                setSuccess('Password reset successfully! Please login.');
                 navigate('/login');
             }
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to reset password');
+            const message = error.response?.data?.message || 'Failed to reset password';
+            setError(message);
         } finally {
             setLoading(false);
         }
@@ -86,6 +97,20 @@ const ForgotPassword = () => {
                                 {step === 3 && "Create a strong new password"}
                             </p>
                         </div>
+
+                        {error && (
+                            <div className="auth-message error">
+                                <span className="message-icon">⚠️</span>
+                                <span>{error}</span>
+                            </div>
+                        )}
+
+                        {success && (
+                            <div className="auth-message success">
+                                <span className="message-icon">✓</span>
+                                <span>{success}</span>
+                            </div>
+                        )}
 
                         {step === 1 && (
                             <form onSubmit={handleSendOTP} className="auth-form">

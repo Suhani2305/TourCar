@@ -13,6 +13,8 @@ const Login = () => {
     });
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
 
     const handleChange = (e) => {
         setFormData({
@@ -30,8 +32,11 @@ const Login = () => {
         setLoading(true);
 
         try {
+            setError('');
+            setSuccess('');
             const response = await login(formData.email, formData.password);
-            toast.success(response.message || 'Login successful!');
+            setSuccess(response.message || 'Login successful!');
+            // toast.success removed
 
             // Redirect based on role
             if (response.user.role === 'superadmin') {
@@ -41,7 +46,8 @@ const Login = () => {
             }
         } catch (error) {
             const message = error.response?.data?.message || 'Login failed. Please try again.';
-            toast.error(message);
+            setError(message);
+            // toast.error removed
         } finally {
             setLoading(false);
         }
@@ -70,6 +76,20 @@ const Login = () => {
                             <h1>Welcome Back</h1>
                             <p>Enter your credentials to access the dashboard</p>
                         </div>
+
+                        {error && (
+                            <div className="auth-message error">
+                                <span className="message-icon">⚠️</span>
+                                <span>{error}</span>
+                            </div>
+                        )}
+
+                        {success && (
+                            <div className="auth-message success">
+                                <span className="message-icon">✓</span>
+                                <span>{success}</span>
+                            </div>
+                        )}
 
                         <form onSubmit={handleSubmit} className="auth-form">
                             <div className="form-group premium-group">

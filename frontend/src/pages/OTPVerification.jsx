@@ -15,6 +15,8 @@ const OTPVerification = () => {
     const [timeLeft, setTimeLeft] = useState(600); // 10 minutes in seconds
     const [canResend, setCanResend] = useState(false);
     const [resendCooldown, setResendCooldown] = useState(60); // 1 minute cooldown
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
 
     useEffect(() => {
         if (!email) {
@@ -100,6 +102,8 @@ const OTPVerification = () => {
         }
 
         setLoading(true);
+        setError('');
+        setSuccess('');
         try {
             const response = await authAPI.verifyOTP({
                 email,
@@ -107,13 +111,14 @@ const OTPVerification = () => {
             });
 
             if (response.data.success) {
-                toast.success('Email verified successfully! Redirecting to login...');
+                setSuccess('Email verified successfully! Redirecting to login...');
                 setTimeout(() => {
                     navigate('/login');
                 }, 2000);
             }
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Invalid OTP');
+            const message = error.response?.data?.message || 'Invalid OTP';
+            setError(message);
             // Clear OTP on error
             setOtp(['', '', '', '', '', '']);
             document.getElementById('otp-0').focus();
@@ -126,11 +131,13 @@ const OTPVerification = () => {
         if (!canResend) return;
 
         setLoading(true);
+        setError('');
+        setSuccess('');
         try {
             const response = await authAPI.resendOTP({ email }); // Fixed passing specific property if API expects object, or 'email' directly if API expects string. authAPI.resendOTP takes object {email} in api.js line 33.
 
             if (response.data.success) {
-                toast.success('New OTP sent to your email!');
+                setSuccess('New OTP sent to your email!');
                 setTimeLeft(600); // Reset timer
                 setCanResend(false);
                 setResendCooldown(60);
@@ -138,7 +145,8 @@ const OTPVerification = () => {
                 document.getElementById('otp-0').focus();
             }
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to resend OTP');
+            const message = error.response?.data?.message || 'Failed to resend OTP';
+            setError(message);
         } finally {
             setLoading(false);
         }
@@ -173,6 +181,20 @@ const OTPVerification = () => {
                             <p>We've sent a 6-digit verification code to</p>
                             <p className="email-highlight">{email}</p>
                         </div>
+
+                        {error && (
+                            <div className="auth-message error">
+                                <span className="message-icon">⚠️</span>
+                                <span>{error}</span>
+                            </div>
+                        )}
+
+                        {success && (
+                            <div className="auth-message success">
+                                <span className="message-icon">✓</span>
+                                <span>{success}</span>
+                            </div>
+                        )}
 
                         <form onSubmit={handleSubmit} className="auth-form otp-form">
                             <div className="otp-inputs-grid" onPaste={handlePaste}>

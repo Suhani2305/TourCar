@@ -450,6 +450,54 @@
     transform: translateX(-5px);
 }
 
+/* Inline Messages */
+.auth-message {
+    padding: 1.25rem 1.5rem;
+    border-radius: 16px;
+    margin-bottom: 2.25rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    animation: authMessageFadeIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid transparent;
+    line-height: 1.5;
+}
+
+@keyframes authMessageFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-15px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.auth-message.error {
+    background: #fffcfb;
+    border: 1px solid #ffcfcc;
+    border-left: 5px solid #e74c3c;
+    color: #c0392b;
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.08);
+}
+
+.auth-message.success {
+    background: #f8fffb;
+    border: 1px solid #cfffdc;
+    border-left: 5px solid #2ecc71;
+    color: #1e8449;
+    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.08);
+}
+
+.message-icon {
+    font-size: 1.35rem;
+    flex-shrink: 0;
+}
+
 /* Loader */
 .loader-small {
     width: 20px;

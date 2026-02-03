@@ -18,6 +18,8 @@ const Register = () => {
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
 
     const handleChange = (e) => {
         setFormData({
@@ -31,24 +33,26 @@ const Register = () => {
 
         // Validation
         if (formData.password !== formData.confirmPassword) {
-            toast.error('Passwords do not match!');
+            setError('Passwords do not match!');
             return;
         }
 
         if (formData.password.length < 6) {
-            toast.error('Password must be at least 6 characters!');
+            setError('Password must be at least 6 characters!');
             return;
         }
 
         setLoading(true);
 
         try {
+            setError('');
+            setSuccess('');
             const { confirmPassword, ...registerData } = formData;
 
             // Send OTP instead of direct registration
             await register(registerData, true); // true = send OTP mode
 
-            toast.success('OTP sent to your email! Please verify.');
+            setSuccess('OTP sent to your email! Please verify.');
 
             // Navigate to OTP verification page with email and name
             setTimeout(() => {
@@ -61,7 +65,7 @@ const Register = () => {
             }, 1000);
         } catch (error) {
             const message = error.response?.data?.message || 'Failed to send OTP. Please try again.';
-            toast.error(message);
+            setError(message);
         } finally {
             setLoading(false);
         }
@@ -90,6 +94,20 @@ const Register = () => {
                             <h1>Create Account</h1>
                             <p>Register to join our premium management network</p>
                         </div>
+
+                        {error && (
+                            <div className="auth-message error">
+                                <span className="message-icon">⚠️</span>
+                                <span>{error}</span>
+                            </div>
+                        )}
+
+                        {success && (
+                            <div className="auth-message success">
+                                <span className="message-icon">✓</span>
+                                <span>{success}</span>
+                            </div>
+                        )}
 
                         <form onSubmit={handleSubmit} className="auth-form scrollable-form">
                             <div className="form-row">
