@@ -5,6 +5,104 @@ const Vehicle = require('../models/Vehicle');
 const { protect } = require('../middleware/auth');
 const { sendBookingConfirmation } = require('../utils/emailService');
 
+const { getTravelTime } = require('../utils/routeHelper');
+
+// Helper function to check date conflicts and travel time
+const checkVehicleAvailability = async (startDate, endDate, pickupTime, dropTime, pickupLocation, dropLocation, excludeBookingId = null) => {
+    const vehicles = await Vehicle.find({ status: { $ne: 'inactive' } });
+    const startDateTime = new Date(`${startDate}T${pickupTime || '00:00'}`);
+    const endDateTime = new Date(`${endDate}T${dropTime || '23:59'}`);
+
+    const availabilityStatus = await Promise.all(vehicles.map(async (vehicle) => {
+        // Find conflicting bookings (direct overlap)
+        const conflictQuery = {
+            vehicle: vehicle._id,
+            status: { $in: ['pending', 'confirmed'] },
+            $or: [
+                {
+                    startDate: { $lte: endDateTime },
+                    endDate: { $gte: startDateTime }
+                }
+            ]
+        };
+        if (excludeBookingId) conflictQuery._id = { $ne: excludeBookingId };
+
+        const directConflict = await Booking.findOne(conflictQuery);
+        if (directConflict) {
+            return {
+                vehicleId: vehicle._id,
+                available: false,
+                reason: 'booked',
+                bookingNumber: directConflict.bookingNumber
+            };
+        }
+
+        // Travel Time logic: Check previous and next bookings
+        // 1. Check booking finishing before this one
+        const previousBooking = await Booking.findOne({
+            vehicle: vehicle._id,
+            status: { $in: ['confirmed', 'completed', 'pending'] },
+            endDate: { $lte: startDateTime }
+        }).sort({ endDate: -1 });
+
+        if (previousBooking) {
+            const prevEndDateTime = new Date(previousBooking.endDate);
+            if (previousBooking.dropTime) {
+                const [hours, minutes] = previousBooking.dropTime.split(':');
+                prevEndDateTime.setHours(parseInt(hours), parseInt(minutes));
+            }
+
+            const bufferHours = await getTravelTime(previousBooking.dropLocation, pickupLocation);
+            const diffHours = (startDateTime - prevEndDateTime) / (1000 * 60 * 60);
+
+            if (diffHours < bufferHours) {
+                return {
+                    vehicleId: vehicle._id,
+                    available: false,
+                    reason: 'travel_time_buffer',
+                    message: `Needs ${bufferHours}h to reach from ${previousBooking.dropLocation || 'last drop'}`,
+                    bookingNumber: previousBooking.bookingNumber
+                };
+            }
+        }
+
+        // 2. Check booking starting after this one
+        const nextBooking = await Booking.findOne({
+            vehicle: vehicle._id,
+            status: { $in: ['confirmed', 'pending'] },
+            startDate: { $gte: endDateTime }
+        }).sort({ startDate: 1 });
+
+        if (nextBooking) {
+            const nextStartDateTime = new Date(nextBooking.startDate);
+            if (nextBooking.pickupTime) {
+                const [hours, minutes] = nextBooking.pickupTime.split(':');
+                nextStartDateTime.setHours(parseInt(hours), parseInt(minutes));
+            }
+
+            const bufferHours = await getTravelTime(dropLocation, nextBooking.pickupLocation);
+            const diffHours = (nextStartDateTime - endDateTime) / (1000 * 60 * 60);
+
+            if (diffHours < bufferHours) {
+                return {
+                    vehicleId: vehicle._id,
+                    available: false,
+                    reason: 'travel_time_buffer',
+                    message: `Needs ${bufferHours}h to reach ${nextBooking.pickupLocation} for next trip`,
+                    bookingNumber: nextBooking.bookingNumber
+                };
+            }
+        }
+
+        return {
+            vehicleId: vehicle._id,
+            available: true
+        };
+    }));
+
+    return availabilityStatus;
+};
+
 // Helper function to check date conflicts
 const checkDateConflict = async (vehicleId, startDate, endDate, excludeBookingId = null) => {
     const query = {
@@ -246,6 +344,46 @@ router.get('/stats/dashboard', protect, async (req, res) => {
     }
 });
 
+// @route   GET /api/bookings/availability-check
+// @desc    Check all vehicles availability for a given slot
+// @access  Private
+router.get('/availability-check', protect, async (req, res) => {
+    try {
+        const { startDate, endDate, pickupTime, dropTime, pickupLocation, dropLocation, excludeBookingId } = req.query;
+
+        console.log('Availability check params:', { startDate, endDate, pickupTime, dropTime, pickupLocation, dropLocation });
+
+        if (!startDate || !endDate) {
+            return res.status(400).json({
+                success: false,
+                message: 'Start date and end date are required'
+            });
+        }
+
+        const availability = await checkVehicleAvailability(
+            startDate,
+            endDate,
+            pickupTime,
+            dropTime,
+            pickupLocation,
+            dropLocation,
+            excludeBookingId
+        );
+
+        res.status(200).json({
+            success: true,
+            availability
+        });
+    } catch (error) {
+        console.error('Availability check error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error checking availability',
+            error: error.message
+        });
+    }
+});
+
 // @route   GET /api/bookings/:id
 // @desc    Get single booking
 // @access  Private
@@ -305,13 +443,24 @@ router.post('/', protect, async (req, res) => {
             });
         }
 
-        // Check for date conflicts
-        const conflict = await checkDateConflict(vehicle, startDate, endDate);
-        if (conflict) {
+        // Check for date conflicts and travel time
+        const availability = await checkVehicleAvailability(
+            startDate,
+            endDate,
+            pickupTime,
+            dropTime,
+            pickupLocation,
+            dropLocation
+        );
+
+        const vStatus = availability.find(a => a.vehicleId.toString() === vehicle.toString());
+        if (!vStatus || !vStatus.available) {
+            const reason = vStatus?.reason === 'travel_time_buffer' ? 'requires travel time' : 'is already booked';
+            const message = vStatus?.message ? ` (${vStatus.message})` : '';
             return res.status(400).json({
                 success: false,
-                message: `Vehicle is already booked from ${new Date(conflict.startDate).toLocaleDateString()} to ${new Date(conflict.endDate).toLocaleDateString()}`,
-                conflictingBooking: conflict.bookingNumber
+                message: `Vehicle ${reason} for these dates${message}`,
+                conflictingBooking: vStatus?.bookingNumber
             });
         }
 
@@ -382,17 +531,33 @@ router.put('/:id', protect, async (req, res) => {
         }
 
         // If dates or vehicle are being updated, check for conflicts
-        if (req.body.startDate || req.body.endDate || req.body.vehicle) {
+        if (req.body.startDate || req.body.endDate || req.body.vehicle || req.body.pickupTime || req.body.dropTime || req.body.pickupLocation || req.body.dropLocation) {
             const vehicleId = req.body.vehicle || booking.vehicle;
             const startDate = req.body.startDate || booking.startDate;
             const endDate = req.body.endDate || booking.endDate;
+            const pickupTime = req.body.pickupTime || booking.pickupTime;
+            const dropTime = req.body.dropTime || booking.dropTime;
+            const pickupLocation = req.body.pickupLocation || booking.pickupLocation;
+            const dropLocation = req.body.dropLocation || booking.dropLocation;
 
-            const conflict = await checkDateConflict(vehicleId, startDate, endDate, req.params.id);
-            if (conflict) {
+            const availability = await checkVehicleAvailability(
+                startDate,
+                endDate,
+                pickupTime,
+                dropTime,
+                pickupLocation,
+                dropLocation,
+                req.params.id
+            );
+
+            const vStatus = availability.find(a => a.vehicleId.toString() === vehicleId.toString());
+            if (!vStatus || !vStatus.available) {
+                const reason = vStatus?.reason === 'travel_time_buffer' ? 'requires travel time' : 'is already booked';
+                const message = vStatus?.message ? ` (${vStatus.message})` : '';
                 return res.status(400).json({
                     success: false,
-                    message: `Vehicle is already booked from ${new Date(conflict.startDate).toLocaleDateString()} to ${new Date(conflict.endDate).toLocaleDateString()}`,
-                    conflictingBooking: conflict.bookingNumber
+                    message: `Vehicle ${reason} for these dates${message}`,
+                    conflictingBooking: vStatus?.bookingNumber
                 });
             }
         }

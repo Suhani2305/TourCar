@@ -42,6 +42,9 @@ const BookingManagement = () => {
         notes: ''
     });
 
+    const [vehicleAvailability, setVehicleAvailability] = useState([]);
+    const [checkingAvailability, setCheckingAvailability] = useState(false);
+
     const statusOptions = ['pending', 'confirmed', 'completed', 'cancelled'];
 
     const fetchBookings = useCallback(async () => {
@@ -101,6 +104,44 @@ const BookingManagement = () => {
             fetchUsersList();
         }
     }, [fetchBookings, fetchVehicles, fetchUsersList, user?.role]);
+
+    const handleAvailabilityCheck = useCallback(async () => {
+        if (!formData.startDate || !formData.endDate) return;
+
+        setCheckingAvailability(true);
+        try {
+            const params = {
+                startDate: formData.startDate,
+                endDate: formData.endDate,
+                pickupTime: formData.pickupTime,
+                dropTime: formData.dropTime,
+                pickupLocation: formData.pickupLocation,
+                dropLocation: formData.dropLocation,
+                excludeBookingId: editingBooking?._id
+            };
+            const response = await bookingAPI.checkAvailability(params);
+            setVehicleAvailability(response.data.availability);
+        } catch (error) {
+            console.error('Failed to check availability:', error);
+        } finally {
+            setCheckingAvailability(false);
+        }
+    }, [formData.startDate, formData.endDate, formData.pickupTime, formData.dropTime, formData.pickupLocation, formData.dropLocation, editingBooking?._id]);
+
+    useEffect(() => {
+        if (showModal) {
+            handleAvailabilityCheck();
+        }
+    }, [
+        formData.startDate,
+        formData.endDate,
+        formData.pickupTime,
+        formData.dropTime,
+        formData.pickupLocation,
+        formData.dropLocation,
+        showModal,
+        handleAvailabilityCheck
+    ]);
 
     const handleViewModeChange = (mode) => {
         setViewMode(mode);
@@ -383,7 +424,36 @@ const BookingManagement = () => {
                 {/* Bookings List */}
                 <div className="bookings-list">
                     {filteredBookings.length === 0 ? (
-                        <div className="no-data">No bookings found</div>
+                        <div className="empty-state-container">
+                            <div className="empty-state-content">
+                                <div className="empty-state-icon-wrapper">
+                                    <span className="empty-icon">📅</span>
+                                    <div className="icon-pulse"></div>
+                                </div>
+                                <h2 className="empty-title">No Bookings Found</h2>
+                                <p className="empty-text">
+                                    {searchTerm || filter !== 'all'
+                                        ? "We couldn't find any bookings matching your search or filters. Try adjusting them or clear filters to see more."
+                                        : "It looks like your booking ledger is empty. Time to get some business on the road!"}
+                                </p>
+                                <div className="empty-actions">
+                                    {searchTerm || filter !== 'all' ? (
+                                        <button
+                                            className="btn-empty-secondary"
+                                            onClick={() => { setSearchTerm(''); setFilter('all'); }}
+                                        >
+                                            Reset Filters
+                                        </button>
+                                    ) : null}
+                                    <button
+                                        className="btn-premium-add"
+                                        onClick={() => setShowModal(true)}
+                                    >
+                                        + CREATE NEW BOOKING
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     ) : (
                         filteredBookings.map((booking) => (
                             <div key={booking._id} className="booking-card">
@@ -578,21 +648,119 @@ const BookingManagement = () => {
 
                             <form onSubmit={handleSubmit} className="modal-form">
                                 <div className="form-section">
-                                    <h3>Vehicle Selection</h3>
+                                    <h3>Booking Schedule</h3>
+                                    <div className="form-row">
+                                        <div className="form-group">
+                                            <label>Start Date *</label>
+                                            <input
+                                                type="date"
+                                                value={formData.startDate}
+                                                onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                                                min={!editingBooking ? new Date().toISOString().split('T')[0] : ''}
+                                                required
+                                            />
+                                        </div>
+                                        <div className="form-group">
+                                            <label>Pickup Time</label>
+                                            <input
+                                                type="time"
+                                                value={formData.pickupTime}
+                                                onChange={(e) => setFormData({ ...formData, pickupTime: e.target.value })}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="form-row">
+                                        <div className="form-group">
+                                            <label>End Date *</label>
+                                            <input
+                                                type="date"
+                                                value={formData.endDate}
+                                                onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                                                min={formData.startDate || new Date().toISOString().split('T')[0]}
+                                                required
+                                            />
+                                        </div>
+                                        <div className="form-group">
+                                            <label>Drop Time</label>
+                                            <input
+                                                type="time"
+                                                value={formData.dropTime}
+                                                onChange={(e) => setFormData({ ...formData, dropTime: e.target.value })}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="form-section">
+                                    <h3>Route Details</h3>
+                                    <div className="form-row">
+                                        <div className="form-group">
+                                            <label>Pickup Location *</label>
+                                            <input
+                                                type="text"
+                                                value={formData.pickupLocation}
+                                                onChange={(e) => setFormData({ ...formData, pickupLocation: e.target.value })}
+                                                placeholder="e.g., Delhi Airport"
+                                                required
+                                            />
+                                        </div>
+                                        <div className="form-group">
+                                            <label>Drop Location</label>
+                                            <input
+                                                type="text"
+                                                value={formData.dropLocation}
+                                                onChange={(e) => setFormData({ ...formData, dropLocation: e.target.value })}
+                                                placeholder="e.g., Manali"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="form-section">
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <h3>Vehicle Selection</h3>
+                                        {checkingAvailability && <span style={{ fontSize: '0.8rem', color: '#6366f1' }}>Checking availability...</span>}
+                                    </div>
                                     <div className="form-group">
                                         <label>Vehicle *</label>
                                         <select
                                             value={formData.vehicle}
                                             onChange={(e) => setFormData({ ...formData, vehicle: e.target.value })}
                                             required
+                                            className={checkingAvailability ? 'loading' : ''}
                                         >
                                             <option value="">Select Vehicle</option>
-                                            {vehicles.map(vehicle => (
-                                                <option key={vehicle._id} value={vehicle._id}>
-                                                    {vehicle.vehicleNumber} - {vehicle.type} ({vehicle.status})
-                                                </option>
-                                            ))}
+                                            {vehicles.map(vehicle => {
+                                                const availability = vehicleAvailability.find(a => a.vehicleId === vehicle._id);
+                                                const isAvailable = availability ? availability.available : true;
+                                                const reason = availability?.reason;
+                                                const bookingNum = availability?.bookingNumber;
+                                                const message = availability?.message;
+
+                                                let label = `${vehicle.vehicleNumber} - ${vehicle.type}`;
+                                                if (!isAvailable) {
+                                                    if (reason === 'booked') {
+                                                        label += ` (BOOKED - ${bookingNum})`;
+                                                    } else if (reason === 'travel_time_buffer') {
+                                                        label += ` (TRANSIT - ${bookingNum} | ${message})`;
+                                                    }
+                                                }
+
+                                                return (
+                                                    <option
+                                                        key={vehicle._id}
+                                                        value={vehicle._id}
+                                                        disabled={!isAvailable}
+                                                        style={!isAvailable ? { color: '#dc2626', backgroundColor: '#fee2e2' } : {}}
+                                                    >
+                                                        {label}
+                                                    </option>
+                                                );
+                                            })}
                                         </select>
+                                        {!formData.startDate && (
+                                            <small style={{ color: '#64748b' }}>Please select dates first to see availability</small>
+                                        )}
                                     </div>
                                 </div>
 
@@ -632,75 +800,6 @@ const BookingManagement = () => {
                                 </div>
 
                                 <div className="form-section">
-                                    <h3>Booking Dates</h3>
-                                    <div className="form-row">
-                                        <div className="form-group">
-                                            <label>Start Date *</label>
-                                            <input
-                                                type="date"
-                                                value={formData.startDate}
-                                                onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                                                min={new Date().toISOString().split('T')[0]}
-                                                required
-                                            />
-                                        </div>
-                                        <div className="form-group">
-                                            <label>End Date *</label>
-                                            <input
-                                                type="date"
-                                                value={formData.endDate}
-                                                onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                                                min={formData.startDate || new Date().toISOString().split('T')[0]}
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="form-section">
-                                    <h3>Location Details</h3>
-                                    <div className="form-row">
-                                        <div className="form-group">
-                                            <label>Pickup Location *</label>
-                                            <input
-                                                type="text"
-                                                value={formData.pickupLocation}
-                                                onChange={(e) => setFormData({ ...formData, pickupLocation: e.target.value })}
-                                                placeholder="Enter pickup location"
-                                                required
-                                            />
-                                        </div>
-                                        <div className="form-group">
-                                            <label>Pickup Time</label>
-                                            <input
-                                                type="time"
-                                                value={formData.pickupTime}
-                                                onChange={(e) => setFormData({ ...formData, pickupTime: e.target.value })}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="form-row">
-                                        <div className="form-group">
-                                            <label>Drop Location</label>
-                                            <input
-                                                type="text"
-                                                value={formData.dropLocation}
-                                                onChange={(e) => setFormData({ ...formData, dropLocation: e.target.value })}
-                                                placeholder="Enter drop location"
-                                            />
-                                        </div>
-                                        <div className="form-group">
-                                            <label>Drop Time</label>
-                                            <input
-                                                type="time"
-                                                value={formData.dropTime}
-                                                onChange={(e) => setFormData({ ...formData, dropTime: e.target.value })}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="form-section">
                                     <h3>Payment Details</h3>
                                     <div className="form-row">
                                         <div className="form-group">
@@ -709,7 +808,7 @@ const BookingManagement = () => {
                                                 type="number"
                                                 value={formData.totalAmount}
                                                 onChange={(e) => setFormData({ ...formData, totalAmount: e.target.value })}
-                                                placeholder="Enter total amount"
+                                                placeholder="0.00"
                                                 min="0"
                                             />
                                         </div>
@@ -719,7 +818,7 @@ const BookingManagement = () => {
                                                 type="number"
                                                 value={formData.advanceAmount}
                                                 onChange={(e) => setFormData({ ...formData, advanceAmount: e.target.value })}
-                                                placeholder="Enter advance amount"
+                                                placeholder="0.00"
                                                 min="0"
                                             />
                                         </div>
@@ -728,22 +827,24 @@ const BookingManagement = () => {
 
                                 <div className="form-section">
                                     <h3>📝 Additional Information</h3>
-                                    <div className="form-group">
-                                        <label>Purpose</label>
-                                        <input
-                                            type="text"
-                                            value={formData.purpose}
-                                            onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
-                                            placeholder="e.g., Wedding, Corporate Event, Tour"
-                                        />
+                                    <div className="form-row">
+                                        <div className="form-group">
+                                            <label>Purpose</label>
+                                            <input
+                                                type="text"
+                                                value={formData.purpose}
+                                                onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
+                                                placeholder="e.g., Wedding, Tour"
+                                            />
+                                        </div>
                                     </div>
                                     <div className="form-group">
                                         <label>Notes</label>
                                         <textarea
                                             value={formData.notes}
                                             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                                            placeholder="Additional notes or special requirements..."
-                                            rows="3"
+                                            placeholder="Special requirements..."
+                                            rows="2"
                                         />
                                     </div>
                                 </div>

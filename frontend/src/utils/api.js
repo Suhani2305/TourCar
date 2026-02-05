@@ -72,7 +72,8 @@ export const bookingAPI = {
     getAllUsers: () => api.get('/auth/users'), // Get all users for filtering
     getRevenueReport: (params) => api.get('/reports/revenue', { params }), // Revenue report
     getBookingAnalytics: (params) => api.get('/reports/booking-analytics', { params }), // Booking analytics
-    getVehicleUtilization: (params) => api.get('/reports/vehicle-utilization', { params }) // Vehicle utilization
+    getVehicleUtilization: (params) => api.get('/reports/vehicle-utilization', { params }), // Vehicle utilization
+    checkAvailability: (params) => api.get('/bookings/availability-check', { params }) // Check vehicle availability
 };
 
 // Expense API calls
