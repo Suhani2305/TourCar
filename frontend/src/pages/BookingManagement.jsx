@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { bookingAPI, vehicleAPI, authAPI } from '../utils/api';
 import { toast } from 'react-toastify';
@@ -45,7 +45,7 @@ const BookingManagement = () => {
     const [vehicleAvailability, setVehicleAvailability] = useState([]);
     const [checkingAvailability, setCheckingAvailability] = useState(false);
 
-    const statusOptions = ['pending', 'confirmed', 'completed', 'cancelled'];
+    const statusOptions = ['confirmed', 'completed', 'cancelled'];
 
     const fetchBookings = useCallback(async () => {
         try {
@@ -255,31 +255,32 @@ const BookingManagement = () => {
         resetForm();
     };
 
-    const filteredBookings = bookings.filter(b => {
-        const matchesFilter = filter === 'all' || b.status === filter;
+    const filteredBookings = useMemo(() => {
+        return bookings.filter(b => {
+            const matchesFilter = filter === 'all' || b.status === filter;
 
-        if (!searchTerm) return matchesFilter;
+            if (!searchTerm) return matchesFilter;
 
-        const term = searchTerm.toLowerCase();
-        const matchesSearch =
-            (b.bookingNumber?.toLowerCase() || '').includes(term) ||
-            (b.customerName?.toLowerCase() || '').includes(term) ||
-            (b.customerPhone || '').includes(term) ||
-            (b.vehicle?.vehicleNumber?.toLowerCase() || '').includes(term) ||
-            (b.vehicle?.type?.toLowerCase() || '').includes(term) ||
-            (b.vehicle?.brand?.toLowerCase() || '').includes(term);
+            const term = searchTerm.toLowerCase();
+            const matchesSearch =
+                (b.bookingNumber?.toLowerCase() || '').includes(term) ||
+                (b.customerName?.toLowerCase() || '').includes(term) ||
+                (b.customerPhone || '').includes(term) ||
+                (b.vehicle?.vehicleNumber?.toLowerCase() || '').includes(term) ||
+                (b.vehicle?.type?.toLowerCase() || '').includes(term) ||
+                (b.vehicle?.brand?.toLowerCase() || '').includes(term);
 
-        return matchesFilter && matchesSearch;
-    });
+            return matchesFilter && matchesSearch;
+        });
+    }, [bookings, filter, searchTerm]);
 
     const getStatusBadge = (status) => {
         const badges = {
-            pending: { class: 'badge-warning', text: 'Pending' },
             confirmed: { class: 'badge-success', text: 'Confirmed' },
             completed: { class: 'badge-info', text: 'Completed' },
             cancelled: { class: 'badge-danger', text: 'Cancelled' }
         };
-        const badge = badges[status] || badges.pending;
+        const badge = badges[status] || badges.confirmed;
         return (
             <span className={`badge ${badge.class}`}>
                 {badge.text}
@@ -322,19 +323,12 @@ const BookingManagement = () => {
                 </div>
 
                 {/* Stats Grid - Dashboard Style */}
-                <div className="cards-grid-4" style={{ marginBottom: '2.5rem' }}>
+                <div className="cards-grid-3" style={{ marginBottom: '2.5rem' }}>
                     <div className="stat-card">
                         <div className="stat-icon-dot main"></div>
                         <div className="stat-content">
                             <h3>Total Bookings</h3>
                             <p className="stat-value">{bookings.length}</p>
-                        </div>
-                    </div>
-                    <div className="stat-card" style={{ borderLeftColor: '#D4AF37' }}>
-                        <div className="stat-icon-dot pending"></div>
-                        <div className="stat-content">
-                            <h3>Pending</h3>
-                            <p className="stat-value">{bookings.filter(b => b.status === 'pending').length}</p>
                         </div>
                     </div>
                     <div className="stat-card" style={{ borderLeftColor: '#2D5A27' }}>
@@ -374,7 +368,6 @@ const BookingManagement = () => {
                                 onChange={(e) => setFilter(e.target.value)}
                             >
                                 <option value="all">All Status</option>
-                                <option value="pending">Pending</option>
                                 <option value="confirmed">Confirmed</option>
                                 <option value="completed">Completed</option>
                                 <option value="cancelled">Cancelled</option>

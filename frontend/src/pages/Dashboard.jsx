@@ -111,7 +111,7 @@ const Dashboard = () => {
                         </div>
 
                         <div className="stat-card stat-upcoming">
-                            <div className="stat-icon-dot pending"></div>
+                            <div className="stat-icon-dot upcoming"></div>
                             <div className="stat-content">
                                 <h3>Upcoming (48h)</h3>
                                 <p className="stat-value">{stats.upcomingCount}</p>

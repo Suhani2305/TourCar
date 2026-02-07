@@ -17,7 +17,7 @@ const checkVehicleAvailability = async (startDate, endDate, pickupTime, dropTime
         // Find conflicting bookings (direct overlap)
         const conflictQuery = {
             vehicle: vehicle._id,
-            status: { $in: ['pending', 'confirmed'] },
+            status: 'confirmed',
             $or: [
                 {
                     startDate: { $lte: endDateTime },
@@ -41,7 +41,7 @@ const checkVehicleAvailability = async (startDate, endDate, pickupTime, dropTime
         // 1. Check booking finishing before this one
         const previousBooking = await Booking.findOne({
             vehicle: vehicle._id,
-            status: { $in: ['confirmed', 'completed', 'pending'] },
+            status: { $in: ['confirmed', 'completed'] },
             endDate: { $lte: startDateTime }
         }).sort({ endDate: -1 });
 
@@ -69,7 +69,7 @@ const checkVehicleAvailability = async (startDate, endDate, pickupTime, dropTime
         // 2. Check booking starting after this one
         const nextBooking = await Booking.findOne({
             vehicle: vehicle._id,
-            status: { $in: ['confirmed', 'pending'] },
+            status: 'confirmed',
             startDate: { $gte: endDateTime }
         }).sort({ startDate: 1 });
 
@@ -107,7 +107,7 @@ const checkVehicleAvailability = async (startDate, endDate, pickupTime, dropTime
 const checkDateConflict = async (vehicleId, startDate, endDate, excludeBookingId = null) => {
     const query = {
         vehicle: vehicleId,
-        status: { $in: ['pending', 'confirmed'] },
+        status: 'confirmed',
         $or: [
             {
                 startDate: { $lte: new Date(endDate) },
@@ -244,7 +244,6 @@ router.get('/stats/summary', protect, async (req, res) => {
             : {};
 
         const total = await Booking.countDocuments(baseQuery);
-        const pending = await Booking.countDocuments({ ...baseQuery, status: 'pending' });
         const confirmed = await Booking.countDocuments({ ...baseQuery, status: 'confirmed' });
         const completed = await Booking.countDocuments({ ...baseQuery, status: 'completed' });
         const cancelled = await Booking.countDocuments({ ...baseQuery, status: 'cancelled' });
@@ -264,7 +263,6 @@ router.get('/stats/summary', protect, async (req, res) => {
             success: true,
             stats: {
                 total,
-                pending,
                 confirmed,
                 completed,
                 cancelled,
@@ -317,7 +315,7 @@ router.get('/stats/dashboard', protect, async (req, res) => {
         const upcomingBookings = await Booking.find({
             ...baseQuery,
             startDate: { $gte: now, $lte: next48Hours },
-            status: { $in: ['pending', 'confirmed'] }
+            status: 'confirmed'
         })
             .populate('vehicle', 'registrationNumber model')
             .populate('createdBy', 'name')
@@ -483,15 +481,7 @@ router.post('/', protect, async (req, res) => {
             createdBy: req.user._id
         });
 
-        // Update vehicle status to booked if booking starts today or in past
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const bookingStart = new Date(startDate);
-        bookingStart.setHours(0, 0, 0, 0);
-
-        if (bookingStart <= today) {
-            await Vehicle.findByIdAndUpdate(vehicle, { status: 'booked' });
-        }
+        // No longer updating vehicle status to 'booked' as per requirement
 
         const populatedBooking = await Booking.findById(booking._id)
             .populate('vehicle')
@@ -631,19 +621,7 @@ router.put('/:id/status', protect, async (req, res) => {
             });
         }
 
-        // Update vehicle status based on booking status
-        if (status === 'cancelled' || status === 'completed') {
-            // Check if there are other active bookings for this vehicle
-            const activeBookings = await Booking.countDocuments({
-                vehicle: booking.vehicle._id,
-                status: { $in: ['pending', 'confirmed'] },
-                _id: { $ne: booking._id }
-            });
-
-            if (activeBookings === 0) {
-                await Vehicle.findByIdAndUpdate(booking.vehicle._id, { status: 'available' });
-            }
-        }
+        // No longer reverting to 'available' as per requirement
 
         res.status(200).json({
             success: true,

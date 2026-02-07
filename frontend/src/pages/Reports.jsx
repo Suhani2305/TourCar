@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { bookingAPI } from '../utils/api';
 import {
@@ -34,6 +34,18 @@ const Reports = () => {
     // Removed showExportDropdown state as buttons are now separate
 
     const COLORS = ['#2ecc71', '#f39c12', '#e74c3c', '#3498db', '#9b59b6'];
+
+    // OPTIMIZATIONS: Memoize data transformations for charts
+    const chartData = useMemo(() => ({
+        revenueTrend: revenueData?.dailyRevenue || [],
+        statusDistribution: Object.entries(bookingStats?.byStatus || {})
+            .map(([name, value]) => ({
+                name: name.charAt(0).toUpperCase() + name.slice(1),
+                value
+            }))
+            .filter(item => item.value > 0),
+        vehicleUtilizationData: vehicleUtilization?.topVehicles?.slice(0, 10) || []
+    }), [revenueData, bookingStats, vehicleUtilization]);
 
     const fetchUsers = useCallback(async () => {
         try {
@@ -315,7 +327,7 @@ const Reports = () => {
                     <div className="chart-card">
                         <h3>Revenue Trend</h3>
                         <ResponsiveContainer width="100%" height={300}>
-                            <LineChart data={revenueData?.dailyRevenue || []}>
+                            <LineChart data={chartData.revenueTrend}>
                                 <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis dataKey="date" />
                                 <YAxis />
@@ -337,12 +349,7 @@ const Reports = () => {
                         <ResponsiveContainer width="100%" height={300}>
                             <PieChart>
                                 <Pie
-                                    data={Object.entries(bookingStats?.byStatus || {})
-                                        .map(([name, value]) => ({
-                                            name: name.charAt(0).toUpperCase() + name.slice(1),
-                                            value
-                                        }))
-                                        .filter(item => item.value > 0)}
+                                    data={chartData.statusDistribution}
                                     cx="50%"
                                     cy="50%"
                                     labelLine={true}
@@ -351,11 +358,9 @@ const Reports = () => {
                                     fill="#8884d8"
                                     dataKey="value"
                                 >
-                                    {Object.entries(bookingStats?.byStatus || {})
-                                        .filter(([_, value]) => value > 0)
-                                        .map((_, index) => (
-                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                        ))}
+                                    {chartData.statusDistribution.map((_, index) => (
+                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                    ))}
                                 </Pie>
                                 <Tooltip />
                                 <Legend verticalAlign="bottom" height={36} />
@@ -367,7 +372,7 @@ const Reports = () => {
                     <div className="chart-card full-width">
                         <h3>Top Vehicles by Revenue</h3>
                         <ResponsiveContainer width="100%" height={300}>
-                            <BarChart data={vehicleUtilization?.topVehicles?.slice(0, 10) || []}>
+                            <BarChart data={chartData.vehicleUtilizationData}>
                                 <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis dataKey="vehicleNumber" />
                                 <YAxis />

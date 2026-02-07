@@ -107,11 +107,30 @@ const Expenses = () => {
             {loading ? (
                 <div className="loader">Loading expenses...</div>
             ) : (
-                <div className="expense-list-grid">
-                    {expenses.length === 0 ? (
-                        <div className="no-data">No expenses logged yet.</div>
-                    ) : (
-                        expenses.map(exp => (
+                expenses.length === 0 ? (
+                    <div className="empty-state-container">
+                        <div className="empty-state-content">
+                            <div className="empty-state-icon-wrapper">
+                                <span className="empty-icon">💸</span>
+                                <div className="icon-pulse"></div>
+                            </div>
+                            <h2 className="empty-title">No Expenses Yet</h2>
+                            <p className="empty-text">
+                                Your expense ledger is clear. Keep it this way or log your first maintenance or fuel cost to keep track of your fleet's profitability.
+                            </p>
+                            <div className="empty-actions">
+                                <button
+                                    className="btn-premium-add"
+                                    onClick={() => setShowModal(true)}
+                                >
+                                    + LOG FIRST EXPENSE
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="expense-list-grid">
+                        {expenses.map(exp => (
                             <div key={exp._id} className="expense-card">
                                 <div className="expense-tag">{exp.type.toUpperCase()}</div>
                                 <div className="expense-amount">₹{exp.amount}</div>
@@ -124,9 +143,9 @@ const Expenses = () => {
                                     setDeleteModal({ isOpen: true, expenseId: exp._id })
                                 }>🗑️</button>
                             </div>
-                        ))
-                    )}
-                </div>
+                        ))}
+                    </div>
+                )
             )}
 
             {/* Premium Delete Confirmation Modal */}

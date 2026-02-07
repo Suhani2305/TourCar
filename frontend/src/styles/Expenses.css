@@ -49,10 +49,21 @@
 }
 
 .expense-summary-mini {
-    background: #e8f5e9;
-    padding: 10px 15px;
-    border-radius: 8px;
-    color: #2e7d32;
-    font-weight: bold;
-    margin-bottom: 1.5rem;
+    background: #FFFBF4;
+    padding: 0.6rem 1.25rem;
+    border-radius: 12px;
+    color: #4A3728;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1.5px solid var(--border-light);
+    box-shadow: 0 4px 12px rgba(74, 55, 40, 0.08);
+}
+
+.expense-summary-mini strong {
+    font-size: 1.1rem;
+    color: #11120D;
+    font-weight: 800;
 }

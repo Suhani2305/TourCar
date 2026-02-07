@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { vehicleAPI, authAPI } from '../utils/api';
 import { toast } from 'react-toastify';
@@ -32,12 +32,12 @@ const VehicleManagement = () => {
         capacity: '',
         color: '',
         year: new Date().getFullYear(),
-        status: 'available',
+        status: 'active',
         notes: ''
     });
 
     const vehicleTypes = ['Sedan', 'SUV', 'Mini Bus', 'Bus', 'Luxury Car', 'Tempo Traveller', 'Other'];
-    const statusOptions = ['available', 'booked', 'maintenance', 'inactive'];
+    const statusOptions = ['active', 'inactive'];
 
     const fetchVehicles = useCallback(async () => {
         try {
@@ -135,7 +135,7 @@ const VehicleManagement = () => {
             capacity: '',
             color: '',
             year: new Date().getFullYear(),
-            status: 'available',
+            status: 'active',
             notes: ''
         });
     };
@@ -146,24 +146,25 @@ const VehicleManagement = () => {
         resetForm();
     };
 
-    const filteredVehicles = vehicles.filter(v => {
-        const matchesFilter = filter === 'all' || v.status === filter;
-        const matchesSearch =
-            v.vehicleNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (v.brand && v.brand.toLowerCase().includes(searchTerm.toLowerCase())) ||
-            (v.model && v.model.toLowerCase().includes(searchTerm.toLowerCase()));
+    const filteredVehicles = useMemo(() => {
+        const lowerSearch = searchTerm.toLowerCase();
+        return vehicles.filter(v => {
+            const matchesFilter = filter === 'all' || v.status === filter;
+            const matchesSearch =
+                v.vehicleNumber.toLowerCase().includes(lowerSearch) ||
+                (v.brand && v.brand.toLowerCase().includes(lowerSearch)) ||
+                (v.model && v.model.toLowerCase().includes(lowerSearch));
 
-        return matchesFilter && matchesSearch;
-    });
+            return matchesFilter && matchesSearch;
+        });
+    }, [vehicles, filter, searchTerm]);
 
     const getStatusBadge = (status) => {
         const badges = {
-            available: { class: 'badge-success', icon: '✅', text: 'Available' },
-            booked: { class: 'badge-warning', icon: '📅', text: 'Booked' },
-            maintenance: { class: 'badge-danger', icon: '🔧', text: 'Maintenance' },
+            active: { class: 'badge-success', icon: '✅', text: 'Active' },
             inactive: { class: 'badge-secondary', icon: '⏸️', text: 'Inactive' }
         };
-        const badge = badges[status] || badges.available;
+        const badge = badges[status] || badges.active;
         return (
             <span className={`badge ${badge.class}`}>
                 {badge.icon} {badge.text}
@@ -192,7 +193,7 @@ const VehicleManagement = () => {
                 </div>
 
                 {/* Stats Grid - Dashboard Style */}
-                <div className="cards-grid-4" style={{ marginBottom: '2.5rem' }}>
+                <div className="cards-grid-3" style={{ marginBottom: '2.5rem' }}>
                     <div className="stat-card">
                         <div className="stat-icon-dot main"></div>
                         <div className="stat-content">
@@ -203,22 +204,15 @@ const VehicleManagement = () => {
                     <div className="stat-card" style={{ borderLeftColor: '#2D5A27' }}>
                         <div className="stat-icon-dot approved"></div>
                         <div className="stat-content">
-                            <h3>Available</h3>
-                            <p className="stat-value">{vehicles.filter(v => v.status === 'available').length}</p>
+                            <h3>Active Fleet</h3>
+                            <p className="stat-value">{vehicles.filter(v => v.status === 'active').length}</p>
                         </div>
                     </div>
-                    <div className="stat-card" style={{ borderLeftColor: '#D4AF37' }}>
-                        <div className="stat-icon-dot in-use"></div>
+                    <div className="stat-card" style={{ borderLeftColor: '#64748b' }}>
+                        <div className="stat-icon-dot inactive"></div>
                         <div className="stat-content">
-                            <h3>In Use</h3>
-                            <p className="stat-value">{vehicles.filter(v => v.status === 'booked').length}</p>
-                        </div>
-                    </div>
-                    <div className="stat-card" style={{ borderLeftColor: '#8B0000' }}>
-                        <div className="stat-icon-dot service"></div>
-                        <div className="stat-content">
-                            <h3>Service</h3>
-                            <p className="stat-value">{vehicles.filter(v => v.status === 'maintenance').length}</p>
+                            <h3>Inactive</h3>
+                            <p className="stat-value">{vehicles.filter(v => v.status === 'inactive').length}</p>
                         </div>
                     </div>
                 </div>
@@ -244,9 +238,7 @@ const VehicleManagement = () => {
                                 onChange={(e) => setFilter(e.target.value)}
                             >
                                 <option value="all">All Status</option>
-                                <option value="available">Available</option>
-                                <option value="booked">Booked</option>
-                                <option value="maintenance">Maintenance</option>
+                                <option value="active">Active</option>
                                 <option value="inactive">Inactive</option>
                             </select>
                         </div>
@@ -291,12 +283,41 @@ const VehicleManagement = () => {
                     </div>
                 </div>
 
-                {/* Vehicles Grid - Desktop & Tablet */}
-                <div className="vehicles-grid">
-                    {filteredVehicles.length === 0 ? (
-                        <div className="no-data">No vehicles found</div>
-                    ) : (
-                        filteredVehicles.map((vehicle) => (
+                {/* Vehicles List/Grid */}
+                {filteredVehicles.length === 0 ? (
+                    <div className="empty-state-container">
+                        <div className="empty-state-content">
+                            <div className="empty-state-icon-wrapper">
+                                <span className="empty-icon">🚗</span>
+                                <div className="icon-pulse"></div>
+                            </div>
+                            <h2 className="empty-title">No Vehicles Found</h2>
+                            <p className="empty-text">
+                                {searchTerm || filter !== 'all'
+                                    ? "We couldn't find any vehicles matching your search or filters. Try adjusting them to see more of your fleet."
+                                    : "Your vehicle fleet is looking a bit empty. Ready to add some premium cars to your collection?"}
+                            </p>
+                            <div className="empty-actions">
+                                {searchTerm || filter !== 'all' ? (
+                                    <button
+                                        className="btn-empty-secondary"
+                                        onClick={() => { setSearchTerm(''); setFilter('all'); }}
+                                    >
+                                        Reset Filters
+                                    </button>
+                                ) : null}
+                                <button
+                                    className="btn-premium-add"
+                                    onClick={() => { resetForm(); setShowModal(true); }}
+                                >
+                                    + ADD NEW VEHICLE
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="vehicles-grid">
+                        {filteredVehicles.map((vehicle) => (
                             <div key={vehicle._id} className="vehicle-card">
                                 <div className="vehicle-card-header">
                                     <h3>{vehicle.vehicleNumber}</h3>
@@ -357,9 +378,9 @@ const VehicleManagement = () => {
                                     </button>
                                 </div>
                             </div>
-                        ))
-                    )}
-                </div>
+                        ))}
+                    </div>
+                )}
 
                 {/* Premium Delete Confirmation Modal */}
                 <ConfirmationModal

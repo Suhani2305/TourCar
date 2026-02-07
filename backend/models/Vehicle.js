@@ -28,8 +28,8 @@ const vehicleSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['available', 'booked', 'maintenance', 'inactive'],
-        default: 'available'
+        enum: ['active', 'inactive'],
+        default: 'active'
     },
     color: {
         type: String,

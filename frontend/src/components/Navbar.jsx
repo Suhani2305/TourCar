@@ -25,7 +25,11 @@ const Navbar = () => {
                 </div>
 
                 {/* User Section - Right */}
-                <div className="navbar-user">
+                <div
+                    className="navbar-user"
+                    onMouseEnter={() => setDropdownOpen(true)}
+                    onMouseLeave={() => setDropdownOpen(false)}
+                >
                     <div className="user-profile" onClick={() => setDropdownOpen(!dropdownOpen)}>
                         <div className="user-avatar-mini">
                             {user?.name?.charAt(0).toUpperCase() || 'U'}

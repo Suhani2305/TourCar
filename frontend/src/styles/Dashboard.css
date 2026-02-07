@@ -104,11 +104,11 @@
     border-color: rgba(46, 204, 113, 0.2);
 }
 
-.stat-icon-dot.pending {
+.stat-icon-dot.upcoming {
     background: #f39c12;
 }
 
-.stat-icon-dot.pending::after {
+.stat-icon-dot.upcoming::after {
     border-color: rgba(243, 156, 18, 0.2);
 }
 

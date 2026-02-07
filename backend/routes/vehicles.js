@@ -214,18 +214,14 @@ router.delete('/:id', protect, async (req, res) => {
 router.get('/stats/summary', protect, async (req, res) => {
     try {
         const total = await Vehicle.countDocuments();
-        const available = await Vehicle.countDocuments({ status: 'available' });
-        const booked = await Vehicle.countDocuments({ status: 'booked' });
-        const maintenance = await Vehicle.countDocuments({ status: 'maintenance' });
+        const active = await Vehicle.countDocuments({ status: 'active' });
         const inactive = await Vehicle.countDocuments({ status: 'inactive' });
 
         res.status(200).json({
             success: true,
             stats: {
                 total,
-                available,
-                booked,
-                maintenance,
+                active,
                 inactive
             }
         });

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { bookingAPI } from '../utils/api';
 import Calendar from 'react-calendar';
@@ -65,13 +65,22 @@ const CalendarView = () => {
         }
     }, [date, viewMode, selectedUser, user?.role, fetchCalendarBookings, fetchUsers]);
 
-    const getBookingsForDate = (selectedDate) => {
-        const dateStr = format(selectedDate, 'yyyy-MM-dd');
-        return bookings.filter(booking => {
-            const bookingDate = booking.startDate.split('T')[0];
-            return bookingDate === dateStr;
+    // OPTIMIZATION: Create a memoized lookup map for bookings by date
+    // This avoids filtering the entire array for every single calendar tile (30+ times per render)
+    const bookingsByDate = useMemo(() => {
+        const map = {};
+        bookings.forEach(booking => {
+            const dateKey = booking.startDate.split('T')[0];
+            if (!map[dateKey]) map[dateKey] = [];
+            map[dateKey].push(booking);
         });
-    };
+        return map;
+    }, [bookings]);
+
+    const getBookingsForDate = useCallback((selectedDate) => {
+        const dateStr = format(selectedDate, 'yyyy-MM-dd');
+        return bookingsByDate[dateStr] || [];
+    }, [bookingsByDate]);
 
     const handleDateClick = (clickedDate) => {
         const dateBookings = getBookingsForDate(clickedDate);
@@ -98,11 +107,7 @@ const CalendarView = () => {
             const dayBookings = getBookingsForDate(date);
             if (dayBookings.length > 0) {
                 const hasConfirmed = dayBookings.some(b => b.status === 'confirmed');
-                const hasPending = dayBookings.some(b => b.status === 'pending');
-                const hasCancelled = dayBookings.some(b => b.status === 'cancelled');
-
                 if (hasConfirmed) return 'has-confirmed';
-                if (hasPending) return 'has-pending';
                 if (hasCancelled) return 'has-cancelled';
             }
         }
@@ -112,7 +117,6 @@ const CalendarView = () => {
     const getStatusColor = (status) => {
         const colors = {
             confirmed: '#27ae60',  // Darker green
-            pending: '#e67e22',    // Darker orange
             cancelled: '#c0392b',  // Darker red
             completed: '#2980b9'   // Darker blue
         };
@@ -134,30 +138,23 @@ const CalendarView = () => {
 
 
                 {/* Stats Summary - Dashboard Style */}
-                <div className="cards-grid-4" style={{ marginBottom: '2.5rem' }}>
+                <div className="cards-grid-3" style={{ marginBottom: '2.5rem' }}>
                     <div className="stat-card">
-                        <div className="stat-icon">📊</div>
+                        <div className="stat-icon-dot main"></div>
                         <div className="stat-content">
                             <h3>Month Bookings</h3>
                             <p className="stat-value">{bookings.length}</p>
                         </div>
                     </div>
                     <div className="stat-card" style={{ borderLeftColor: '#2ecc71' }}>
-                        <div className="stat-icon">✅</div>
+                        <div className="stat-icon-dot approved"></div>
                         <div className="stat-content">
                             <h3>Confirmed</h3>
                             <p className="stat-value">{bookings.filter(b => b.status === 'confirmed').length}</p>
                         </div>
                     </div>
-                    <div className="stat-card" style={{ borderLeftColor: '#f39c12' }}>
-                        <div className="stat-icon">⏳</div>
-                        <div className="stat-content">
-                            <h3>Pending</h3>
-                            <p className="stat-value">{bookings.filter(b => b.status === 'pending').length}</p>
-                        </div>
-                    </div>
                     <div className="stat-card" style={{ borderLeftColor: '#4A3728' }}>
-                        <div className="stat-icon">💰</div>
+                        <div className="stat-icon-dot revenue"></div>
                         <div className="stat-content">
                             <h3>Month Revenue</h3>
                             <p className="stat-value">{formatCurrencyShorthand(bookings.filter(b => b.status === 'completed').reduce((sum, b) => sum + (b.totalAmount || 0), 0))}</p>
@@ -168,7 +165,6 @@ const CalendarView = () => {
                 <div className="calendar-controls-row">
                     <div className="legend-pills">
                         <span className="legend-pill confirmed">Confirmed</span>
-                        <span className="legend-pill pending">Pending</span>
                         <span className="legend-pill cancelled">Cancelled</span>
                         <span className="legend-pill completed">Completed</span>
                     </div>
@@ -208,22 +204,20 @@ const CalendarView = () => {
                 </div>
 
                 {/* Calendar Wrapper */}
-                <div className="calendar-main-wrapper">
-                    {loading ? (
-                        <div className="loading-spinner">
+                <div className="calendar-main-wrapper" style={{ position: 'relative' }}>
+                    {loading && (
+                        <div className="calendar-loading-overlay">
                             <div className="spinner"></div>
-                            <p>Loading schedule...</p>
                         </div>
-                    ) : (
-                        <Calendar
-                            onChange={setDate}
-                            value={date}
-                            onClickDay={handleDateClick}
-                            tileContent={getTileContent}
-                            tileClassName={getTileClassName}
-                            locale="en-US"
-                        />
                     )}
+                    <Calendar
+                        onChange={setDate}
+                        value={date}
+                        onClickDay={handleDateClick}
+                        tileContent={getTileContent}
+                        tileClassName={getTileClassName}
+                        locale="en-US"
+                    />
                 </div>
 
                 {/* Booking Popup */}

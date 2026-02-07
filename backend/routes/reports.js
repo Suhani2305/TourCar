@@ -137,7 +137,6 @@ router.get('/booking-analytics', protect, async (req, res) => {
 
         // Booking status distribution
         const byStatus = {
-            pending: 0,
             confirmed: 0,
             cancelled: 0,
             completed: 0
